@@ -1,7 +1,7 @@
 -- vim: ft=mysql
 
 --
--- wikipedia abstract of a codepoint
+-- Wikipedia abstract of a codepoint
 --
 CREATE TABLE codepoint_abstract (
   cp       INTEGER REFERENCES codepoints,
@@ -13,7 +13,7 @@ CREATE INDEX codepoint_abstract_cp ON codepoint_abstract ( cp );
 CREATE INDEX codepoint_abstract_cp_lang ON codepoint_abstract ( cp, lang );
 
 --
--- wikipedia abstract of a Unicode block
+-- Wikipedia abstract of a Unicode block
 --
 CREATE TABLE block_abstract (
   block    VARCHAR(255) REFERENCES blocks,
@@ -31,8 +31,9 @@ CREATE TABLE script_abstract (
   sc       VARCHAR(4) REFERENCES scripts,
   abstract MEDIUMTEXT,
   lang     VARCHAR(6) DEFAULT 'en',
-  src      VARCHAR(255) -- explicitly give a source, since the Wikipedia name
-                        -- might not be obvious.
+  src      VARCHAR(255), -- explicitly give a source, since the Wikipedia name
+                         -- might not be obvious.
+  UNIQUE ( sc, lang )
 );
 CREATE INDEX script_abstract_sc ON script_abstract ( sc );
 CREATE INDEX script_abstract_sc_lang ON script_abstract ( sc, lang );
