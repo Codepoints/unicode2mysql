@@ -127,6 +127,7 @@ INSERT INTO  prop_relation VALUES ('bmg'), ('dm'), ('FC_NFKC'), ('suc'),
 ('slc'), ('stc'), ('uc'), ('lc'), ('tc'), ('scf'), ('cf'), ('NFKC_CF'),
 ('bpb');
 
+
 --
 -- Codepoints and their properties
 --
@@ -326,6 +327,10 @@ CREATE TABLE codepoints (
   kTGT_MergedSrc        VARCHAR(255), -- 9.0
   kSrc_NushuDuben       VARCHAR(255), -- 10.0
   kReading              VARCHAR(255), -- 10.0
+  Emoji                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
+  Emoji_Presentation    BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
+  Emoji_Modifier_Base   BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
+  Emoji_Component       BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   blk                   VARCHAR(255)
 );
 CREATE INDEX codepoints_name ON codepoints ( na );
@@ -388,40 +393,28 @@ CREATE INDEX codepoint_block_blk ON codepoint_block ( blk );
 -- defined Unicode planes
 --
 CREATE TABLE planes (
-  name   VARCHAR(255) PRIMARY KEY,
-  first  INTEGER(7),
-  last   INTEGER(7)
+  name   VARCHAR(255) PRIMARY KEY NOT NULL,
+  first  INTEGER(7) NOT NULL,
+  last   INTEGER(7) NOT NULL
 );
 CREATE INDEX planes_cps ON planes ( first, last );
-INSERT INTO planes (name, first, last) VALUES ('Basic Multilingual Plane', 0, 65535);
-INSERT INTO planes (name, first, last) VALUES ('Supplementary Multilingual Plane', 65536, 131071);
-INSERT INTO planes (name, first, last) VALUES ('Supplementary Ideographic Plane', 131072, 196607);
-INSERT INTO planes (name, first, last) VALUES ('Tertiary Ideographic Plane', 196608, 262143);
-INSERT INTO planes (name, first, last) VALUES ('Plane 5 (unassigned)', 262144, 327679);
-INSERT INTO planes (name, first, last) VALUES ('Plane 6 (unassigned)', 327680, 393215);
-INSERT INTO planes (name, first, last) VALUES ('Plane 7 (unassigned)', 393216, 458751);
-INSERT INTO planes (name, first, last) VALUES ('Plane 8 (unassigned)', 458752, 524287);
-INSERT INTO planes (name, first, last) VALUES ('Plane 9 (unassigned)', 524288, 589823);
-INSERT INTO planes (name, first, last) VALUES ('Plane 10 (unassigned)', 589824, 655359);
-INSERT INTO planes (name, first, last) VALUES ('Plane 11 (unassigned)', 655360, 720895);
-INSERT INTO planes (name, first, last) VALUES ('Plane 12 (unassigned)', 720896, 786431);
-INSERT INTO planes (name, first, last) VALUES ('Plane 13 (unassigned)', 786432, 851967);
-INSERT INTO planes (name, first, last) VALUES ('Plane 14 (unassigned)', 851968, 917503);
-INSERT INTO planes (name, first, last) VALUES ('Supplementary Special-purpose Plane', 917504, 983039);
-INSERT INTO planes (name, first, last) VALUES ('Supplementary Private Use Area - A', 983040, 1048575);
-INSERT INTO planes (name, first, last) VALUES ('Supplementary Private Use Area - B', 1048576, 1114111);
-
-
---
--- defined properties and their alternate names
---
-CREATE TABLE propval (
-  prop VARCHAR(12),
-  abbr VARCHAR(255),
-  name VARCHAR(255)
-);
-CREATE INDEX propval_prop ON propval ( prop );
-CREATE INDEX propval_prop_abbr ON propval ( prop, abbr );
+INSERT INTO planes (name, first, last) VALUES ('Basic Multilingual Plane',                  0,   0xFFFF);
+INSERT INTO planes (name, first, last) VALUES ('Supplementary Multilingual Plane',    0x10000,  0x1FFFF);
+INSERT INTO planes (name, first, last) VALUES ('Supplementary Ideographic Plane',     0x20000,  0x2FFFF);
+INSERT INTO planes (name, first, last) VALUES ('Tertiary Ideographic Plane',          0x30000,  0x3FFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 5 (unassigned)',                0x40000,  0x4FFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 6 (unassigned)',                0x50000,  0x5FFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 7 (unassigned)',                0x60000,  0x6FFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 8 (unassigned)',                0x70000,  0x7FFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 9 (unassigned)',                0x80000,  0x8FFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 10 (unassigned)',               0x90000,  0x9FFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 11 (unassigned)',               0xA0000,  0xAFFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 12 (unassigned)',               0xB0000,  0xBFFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 13 (unassigned)',               0xC0000,  0xCFFFF);
+INSERT INTO planes (name, first, last) VALUES ('Plane 14 (unassigned)',               0xD0000,  0xDFFFF);
+INSERT INTO planes (name, first, last) VALUES ('Supplementary Special-purpose Plane', 0xE0000,  0xEFFFF);
+INSERT INTO planes (name, first, last) VALUES ('Supplementary Private Use Area - A',  0xF0000,  0xFFFFF);
+INSERT INTO planes (name, first, last) VALUES ('Supplementary Private Use Area - B', 0x100000, 0x10FFFF);
 
 
 --
@@ -463,11 +456,10 @@ CREATE TABLE codepoint_image (
 -- other codepoints to be confusable with this
 --
 CREATE TABLE codepoint_confusables (
-  id       INTEGER,
-  cp       INTEGER REFERENCES codepoints,
-  other    INTEGER REFERENCES codepoints,
-  `type`   VARCHAR(12),
-  `order`  INTEGER
+  id       INTEGER PRIMARY KEY NOT NULL,
+  cp       INTEGER(7) REFERENCES codepoints NOT NULL,
+  other    INTEGER(7) REFERENCES codepoints NOT NULL,
+  `order`  INTEGER NOT NULL DEFAULT 1
 );
 CREATE INDEX codepoint_confusables_cp ON codepoint_confusables ( cp );
 CREATE INDEX codepoint_confusables_other ON codepoint_confusables ( other );
