@@ -16,15 +16,15 @@ endef
 
 
 all: \
-	cache/ucd.all.flat.xml \
 	cache/unicode/ReadMe.txt \
 	cache/noto/NotoSans-Regular.svg \
 	sql
 .PHONY: all
 
 sql: \
-	sql/30_confusables.sql \
+	sql/30_ucd.sql \
 	sql/31_htmlentities.sql \
+	sql/32_confusables.sql \
 	sql/40_digraphs.sql \
 	sql/50_wp_codepoints_de.sql \
 	sql/50_wp_codepoints_en.sql \
@@ -87,7 +87,15 @@ cache/noto/NotoSans-Regular.ttf:
 .SECONDARY: cache/noto/NotoSans-Regular.ttf
 
 
-sql/30_confusables.sql: cache/confusables.txt
+sql/30_ucd.sql: cache/ucd.all.flat.xml
+	@cat $< | bin/ucd_to_sql.py > $@
+
+sql/31_htmlentities.sql: cache/htmlentities.json
+	@cat $< | \
+	    $(JQ) -r '. as $$orig | keys[] | { n: ., o: $$orig[.].codepoints } | select( ( .o | length ) == 1 ) | "INSERT INTO codepoint_alias (cp, alias, `type`) VALUES (" + (.o[0] | tostring) + ", \"" + .n + "\", \"html\");"' \
+	    > $@
+
+sql/32_confusables.sql: cache/confusables.txt
 	@true > $@
 	@cat $< | \
 	    sed -e 1d -e '/^#/d' -e '/^\s*$$/d' | \
@@ -96,11 +104,6 @@ sql/30_confusables.sql: cache/confusables.txt
 	    while read line; do \
 	        bin/confusables_to_sql.py "$$line" >> $@ ; \
 	    done
-
-sql/31_htmlentities.sql: cache/htmlentities.json
-	@cat $< | \
-	    $(JQ) -r '. as $$orig | keys[] | { n: ., o: $$orig[.].codepoints } | select( ( .o | length ) == 1 ) | "INSERT INTO codepoint_alias (cp, alias, `type`) VALUES (" + (.o[0] | tostring) + ", \"" + .n + "\", \"html\");"' \
-	    > $@
 
 sql/40_digraphs.sql: cache/rfc1345.txt
 	@true > $@
@@ -123,8 +126,9 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 
 clean:
 	@-/bin/rm -fr \
-	    sql/30_confusables.sql \
+	    sql/30_ucd.sql \
 	    sql/31_htmlentities.sql \
+	    sql/32_confusables.sql \
 	    sql/40_digraphs.sql \
 	    sql/50_wikipedia.sql \
 	    sql/50_wp_codepoints_*.sql \
