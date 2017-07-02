@@ -1,0 +1,132 @@
+SHELL := /bin/bash
+
+CURL := curl
+CURL_OPTS := --silent --show-error --user-agent "Unicode2MySQL,github.com/Codepoints/unicode2mysql"
+
+JQ := jq
+
+EMOJI_VERSION := 5.0
+
+define TTF2SVG
+Open($$1);
+Reencode("unicode");
+Generate($$1:r + ".svg");
+Quit(0);
+endef
+
+
+all: \
+	cache/ucd.all.flat.xml \
+	cache/unicode/ReadMe.txt \
+	cache/noto/NotoSans-Regular.svg \
+	sql
+.PHONY: all
+
+sql: \
+	sql/30_confusables.sql \
+	sql/31_htmlentities.sql \
+	sql/40_digraphs.sql \
+	sql/50_wp_codepoints_de.sql \
+	sql/50_wp_codepoints_en.sql \
+	sql/50_wp_codepoints_pl.sql \
+	sql/50_wp_codepoints_es.sql
+.PHONY: sql
+
+
+cache/confusables.txt:
+	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/security/latest/confusables.txt > $@
+.SECONDARY: cache/confusables.txt
+
+cache/rfc1345.txt:
+	@$(CURL) $(CURL_OPTS) http://www.rfc-editor.org/rfc/rfc1345.txt > $@
+.SECONDARY: cache/rfc1345.txt
+
+cache/htmlentities.json:
+	@$(CURL) $(CURL_OPTS) https://html.spec.whatwg.org/entities.json > $@
+.SECONDARY: cache/htmlentities.json
+
+cache/emoji-data.txt:
+	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/emoji/$(EMOJI_VERSION)/emoji-data.txt > $@
+.SECONDARY: cache/emoji-data.txt
+
+cache/ucd.all.flat.xml:
+	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip | \
+	    bsdtar -xf- --cd cache
+.SECONDARY: cache/ucd.all.flat.xml
+
+cache/unicode/ReadMe.txt:
+	@mkdir -p cache/unicode
+	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/UCD/latest/ucd/UCD.zip | \
+	    bsdtar -xf- --cd cache/unicode
+.SECONDARY: cache/unicode/ReadMe.txt
+
+cache/%wiki-latest-all-titles-in-ns0.gz:
+	@$(CURL) $(CURL_OPTS) https://dumps.wikimedia.org/$*wiki/latest/$*wiki-latest-all-titles-in-ns0.gz > "$@"
+.SECONDARY: cache/*wiki-latest-all-titles-in-ns0.gz
+
+export CURL CURL_OPTS JQ
+cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
+	@mkdir -p cache/abstracts/$*
+	@zcat cache/$*wiki-latest-all-titles-in-ns0.gz | \
+	    LANG=C.UTF-8 grep '^.$$' | \
+	    SRCLANG="$*" xargs -d '\n' -i -n 1 -P 0 bin/char_to_abstract.sh '{}'
+
+export TTF2SVG
+cache/noto/NotoSans-Regular.svg: cache/noto/NotoSans-Regular.ttf
+	@for font in cache/noto/NotoSans*-Regular.ttf; do \
+	    echo "$$TTF2SVG" | /usr/bin/env fontforge -lang=ff -script /dev/stdin "$$font"; \
+	done
+	@for font in cache/noto/NotoSansCJK*-Regular.otf; do \
+	    echo "$$TTF2SVG" | /usr/bin/env fontforge -lang=ff -script /dev/stdin "$$font"; \
+	done
+
+cache/noto/NotoSans-Regular.ttf:
+	@mkdir -p cache/noto
+	@$(CURL) $(CURL_OPTS) https://noto-website.storage.googleapis.com/pkgs/Noto-unhinted.zip | \
+	    bsdtar -xf- --cd cache/noto
+.SECONDARY: cache/noto/NotoSans-Regular.ttf
+
+
+sql/30_confusables.sql: cache/confusables.txt
+	@true > $@
+	@cat $< | \
+	    sed -e 1d -e '/^#/d' -e '/^\s*$$/d' | \
+	    sed 's/\s*;\s*MA\s.\+//' | \
+	    sed 's/\s*;\s*/;/' | \
+	    while read line; do \
+	        bin/confusables_to_sql.py "$$line" >> $@ ; \
+	    done
+
+sql/31_htmlentities.sql: cache/htmlentities.json
+	@cat $< | \
+	    $(JQ) -r '. as $$orig | keys[] | { n: ., o: $$orig[.].codepoints } | select( ( .o | length ) == 1 ) | "INSERT INTO codepoint_alias (cp, alias, `type`) VALUES (" + (.o[0] | tostring) + ", \"" + .n + "\", \"html\");"' \
+	    > $@
+
+sql/40_digraphs.sql: cache/rfc1345.txt
+	@true > $@
+	@cat $< | \
+	    sed -n '/^ [^ ]\{1,6\} \+[0-9A-Fa-f]\{4\}    [^ ].*$$/p' | \
+	    sed 's/^ \([^ ]\{1,6\}\) \+\([0-9A-Fa-f]\{4\}\)    [^ ].*$$/\1\t\2/' | \
+	    sed 's/'"'"'/\\'"'"'/g' | \
+	    perl -p -e 's/^([^\t]+)\t([0-9a-f]{4})$$/"INSERT INTO codepoint_alias (cp, alias, `type`) VALUES (".hex("$$2").", '"'"'".$$1."'"'"', '"'"'digraph'"'"');"/e' > $@
+
+sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
+	@true > $@
+	@for file in cache/abstracts/$*/*; do \
+	    printf "INSERT INTO codepoint_abstract ( cp, abstract, lang ) VALUES ( %s, '%s', '%s' );\n" \
+	        $$(basename $$file | tr a-f A-F | sed 's/^/ibase=16;/' | bc) \
+	        "$$(cat $$file)" \
+	        "$*" \
+	    >> $@; \
+	done
+
+
+clean:
+	@-/bin/rm -fr \
+	    sql/30_confusables.sql \
+	    sql/31_htmlentities.sql \
+	    sql/40_digraphs.sql \
+	    sql/50_wikipedia.sql \
+	    sql/50_wp_codepoints_*.sql \
+	    cache/*
+.PHONY: clean
