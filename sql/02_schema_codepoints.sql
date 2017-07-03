@@ -239,9 +239,12 @@ CREATE INDEX codepoint_alias_alias ON codepoint_alias ( alias );
 -- graphical representation as string (base64 PNG or SVG)
 --
 CREATE TABLE codepoint_image (
-  cp    INTEGER REFERENCES codepoints,
-  image MEDIUMTEXT,
-  UNIQUE ( cp )
+  cp     INTEGER REFERENCES codepoints,
+  image  MEDIUMTEXT,
+  font   VARCHAR(255),
+  width  INTEGER,
+  height INTEGER,
+  UNIQUE ( cp, font )
 );
 
 

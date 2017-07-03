@@ -17,7 +17,6 @@ endef
 
 all: \
 	cache/unicode/ReadMe.txt \
-	cache/noto/NotoSans-Regular.svg \
 	sql
 .PHONY: all
 
@@ -25,11 +24,12 @@ sql: \
 	sql/30_ucd.sql \
 	sql/31_htmlentities.sql \
 	sql/32_confusables.sql \
+	sql/33_images.sql \
 	sql/40_digraphs.sql \
 	sql/50_wp_codepoints_de.sql \
 	sql/50_wp_codepoints_en.sql \
-	sql/50_wp_codepoints_pl.sql \
-	sql/50_wp_codepoints_es.sql
+	sql/50_wp_codepoints_es.sql \
+	sql/50_wp_codepoints_pl.sql
 .PHONY: sql
 
 
@@ -60,9 +60,16 @@ cache/unicode/ReadMe.txt:
 	    bsdtar -xf- --cd cache/unicode
 .SECONDARY: cache/unicode/ReadMe.txt
 
+cache/dewiki-latest-all-titles-in-ns0.gz \
+cache/enwiki-latest-all-titles-in-ns0.gz \
+cache/eswiki-latest-all-titles-in-ns0.gz \
+cache/plwiki-latest-all-titles-in-ns0.gz: \
 cache/%wiki-latest-all-titles-in-ns0.gz:
 	@$(CURL) $(CURL_OPTS) https://dumps.wikimedia.org/$*wiki/latest/$*wiki-latest-all-titles-in-ns0.gz > "$@"
-.SECONDARY: cache/*wiki-latest-all-titles-in-ns0.gz
+.SECONDARY: cache/dewiki-latest-all-titles-in-ns0.gz
+.SECONDARY: cache/enwiki-latest-all-titles-in-ns0.gz
+.SECONDARY: cache/eswiki-latest-all-titles-in-ns0.gz
+.SECONDARY: cache/plwiki-latest-all-titles-in-ns0.gz
 
 export CURL CURL_OPTS JQ
 cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
@@ -70,6 +77,10 @@ cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
 	@zcat cache/$*wiki-latest-all-titles-in-ns0.gz | \
 	    LANG=C.UTF-8 grep '^.$$' | \
 	    SRCLANG="$*" xargs -d '\n' -i -n 1 -P 0 bin/char_to_abstract.sh '{}'
+.SECONDARY: cache/abstracts/de/0041
+.SECONDARY: cache/abstracts/en/0041
+.SECONDARY: cache/abstracts/es/0041
+.SECONDARY: cache/abstracts/pl/0041
 
 export TTF2SVG
 cache/noto/NotoSans-Regular.svg: cache/noto/NotoSans-Regular.ttf
@@ -106,7 +117,12 @@ sql/32_confusables.sql: cache/confusables.txt
 	    done
 
 sql/33_images.sql: cache/noto/NotoSans-Regular.svg
-	#sed 's/<\/svg>/<text id="x" font-family="Noto Sans Rejang" font-size="64" x="32" y="48" text-anchor="middle">\&#xA940;<\/text>&/' cache/noto/NotoSansRejang-Regular.svg | inkscape --export-text-to-path --export-plain-svg=/dev/stdout /dev/stdin | inkscape --select=x --verb SelectionUnGroup --export-plain-svg=/dev/stdout /dev/stdin | rsvg-convert -w 64 -h 64 -f svg | svgo -i - -o - | sed s/64pt/64/g
+	@#sed 's/<\/svg>/<text id="x" font-family="Noto Sans Rejang" font-size="64" x="32" y="48" text-anchor="middle">\&#xA940;<\/text>&/' cache/noto/NotoSansRejang-Regular.svg | inkscape --export-text-to-path --export-plain-svg=/dev/stdout /dev/stdin | inkscape --select=x --verb SelectionUnGroup --export-plain-svg=/dev/stdout /dev/stdin | rsvg-convert -w 64 -h 64 -f svg | svgo -i - -o - | sed s/64pt/64/g
+	@ls -1 cache/noto/Noto*.svg | \
+	    grep -v NotoSansSymbols-Regular.svg | \
+	    nl | \
+	    xargs -n 2 -P 0 sh -c 'saxonb-xslt -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
+	@cat "$@".?* > $@ && /bin/rm "$@".?*
 
 sql/40_digraphs.sql: cache/rfc1345.txt
 	@true > $@
@@ -132,8 +148,8 @@ clean:
 	    sql/30_ucd.sql \
 	    sql/31_htmlentities.sql \
 	    sql/32_confusables.sql \
+	    sql/33_images.sql \
 	    sql/40_digraphs.sql \
-	    sql/50_wikipedia.sql \
 	    sql/50_wp_codepoints_*.sql \
 	    cache/*
 .PHONY: clean
