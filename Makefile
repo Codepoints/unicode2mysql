@@ -105,6 +105,9 @@ sql/32_confusables.sql: cache/confusables.txt
 	        bin/confusables_to_sql.py "$$line" >> $@ ; \
 	    done
 
+sql/33_images.sql: cache/noto/NotoSans-Regular.svg
+	#sed 's/<\/svg>/<text id="x" font-family="Noto Sans Rejang" font-size="64" x="32" y="48" text-anchor="middle">\&#xA940;<\/text>&/' cache/noto/NotoSansRejang-Regular.svg | inkscape --export-text-to-path --export-plain-svg=/dev/stdout /dev/stdin | inkscape --select=x --verb SelectionUnGroup --export-plain-svg=/dev/stdout /dev/stdin | rsvg-convert -w 64 -h 64 -f svg | svgo -i - -o - | sed s/64pt/64/g
+
 sql/40_digraphs.sql: cache/rfc1345.txt
 	@true > $@
 	@cat $< | \
