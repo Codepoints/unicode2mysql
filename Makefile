@@ -148,7 +148,8 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 
 
 db-up: db-down sql
-	@( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/*.sql ) | mysql
+	@( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | mysql
+	@ls sql/[^0]*.sql | xargs -P 0 -i sh -c 'mysql $(DUMMY_DB) < {}'
 .PHONY: db-up
 
 db-down:
