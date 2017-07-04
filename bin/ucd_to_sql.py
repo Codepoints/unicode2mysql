@@ -3,10 +3,10 @@
 import sys
 from xml.parsers import expat
 
-template = u"INSERT INTO codepoints (%(fields)s) VALUES (%(values)s);\n"
-cp_template = u"INSERT INTO codepoint_relation (cp, other, relation) VALUES (%s, %s, '%s');\n"
-cpp_template = u"INSERT INTO codepoint_relation (cp, other, relation, `order`) VALUES (%s, %s, '%s', %s);\n"
-sc_template = u"INSERT INTO codepoint_script (cp, sc, `primary`) VALUES (%s, '%s', %s);\n"
+template = "INSERT INTO codepoints (%(fields)s) VALUES (%(values)s);\n"
+cp_template = "INSERT INTO codepoint_relation (cp, other, relation) VALUES (%s, %s, '%s');\n"
+cpp_template = "INSERT INTO codepoint_relation (cp, other, relation, `order`) VALUES (%s, %s, '%s', %s);\n"
+sc_template = "INSERT INTO codepoint_script (cp, sc, `primary`) VALUES (%s, '%s', %s);\n"
 
 # boolean fields
 boolfields = (
@@ -42,23 +42,25 @@ relation_fields = cpfields + cppfields
 def handle_cp(hex_cp, attrs):
     cp = int(hex_cp, 16)
     ucp = str(hex_cp)
-    fields = [u'cp']
+    fields = ['cp']
     values = [str(cp)]
     add = ''
+    sc = ''
+    scx = ''
     for f, v in attrs.items():
         if f in ('cp', 'first-cp', 'last-cp'):
             continue
         if f == 'na':
             fields.append(f)
-            values.append(u"'%s'" % v.replace("'", "''").replace('#', ucp))
+            values.append("'%s'" % v.replace("'", "''").replace('#', ucp))
         elif f in boolfields:
             fields.append(f)
             if v == "Y":
-                values.append(u"1")
+                values.append("1")
             elif v == "N":
-                values.append(u"0")
+                values.append("0")
             else:
-                values.append(u"NULL")
+                values.append("NULL")
         elif f in intfields:
             fields.append(f)
             values.append(str(int(v)))
@@ -70,16 +72,20 @@ def handle_cp(hex_cp, attrs):
             elif len(v) == 1:
                 add += cp_template % (cp, int(v[0], 16), f)
         elif f == 'sc':
-            add += sc_template % (cp, v, 1)
+            if scx and v in scx:
+                add += "UPDATE codepoint_script SET `primary` = 1 WHERE cp = %s AND sc = '%s'" % (cp, v)
+            else:
+                add += sc_template % (cp, v, 1)
         elif f == 'scx':
             for script in v.split(' '):
-                add += sc_template % (cp, script, 0)
+                if not sc or script != sc:
+                    add += sc_template % (cp, script, 0)
         else:
             fields.append(f)
-            values.append(u"'%s'" % v.replace("'", "''"))
+            values.append("'%s'" % v.replace("'", "''"))
     print(template % {
-        'fields': u','.join(fields),
-        'values': u','.join(values),
+        'fields': ','.join(fields),
+        'values': ','.join(values),
     })
     if add:
         print(add)
