@@ -136,7 +136,7 @@ CREATE TABLE codepoints (
   kHKGlyph              VARCHAR(255),
   kHKSCS                VARCHAR(4),
   kIBMJapan             VARCHAR(4),
-  kIICore               VARCHAR(3),
+  kIICore               VARCHAR(8),
   kIRGDaeJaweon         VARCHAR(8),
   kIRGDaiKanwaZiten     VARCHAR(6),
   kIRGHanyuDaZidian     VARCHAR(9),
