@@ -5,7 +5,7 @@
 --
 CREATE TABLE codepoint_abstract (
   cp       INTEGER REFERENCES codepoints,
-  abstract MEDIUMTEXT,
+  abstract BLOB,
   lang     VARCHAR(6) DEFAULT 'en',
   UNIQUE ( cp, lang )
 ) CHARACTER SET utf8mb4;
@@ -17,7 +17,7 @@ CREATE INDEX codepoint_abstract_cp_lang ON codepoint_abstract ( cp, lang );
 --
 CREATE TABLE block_abstract (
   block    VARCHAR(255) REFERENCES blocks,
-  abstract MEDIUMTEXT,
+  abstract BLOB,
   lang     VARCHAR(6) DEFAULT 'en',
   UNIQUE ( block, lang )
 ) CHARACTER SET utf8mb4;
@@ -29,7 +29,7 @@ CREATE INDEX block_abstract_block_lang ON block_abstract ( block, lang );
 --
 CREATE TABLE script_abstract (
   sc       VARCHAR(4) REFERENCES scripts,
-  abstract MEDIUMTEXT,
+  abstract BLOB,
   lang     VARCHAR(6) DEFAULT 'en',
   src      VARCHAR(255), -- explicitly give a source, since the Wikipedia name
                          -- might not be obvious.

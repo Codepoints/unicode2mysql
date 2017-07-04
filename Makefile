@@ -141,7 +141,7 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 	@for file in cache/abstracts/$*/*; do \
 	    printf "INSERT INTO codepoint_abstract ( cp, abstract, lang ) VALUES ( %s, '%s', '%s' );\n" \
 	        $$(basename $$file | tr a-f A-F | sed 's/^/ibase=16;/' | bc) \
-	        "$$(cat $$file)" \
+	        "$$(sed "s/'/\\\\'/g" $$file)" \
 	        "$*" \
 	    >> $@; \
 	done
