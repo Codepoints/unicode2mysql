@@ -8,7 +8,7 @@
 --
 CREATE TABLE codepoints (
   cp                    INTEGER PRIMARY KEY NOT NULL,
-  age                   VARCHAR(4) REFERENCES prop_age NOT NULL,
+  age                   VARCHAR(4) NOT NULL REFERENCES prop_age,
   na                    VARCHAR(255),
   na1                   VARCHAR(255),
   gc                    VARCHAR(2) REFERENCES prop_gc,
@@ -33,7 +33,7 @@ CREATE TABLE codepoints (
   jt                    VARCHAR(1) REFERENCES prop_jt,
   jg                    VARCHAR(31) REFERENCES prop_jg,
   Join_C                BOOLEAN,
-  lb                    VARCHAR(2) REFERENCES prop_lb,
+  lb                    VARCHAR(3) REFERENCES prop_lb,
   ea                    VARCHAR(2) REFERENCES prop_ea,
   Upper                 BOOLEAN,
   Lower                 BOOLEAN,

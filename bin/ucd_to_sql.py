@@ -6,7 +6,7 @@ from xml.parsers import expat
 template = u"INSERT INTO codepoints (%(fields)s) VALUES (%(values)s);\n"
 cp_template = u"INSERT INTO codepoint_relation (cp, other, relation) VALUES (%s, %s, '%s');\n"
 cpp_template = u"INSERT INTO codepoint_relation (cp, other, relation, `order`) VALUES (%s, %s, '%s', %s);\n"
-sc_template = u"INSERT INTO codepoint_script (cp, sc) VALUES (%s, '%s');\n"
+sc_template = u"INSERT INTO codepoint_script (cp, sc, `primary`) VALUES (%s, '%s', %s);\n"
 
 # boolean fields
 boolfields = (
@@ -39,9 +39,9 @@ intfields = (
 relation_fields = cpfields + cppfields
 
 
-def handle_cp(_cp, attrs):
-    cp = int(_cp, 16)
-    ucp = str(_cp)
+def handle_cp(hex_cp, attrs):
+    cp = int(hex_cp, 16)
+    ucp = str(hex_cp)
     fields = [u'cp']
     values = [str(cp)]
     add = ''
@@ -70,7 +70,10 @@ def handle_cp(_cp, attrs):
             elif len(v) == 1:
                 add += cp_template % (cp, int(v[0], 16), f)
         elif f == 'sc':
-            add += sc_template % (cp, v)
+            add += sc_template % (cp, v, 1)
+        elif f == 'scx':
+            for script in v.split(' '):
+                add += sc_template % (cp, script, 0)
         else:
             fields.append(f)
             values.append(u"'%s'" % v.replace("'", "''"))

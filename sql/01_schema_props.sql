@@ -66,7 +66,7 @@ INSERT INTO  prop_jg VALUES ('African_Feh'), ('African_Noon'), ('African_Qaf'),
 ('Yeh'), ('Yeh_Barree'), ('Yeh_With_Tail'), ('Yudh'), ('Yudh_He'), ('Zain'),
 ('Zhain');
 
-CREATE TABLE prop_lb ( lb VARCHAR(2) PRIMARY KEY );
+CREATE TABLE prop_lb ( lb VARCHAR(3) PRIMARY KEY );
 INSERT INTO  prop_lb VALUES ('AI'), ('AL'), ('B2'), ('BA'), ('BB'), ('BK'),
 ('CB'), ('CJ'), ('CL'), ('CM'), ('CP'), ('CR'), ('EB'), ('EM'), ('EX'), ('GL'),
 ('H2'), ('H3'), ('HL'), ('HY'), ('ID'), ('IN'), ('IS'), ('JL'), ('JT'), ('JV'),

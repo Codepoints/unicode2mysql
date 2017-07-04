@@ -16,9 +16,9 @@ CREATE TABLE scripts (
 -- codepoint, false if it's referenced in the `scx` property.
 --
 CREATE TABLE codepoint_script (
-  cp      INTEGER REFERENCES codepoints,
-  sc      VARCHAR(4) REFERENCES scripts,
-  primary BOOLEAN DEFAULT true,
+  cp        INTEGER REFERENCES codepoints,
+  sc        VARCHAR(4) REFERENCES scripts,
+  `primary` BOOLEAN DEFAULT 1,
   UNIQUE ( cp, sc )
 );
 CREATE INDEX codepoint_script_cp ON codepoint_script ( cp );
