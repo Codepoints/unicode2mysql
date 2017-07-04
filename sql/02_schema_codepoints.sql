@@ -47,7 +47,7 @@ CREATE TABLE codepoints (
   CWKCF                 BOOLEAN, -- 5.2
   CWT                   BOOLEAN, -- 5.2
   CWU                   BOOLEAN, -- 5.2
-  isc                   VARCHAR(2047),
+  isc                   TEXT(2047),
   hst                   VARCHAR(3) REFERENCES prop_hst,
   JSN                   VARCHAR(3),
   InSC                  VARCHAR(26) REFERENCES prop_InSC,    -- 6.0
@@ -98,23 +98,23 @@ CREATE TABLE codepoints (
   VS                    BOOLEAN,
   NChar                 BOOLEAN,
   kAccountingNumeric    VARCHAR(255),
-  kAlternateHanYu       VARCHAR(2047),
-  kAlternateJEF         VARCHAR(2047),
-  kAlternateKangXi      VARCHAR(2047),
-  kAlternateMorohashi   VARCHAR(2047),
+  kAlternateHanYu       TEXT(2047),
+  kAlternateJEF         TEXT(2047),
+  kAlternateKangXi      TEXT(2047),
+  kAlternateMorohashi   TEXT(2047),
   kBigFive              VARCHAR(4),
   kCCCII                VARCHAR(6),
   kCNS1986              VARCHAR(6),
   kCNS1992              VARCHAR(6),
   kCangjie              VARCHAR(255),
   kCantonese            VARCHAR(255),
-  kCheungBauer          VARCHAR(2047),
+  kCheungBauer          TEXT(2047),
   kCheungBauerIndex     VARCHAR(255),
   kCihaiT               VARCHAR(255),
   kCompatibilityVariant VARCHAR(7),
   kCowles               VARCHAR(255),
   kDaeJaweon            VARCHAR(8),
-  kDefinition           VARCHAR(2047),
+  kDefinition           BLOB(2047),
   kEACC                 VARCHAR(6),
   kFenn                 VARCHAR(255),
   kFennIndex            VARCHAR(255),
@@ -128,7 +128,7 @@ CREATE TABLE codepoints (
   kGB8                  VARCHAR(4),
   kGradeLevel           VARCHAR(1),
   kGSR                  VARCHAR(255),
-  kHangul               VARCHAR(2047),
+  kHangul               TEXT(2047),
   kHanYu                VARCHAR(255),
   kHanyuPinlu           VARCHAR(255),
   kHanyuPinyin          VARCHAR(255),
@@ -142,15 +142,15 @@ CREATE TABLE codepoints (
   kIRGHanyuDaZidian     VARCHAR(9),
   kIRGKangXi            VARCHAR(8),
   kIRG_GSource          VARCHAR(24),
-  kIRG_HSource          VARCHAR(4),
+  kIRG_HSource          VARCHAR(8),
   kIRG_JSource          VARCHAR(10),
-  kIRG_KPSource         VARCHAR(7),
+  kIRG_KPSource         VARCHAR(8),
   kIRG_KSource          VARCHAR(8),
   kIRG_MSource          VARCHAR(8),
   kIRG_TSource          VARCHAR(255),
-  kIRG_USource          VARCHAR(8),
-  kIRG_VSource          VARCHAR(6),
-  kJHJ                  VARCHAR(2047),
+  kIRG_USource          VARCHAR(10),
+  kIRG_VSource          VARCHAR(7),
+  kJHJ                  TEXT(2047),
   kJIS0213              VARCHAR(7),
   kJa                   VARCHAR(6),    -- 8.0
   kJapaneseKun          VARCHAR(255),
@@ -180,7 +180,7 @@ CREATE TABLE codepoints (
   kRSKanWa              VARCHAR(6),
   kRSKangXi             VARCHAR(6),
   kRSKorean             VARCHAR(6),
-  kRSMerged             VARCHAR(2047),
+  kRSMerged             TEXT(2047),
   kRSUnicode            VARCHAR(255),
   kSBGY                 VARCHAR(255),
   kSemanticVariant      VARCHAR(255),
@@ -192,7 +192,7 @@ CREATE TABLE codepoints (
   kTraditionalVariant   VARCHAR(255),
   kVietnamese           VARCHAR(255),
   kXHC1983              VARCHAR(255),
-  kWubi                 VARCHAR(2047),
+  kWubi                 TEXT(2047),
   kXerox                VARCHAR(7),
   kZVariant             VARCHAR(255),
   kRSTUnicode           VARCHAR(255), -- 9.0
@@ -204,7 +204,7 @@ CREATE TABLE codepoints (
   Emoji_Modifier_Base   BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Component       BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   blk                   VARCHAR(255)
-);
+) CHARACTER SET utf8mb4;
 CREATE INDEX codepoints_name ON codepoints ( na );
 CREATE INDEX codepoints_blk ON codepoints ( blk );
 
@@ -230,7 +230,7 @@ CREATE TABLE codepoint_alias (
   cp     INTEGER REFERENCES codepoints,
   alias  VARCHAR(255),
   `type` VARCHAR(25)
-);
+) CHARACTER SET utf8mb4;
 CREATE INDEX codepoint_alias_cp ON codepoint_alias ( cp );
 CREATE INDEX codepoint_alias_alias ON codepoint_alias ( alias );
 
@@ -256,5 +256,5 @@ CREATE TABLE namedsequences (
   name    VARCHAR(255),
   `order` INTEGER(3),
   UNIQUE ( cp, name, `order` )
-);
+) CHARACTER SET utf8mb4;
 CREATE INDEX namedsequences_cp ON namedsequences ( cp );

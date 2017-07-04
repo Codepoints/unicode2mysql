@@ -76,10 +76,12 @@ def handle_cp(hex_cp, attrs):
                 add += "UPDATE codepoint_script SET `primary` = 1 WHERE cp = %s AND sc = '%s'" % (cp, v)
             else:
                 add += sc_template % (cp, v, 1)
+            sc = v
         elif f == 'scx':
             for script in v.split(' '):
                 if not sc or script != sc:
                     add += sc_template % (cp, script, 0)
+            scx = v
         else:
             fields.append(f)
             values.append("'%s'" % v.replace("'", "''"))
