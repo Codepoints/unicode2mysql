@@ -7,6 +7,8 @@ JQ := jq
 
 EMOJI_VERSION := 5.0
 
+DUMMY_DB := codepoints_dummy
+
 define TTF2SVG
 Open($$1);
 Reencode("unicode");
@@ -141,6 +143,15 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 	        "$*" \
 	    >> $@; \
 	done
+
+
+db-up: db-down sql
+	@( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/*.sql ) | mysql
+.PHONY: db-up
+
+db-down:
+	@echo 'DROP DATABASE IF EXISTS $(DUMMY_DB);' | mysql
+.PHONY: db-down
 
 
 clean:
