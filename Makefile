@@ -17,9 +17,7 @@ Quit(0);
 endef
 
 
-all: \
-	cache/unicode/ReadMe.txt \
-	sql
+all: sql
 .PHONY: all
 
 sql: \
@@ -27,6 +25,7 @@ sql: \
 	sql/31_htmlentities.sql \
 	sql/32_confusables.sql \
 	sql/33_images.sql \
+	sql/34_aliases.sql \
 	sql/40_digraphs.sql \
 	sql/50_wp_codepoints_de.sql \
 	sql/50_wp_codepoints_en.sql \
@@ -126,6 +125,9 @@ sql/33_images.sql: cache/noto/NotoSans-Regular.svg
 	    xargs -n 2 -P 0 sh -c 'saxonb-xslt -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
 	@cat "$@".?* > $@ && /bin/rm "$@".?*
 
+sql/34_aliases.sql: cache/unicode/ReadMe.txt
+	@bin/alias_to_sql.py > $@
+
 sql/40_digraphs.sql: cache/rfc1345.txt
 	@true > $@
 	@cat $< | \
@@ -160,6 +162,7 @@ clean:
 	    sql/31_htmlentities.sql \
 	    sql/32_confusables.sql \
 	    sql/33_images.sql \
+	    sql/34_aliases.sql \
 	    sql/40_digraphs.sql \
 	    sql/50_wp_codepoints_*.sql \
 	    cache/*
