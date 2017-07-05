@@ -5,6 +5,8 @@ CURL_OPTS := --silent --show-error --user-agent "Unicode2MySQL,github.com/Codepo
 
 JQ := jq
 
+SAXON := saxonb-xslt
+
 EMOJI_VERSION := 5.0
 
 DUMMY_DB := codepoints_dummy
@@ -26,6 +28,9 @@ sql: \
 	sql/32_confusables.sql \
 	sql/33_images.sql \
 	sql/34_aliases.sql \
+	sql/35_blocks.sql \
+	sql/36_encodings.sql \
+	sql/37_latex.sql \
 	sql/40_digraphs.sql \
 	sql/50_wp_codepoints_de.sql \
 	sql/50_wp_codepoints_en.sql \
@@ -102,6 +107,15 @@ cache/noto/NotoSans-Regular.ttf:
 	    bsdtar -xf- --cd cache/noto
 .SECONDARY: cache/noto/NotoSans-Regular.ttf
 
+cache/encoding/README.md:
+	@test -d cache/encoding || git clone git@github.com:whatwg/encoding.git cache/encoding
+	@cd cache/encoding && git pull
+.SECONDARY: cache/encoding
+
+cache/latex.xml:
+	$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > cache/latex.xml
+	$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > cache/charlist.dtd
+
 
 sql/30_ucd.sql: cache/ucd.all.flat.xml
 	@cat $< | bin/ucd_to_sql.py > $@
@@ -126,11 +140,27 @@ sql/33_images.sql: cache/noto/NotoSans-Regular.svg
 	@ls -1 cache/noto/Noto*.svg | \
 	    grep -v NotoSansSymbols-Regular.svg | \
 	    nl | \
-	    xargs -n 2 -P 0 sh -c 'saxonb-xslt -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
+	    xargs -n 2 -P 0 sh -c '$(SAXON) -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
 	@cat "$@".?* > $@ && /bin/rm "$@".?*
 
 sql/34_aliases.sql: cache/unicode/ReadMe.txt
 	@bin/alias_to_sql.py > $@
+
+sql/35_blocks.sql: cache/unicode/ReadMe.txt
+	@sed -n '/^[0-9A-F]/p' cache/unicode/Blocks.txt | \
+	    sed 's/\([0-9A-F]\+\)\.\.\([0-9A-F]\+\); \?\(.\+\)$$/\3\x00\1\x00\2/' | \
+	    tr '\n' '\0' | \
+	    xargs -0 -n 3 sh -c 'printf "INSERT INTO blocks (name, first, last) VALUES ('"'%s'"', %s, %s);\n" "$$0" "$$(echo $$1| tr a-f A-F | sed "s/^/ibase=16;/" | bc)" "$$(echo $$2| tr a-f A-F | sed "s/^/ibase=16;/" | bc)"' \
+	    > $@
+
+sql/36_encodings.sql: cache/encoding/README.md
+	@true > $@
+	@for enc in cache/encoding/index-*.txt; do \
+	    bin/encoding-aliases.py $$enc >> $@; \
+	done
+
+sql/37_latex.sql: cache/latex.xml
+	@$(SAXON) -s "$$<" -xsl bin/latex_to_sql.xsl > "$@"
 
 sql/40_digraphs.sql: cache/rfc1345.txt
 	@true > $@
@@ -172,6 +202,9 @@ clean:
 	    sql/32_confusables.sql \
 	    sql/33_images.sql \
 	    sql/34_aliases.sql \
+	    sql/35_blocks.sql \
+	    sql/36_encodings.sql \
+	    sql/37_latex.sql \
 	    sql/40_digraphs.sql \
 	    sql/50_wp_codepoints_*.sql \
 	    cache/*

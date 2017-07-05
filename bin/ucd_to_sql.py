@@ -73,7 +73,7 @@ def handle_cp(hex_cp, attrs):
                 add += cp_template % (cp, int(v[0], 16), f)
         elif f == 'sc':
             if scx and v in scx:
-                add += "UPDATE codepoint_script SET `primary` = 1 WHERE cp = %s AND sc = '%s'" % (cp, v)
+                add += "UPDATE codepoint_script SET `primary` = 1 WHERE cp = %s AND sc = '%s';\n" % (cp, v)
             else:
                 add += sc_template % (cp, v, 1)
             sc = v
