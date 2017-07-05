@@ -35,7 +35,8 @@ sql: \
 	sql/50_wp_codepoints_de.sql \
 	sql/50_wp_codepoints_en.sql \
 	sql/50_wp_codepoints_es.sql \
-	sql/50_wp_codepoints_pl.sql
+	sql/50_wp_codepoints_pl.sql \
+	sql/51_wp_scripts_en.sql
 .PHONY: sql
 
 
@@ -113,8 +114,8 @@ cache/encoding/README.md:
 .SECONDARY: cache/encoding
 
 cache/latex.xml:
-	$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > cache/latex.xml
-	$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > cache/charlist.dtd
+	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > cache/latex.xml
+	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > cache/charlist.dtd
 
 
 sql/30_ucd.sql: cache/ucd.all.flat.xml
@@ -156,11 +157,11 @@ sql/35_blocks.sql: cache/unicode/ReadMe.txt
 sql/36_encodings.sql: cache/encoding/README.md
 	@true > $@
 	@for enc in cache/encoding/index-*.txt; do \
-	    bin/encoding-aliases.py $$enc >> $@; \
+	    bin/encoding_to_sql.py $$enc >> $@; \
 	done
 
 sql/37_latex.sql: cache/latex.xml
-	@$(SAXON) -s "$$<" -xsl bin/latex_to_sql.xsl > "$@"
+	@$(SAXON) -s "$<" -xsl bin/latex_to_sql.xsl > "$@"
 
 sql/40_digraphs.sql: cache/rfc1345.txt
 	@true > $@
@@ -184,11 +185,30 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 	    >> $@; \
 	done
 
+sql/51_wp_scripts_en.sql:
+	@true > $@
+	@cat data/script_to_wikipedia.csv | \
+	    while IFS= read -r line; do \
+	        ( \
+	        echo -n "INSERT INTO script_abstract ( sc, abstract, lang, src )VALUES ('"; \
+	        echo -n "$${line%;*}"; \
+	        echo -n "', '"; \
+	        $(CURL) $(CURL_OPTS) 'https://en.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles='$${line##*;} | $(JQ) -r '.query.pages[].extract' | sed "s/'/\\'/g"; \
+	        echo  "', 'en', 'https://en.wikipedia.org/wiki/$${line##*;}');"; \
+	        ) >> $@ ; \
+	    done
 
-db-up: db-down sql
-	@( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | mysql
-	@ls sql/[^0]*.sql | xargs -P 0 -i sh -c 'mysql $(DUMMY_DB) < {}'
+
+db-up: db-down db-schema db-data
 .PHONY: db-up
+
+db-schema:
+	@( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | mysql
+.PHONY: db-schema
+
+db-data: sql
+	@ls sql/[^0]*.sql | xargs -P 0 -i sh -c 'mysql $(DUMMY_DB) < {}'
+.PHONY: db-data
 
 db-down:
 	@echo 'DROP DATABASE IF EXISTS $(DUMMY_DB);' | mysql
@@ -207,5 +227,6 @@ clean:
 	    sql/37_latex.sql \
 	    sql/40_digraphs.sql \
 	    sql/50_wp_codepoints_*.sql \
+	    sql/51_wp_scripts_en.sql \
 	    cache/*
 .PHONY: clean

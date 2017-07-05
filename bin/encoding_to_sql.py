@@ -34,11 +34,11 @@ def encode(encoding, pointer, codepoint):
         elif 0xFF61 <= codepoint <= 0xFF9F:
             return '8E {:02X}'.format(codepoint - 0xFF61 + 0xA1)
         else:
-            lead = pointer / 94 + 0xA1
+            lead = int(pointer / 94) + 0xA1
             trail = pointer % 94 + 0xA1
             return '{:02X} {:02X}'.format(lead, trail)
     elif encoding == 'euc-kr':
-        lead = pointer / 190 + 0x81
+        lead = int(pointer / 190) + 0x81
         trail = pointer % 190 + 0x41
         return '{:02X} {:02X}'.format(lead, trail)
     return False
@@ -53,9 +53,9 @@ with open(filename) as file_:
         if match:
             encoded_value = encode(encoding, int(match.group(1)), int(match.group(2), 16))
             if encoded_value:
-                print ('INSERT INTO codepoint_alias (cp, alias, `type`) '
+                print(('INSERT INTO codepoint_alias (cp, alias, `type`) '
                         'VALUES ({}, \'{}\', \'enc:{}\');').format(
                         int(match.group(2), 16),
                         encoded_value,
                         encoding
-                    )
+                    ))

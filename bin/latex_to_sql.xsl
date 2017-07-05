@@ -8,7 +8,7 @@
       <text>INSERT OR REPLACE INTO codepoint_alias (cp, alias, `type`) VALUES (</text>
       <value-of select="@dec"/>
       <text>, '</text>
-      <value-of select="replace(./latex, '&apos;', '\&apos;')"/>
+      <value-of select="replace(./latex, &quot;'&quot;, &quot;\\'&quot;)"/>
       <text>', 'latex');&#xA;</text>
     </if>
   </if>
