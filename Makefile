@@ -73,6 +73,10 @@ cache/%wiki-latest-all-titles-in-ns0.gz:
 .SECONDARY: cache/plwiki-latest-all-titles-in-ns0.gz
 
 export CURL CURL_OPTS JQ
+cache/abstracts/de/0041 \
+cache/abstracts/en/0041 \
+cache/abstracts/es/0041 \
+cache/abstracts/pl/0041: \
 cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
 	@mkdir -p cache/abstracts/$*
 	@zcat cache/$*wiki-latest-all-titles-in-ns0.gz | \
@@ -136,6 +140,10 @@ sql/40_digraphs.sql: cache/rfc1345.txt
 	    sed 's/'"'"'/\\'"'"'/g' | \
 	    perl -p -e 's/^([^\t]+)\t([0-9a-f]{4})$$/"INSERT INTO codepoint_alias (cp, alias, `type`) VALUES (".hex("$$2").", '"'"'".$$1."'"'"', '"'"'digraph'"'"');"/e' > $@
 
+sql/50_wp_codepoints_de.sql \
+sql/50_wp_codepoints_en.sql \
+sql/50_wp_codepoints_es.sql \
+sql/50_wp_codepoints_pl.sql: \
 sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 	@true > $@
 	@for file in cache/abstracts/$*/*; do \
