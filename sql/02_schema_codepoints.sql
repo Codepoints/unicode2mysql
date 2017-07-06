@@ -201,6 +201,7 @@ CREATE TABLE codepoints (
   kReading              VARCHAR(255), -- 10.0
   Emoji                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Presentation    BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
+  Emoji_Modifier        BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Modifier_Base   BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Component       BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   blk                   VARCHAR(255)
