@@ -218,16 +218,16 @@ sql/70_search_index.sql: sql-static db-up
 	@$(PYTHON) bin/create_search_index.py > $@
 
 
-db-up: db-down db-schema db-data
+db-up: db-down db-schema db-data-static
 .PHONY: db-up
 
 db-schema:
 	@( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | mysql
 .PHONY: db-schema
 
-db-data: sql
+db-data-static: sql-static
 	@ls sql/[^1-6]*.sql | xargs -P 0 -i sh -c 'mysql $(DUMMY_DB) < {}'
-.PHONY: db-data
+.PHONY: db-data-static
 
 db-down:
 	@echo 'DROP DATABASE IF EXISTS $(DUMMY_DB);' | mysql
