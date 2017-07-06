@@ -5,10 +5,10 @@
 <template match="character">
   <if test="not(contains(@dec, '-')) and ./latex">
     <if test="./latex != codepoints-to-string(@dec)">
-      <text>INSERT OR REPLACE INTO codepoint_alias (cp, alias, `type`) VALUES (</text>
+      <text>INSERT INTO codepoint_alias (cp, alias, `type`) VALUES (</text>
       <value-of select="@dec"/>
       <text>, '</text>
-      <value-of select="replace(./latex, &quot;'&quot;, &quot;\\'&quot;)"/>
+      <value-of select="replace(replace(./latex, &quot;\\&quot;, &quot;\\\\&quot;), &quot;'&quot;, &quot;\\'&quot;)"/>
       <text>', 'latex');&#xA;</text>
     </if>
   </if>

@@ -193,7 +193,7 @@ sql/51_wp_scripts_en.sql:
 	        echo -n "INSERT INTO script_abstract ( sc, abstract, lang, src )VALUES ('"; \
 	        echo -n "$${line%;*}"; \
 	        echo -n "', '"; \
-	        $(CURL) $(CURL_OPTS) 'https://en.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles='$${line##*;} | $(JQ) -r '.query.pages[].extract' | sed "s/'/\\'/g"; \
+	        $(CURL) $(CURL_OPTS) 'https://en.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles='$${line##*;} | $(JQ) -r '.query.pages[].extract' | sed "s/'/\\\\'/g"; \
 	        echo  "', 'en', 'https://en.wikipedia.org/wiki/$${line##*;}');"; \
 	        ) >> $@ ; \
 	    done
