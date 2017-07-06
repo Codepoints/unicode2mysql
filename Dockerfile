@@ -10,12 +10,15 @@ ENTRYPOINT ["/tini", "--"]
 
 # Install dependencies
 RUN apt update && apt upgrade -y && apt install -y \
+    apt-utils \
     bc \
     bsdtar \
     curl \
     fontforge \
     jq \
     libcurl3-gnutls \
+    libmariadb-client-lgpl-dev \
+    libmariadb-client-lgpl-dev-compat \
     libsaxonb-java \
     make \
     mariadb-client \
@@ -35,11 +38,12 @@ COPY requirements.txt /u2m/requirements.txt
 COPY sql/* /u2m/sql/
 
 RUN chmod +x /bin/*
+RUN ln -s /usr/bin/mariadb_config /usr/bin/mysql_config
 
 # make virtualenv
 RUN virtualenv --python=/usr/bin/python3 /u2m/virtualenv
 RUN /u2m/virtualenv/bin/pip install -r /u2m/requirements.txt
-RUN python -m nltk.downloader -d /usr/local/share/nltk_data all
+RUN /u2m/virtualenv/bin/python -m nltk.downloader wordnet stopwords
 
 WORKDIR /u2m
 CMD ["make", "-j", "-O"]
