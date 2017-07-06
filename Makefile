@@ -118,8 +118,9 @@ cache/noto/NotoSans-Regular.ttf:
 .SECONDARY: cache/noto/NotoSans-Regular.ttf
 
 cache/encoding/README.md:
-	@test -d cache/encoding || git clone https://github.com/whatwg/encoding.git cache/encoding
-	@cd cache/encoding && git pull
+	@$(CURL) $(CURL_OPTS) https://github.com/whatwg/encoding/archive/master.zip | \
+	    bsdtar -xf- --cd cache/
+	@mv cache/encoding-master cache/encoding
 .SECONDARY: cache/encoding
 
 cache/latex.xml:

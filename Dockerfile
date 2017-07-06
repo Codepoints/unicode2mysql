@@ -15,7 +15,6 @@ RUN apt update && apt upgrade -y && apt install -y \
     bsdtar \
     curl \
     fontforge \
-    git \
     jq \
     libcurl3-gnutls \
     libmariadb-client-lgpl-dev \
