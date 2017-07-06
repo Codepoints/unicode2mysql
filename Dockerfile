@@ -30,6 +30,7 @@ RUN apt update && apt upgrade -y && apt install -y \
     virtualenv
 
 # set up infrastructure
+RUN service mysql start
 RUN mkdir -p /u2m/cache
 
 COPY bin/* /u2m/bin/
