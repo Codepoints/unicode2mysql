@@ -36,7 +36,8 @@ sql: \
 	sql/50_wp_codepoints_en.sql \
 	sql/50_wp_codepoints_es.sql \
 	sql/50_wp_codepoints_pl.sql \
-	sql/51_wp_scripts_en.sql
+	sql/51_wp_scripts_en.sql \
+	sql/60_emojis.sql
 .PHONY: sql
 
 
@@ -198,6 +199,13 @@ sql/51_wp_scripts_en.sql:
 	        ) >> $@ ; \
 	    done
 
+sql/60_emojis.sql: cache/emoji-data.txt
+	@sed -n '/^[0-9A-F]/s/\s*#.*//p' $< | \
+	    sed 's/^\([A-F0-9]\+\) /\1..\1 /' | \
+	    sed 's/\s*;\s*/ /' | sed 's/\.\./ /' | \
+	    xargs -n 3 sh -c 'for x in $$(seq $$(echo ibase=16\;$$0|bc) $$(echo ibase=16\;$$1|bc)); do echo UPDATE codepoints SET $$2=1 WHERE cp=$$x\;; done' \
+	    > $@
+
 
 db-up: db-down db-schema db-data
 .PHONY: db-up
@@ -228,5 +236,6 @@ clean:
 	    sql/40_digraphs.sql \
 	    sql/50_wp_codepoints_*.sql \
 	    sql/51_wp_scripts_en.sql \
+	    sql/60_emojis.sql \
 	    cache/*
 .PHONY: clean
