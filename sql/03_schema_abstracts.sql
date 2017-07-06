@@ -16,7 +16,7 @@ CREATE INDEX codepoint_abstract_cp_lang ON codepoint_abstract ( cp, lang );
 -- Wikipedia abstract of a Unicode block
 --
 CREATE TABLE block_abstract (
-  block    VARCHAR(255) REFERENCES blocks,
+  block    VARCHAR(127) REFERENCES blocks,
   abstract BLOB,
   lang     VARCHAR(6) DEFAULT 'en',
   UNIQUE ( block, lang )

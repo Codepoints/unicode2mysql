@@ -204,7 +204,7 @@ CREATE TABLE codepoints (
   Emoji_Modifier        BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Modifier_Base   BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Component       BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
-  blk                   VARCHAR(255)
+  blk                   VARCHAR(127)
 ) CHARACTER SET utf8mb4;
 CREATE INDEX codepoints_name ON codepoints ( na );
 CREATE INDEX codepoints_blk ON codepoints ( blk );
@@ -229,7 +229,7 @@ CREATE INDEX codepoint_relation_other ON codepoint_relation ( other );
 --
 CREATE TABLE codepoint_alias (
   cp     INTEGER REFERENCES codepoints,
-  alias  VARCHAR(255),
+  alias  VARCHAR(127),
   `type` VARCHAR(25)
 ) CHARACTER SET utf8mb4;
 CREATE INDEX codepoint_alias_cp ON codepoint_alias ( cp );
@@ -242,7 +242,7 @@ CREATE INDEX codepoint_alias_alias ON codepoint_alias ( alias );
 CREATE TABLE codepoint_image (
   cp     INTEGER REFERENCES codepoints,
   image  MEDIUMTEXT,
-  font   VARCHAR(255),
+  font   VARCHAR(127),
   width  INTEGER,
   height INTEGER,
   UNIQUE ( cp, font )
@@ -254,7 +254,7 @@ CREATE TABLE codepoint_image (
 --
 CREATE TABLE namedsequences (
   cp      INTEGER(7) REFERENCES codepoints,
-  name    VARCHAR(255),
+  name    VARCHAR(127),
   `order` INTEGER(3),
   UNIQUE ( cp, name, `order` )
 ) CHARACTER SET utf8mb4;

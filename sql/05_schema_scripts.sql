@@ -4,7 +4,7 @@
 -- Scripts defined by their ISO name
 --
 CREATE TABLE scripts (
-  iso  VARCHAR(4) PRIMARY KEY,
+  iso  VARCHAR(4) PRIMARY KEY NOT NULL,
   name VARCHAR(255)
 );
 

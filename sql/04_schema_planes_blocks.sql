@@ -7,7 +7,7 @@
 -- `codepoints` table.
 --
 CREATE TABLE blocks (
-  name   VARCHAR(255) PRIMARY KEY,
+  name   VARCHAR(127) PRIMARY KEY,
   first  INTEGER(7),
   last   INTEGER(7)
 );
@@ -19,7 +19,7 @@ CREATE INDEX blocks_cps ON blocks ( first, last );
 --
 CREATE TABLE codepoint_block (
   cp   INTEGER REFERENCES codepoints,
-  blk  VARCHAR(255) REFERENCES blocks,
+  blk  VARCHAR(127) REFERENCES blocks,
   UNIQUE ( cp, blk )
 );
 CREATE INDEX codepoint_block_cp ON codepoint_block ( cp );
@@ -30,7 +30,7 @@ CREATE INDEX codepoint_block_blk ON codepoint_block ( blk );
 -- defined Unicode planes
 --
 CREATE TABLE planes (
-  name   VARCHAR(255) PRIMARY KEY NOT NULL,
+  name   VARCHAR(127) PRIMARY KEY NOT NULL,
   first  INTEGER(7) NOT NULL,
   last   INTEGER(7) NOT NULL
 );
