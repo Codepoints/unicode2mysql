@@ -24,6 +24,7 @@ RUN apt update && apt upgrade -y && apt install -y \
     make \
     mariadb-client \
     mariadb-server \
+    openjdk-9-jre \
     perl \
     python3 \
     python3-pip \
