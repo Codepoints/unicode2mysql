@@ -47,7 +47,7 @@ def encode(encoding, pointer, codepoint):
 filename = sys.argv[1]
 encoding = re.sub(r'^.*/index-(.+)\.txt', r'\1', filename)
 
-with open(filename) as file_:
+with open(filename, encoding='utf-8') as file_:
     for line in file_:
         match = re.match(r'^ *([0-9]+)\t0x([0-9A-F]{1,6}).*$', line)
         if match:

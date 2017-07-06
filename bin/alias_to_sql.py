@@ -28,13 +28,13 @@ def handle_buf(buffer, template):
             for alias in aliases:
                 print(template % (cp, alias.strip().replace("'", "\\'"), 'alias'))
 
-with open(dirname(__file__)+'/../cache/unicode/NameAliases.txt') as mapfile:
+with open(dirname(__file__)+'/../cache/unicode/NameAliases.txt', encoding='utf-8') as mapfile:
     for line in mapfile:
         if ";" in line and line[0] != "#":
             (cp, name, typ) = line.strip().split(";")
             print(template % (int(cp, 16), name.replace("'", "\\'"), typ))
 
-with open(dirname(__file__)+'/../cache/unicode/NamesList.txt') as mapfile:
+with open(dirname(__file__)+'/../cache/unicode/NamesList.txt', encoding='utf-8') as mapfile:
     buffer = ''
     for line in mapfile:
         if line[0] in string.hexdigits:

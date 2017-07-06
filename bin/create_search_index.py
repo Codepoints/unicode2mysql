@@ -79,7 +79,7 @@ def get_addinfo_tokens(cp):
     if not isfile(mdfile):
         return tokens
 
-    with open(mdfile) as f:
+    with open(mdfile, encoding='utf-8') as f:
         abstract = markdown(f.read())
         terms = BeautifulSoup(abstract).get_text()
         tokens = tokenize(terms)
