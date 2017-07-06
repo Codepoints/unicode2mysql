@@ -146,7 +146,7 @@ CREATE TABLE codepoints (
   kIRG_JSource          VARCHAR(10),
   kIRG_KPSource         VARCHAR(8),
   kIRG_KSource          VARCHAR(8),
-  kIRG_MSource          VARCHAR(8),
+  kIRG_MSource          VARCHAR(9),
   kIRG_TSource          VARCHAR(255),
   kIRG_USource          VARCHAR(10),
   kIRG_VSource          VARCHAR(7),
