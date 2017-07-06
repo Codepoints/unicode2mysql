@@ -118,7 +118,7 @@ cache/noto/NotoSans-Regular.ttf:
 .SECONDARY: cache/noto/NotoSans-Regular.ttf
 
 cache/encoding/README.md:
-	@test -d cache/encoding || git clone git@github.com:whatwg/encoding.git cache/encoding
+	@test -d cache/encoding || git clone https://github.com:whatwg/encoding.git cache/encoding
 	@cd cache/encoding && git pull
 .SECONDARY: cache/encoding
 
