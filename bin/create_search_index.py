@@ -74,7 +74,7 @@ def get_addinfo_tokens(cp):
     """fetch, if exists, the tokens from the additional Markdown file"""
     tokens = []
     mdfile = dirname(dirname(realpath(__file__))) + \
-             ('/codepoints.net/data/U+%04X.en.md' % cp)
+             ('/cache/codepoints.net/codepoints.net/data/U+%04X.en.md' % cp)
 
     if not isfile(mdfile):
         return tokens

@@ -127,6 +127,11 @@ cache/latex.xml:
 	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > cache/latex.xml
 	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > cache/charlist.dtd
 
+cache/codepoints.net:
+	@$(CURL) $(CURL_OPTS) https://github.com/Codepoints/Codepoints.net/archive/master.zip | \
+	    bsdtar -xf- --cd cache/
+	@mv cache/Codepoints.net-master cache/codepoints.net
+
 
 sql/30_ucd.sql: cache/ucd.all.flat.xml
 	@< $< $(PYTHON) bin/ucd_to_sql.py > $@
@@ -215,7 +220,7 @@ sql/60_emojis.sql: cache/emoji-data.txt
 	    xargs -n 3 sh -c 'for x in $$(seq $$(echo ibase=16\;$$0|bc) $$(echo ibase=16\;$$1|bc)); do echo UPDATE codepoints SET $$2=1 WHERE cp=$$x\;; done' \
 	    > $@
 
-sql/70_search_index.sql: sql-static db-up
+sql/70_search_index.sql: cache/codepoints.net sql-static db-up
 	@$(PYTHON) bin/create_search_index.py > $@
 
 
