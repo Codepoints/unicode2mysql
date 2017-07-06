@@ -22,7 +22,10 @@ endef
 all: sql
 .PHONY: all
 
-sql: \
+sql: sql-static sql-dynamic
+.PHONY: sql
+
+sql-static: \
 	sql/30_ucd.sql \
 	sql/31_htmlentities.sql \
 	sql/32_confusables.sql \
@@ -38,7 +41,10 @@ sql: \
 	sql/50_wp_codepoints_pl.sql \
 	sql/51_wp_scripts_en.sql \
 	sql/60_emojis.sql
-.PHONY: sql
+.PHONY: sql-static
+
+sql-dynamic: sql/70_search_index.sql
+.PHONY: sql-dynamic
 
 
 cache/confusables.txt:
@@ -206,6 +212,9 @@ sql/60_emojis.sql: cache/emoji-data.txt
 	    xargs -n 3 sh -c 'for x in $$(seq $$(echo ibase=16\;$$0|bc) $$(echo ibase=16\;$$1|bc)); do echo UPDATE codepoints SET $$2=1 WHERE cp=$$x\;; done' \
 	    > $@
 
+sql/70_search_index.sql: sql-static db-up
+	@bin/create_search_index.py > $@
+
 
 db-up: db-down db-schema db-data
 .PHONY: db-up
@@ -215,7 +224,7 @@ db-schema:
 .PHONY: db-schema
 
 db-data: sql
-	@ls sql/[^0]*.sql | xargs -P 0 -i sh -c 'mysql $(DUMMY_DB) < {}'
+	@ls sql/[^1-6]*.sql | xargs -P 0 -i sh -c 'mysql $(DUMMY_DB) < {}'
 .PHONY: db-data
 
 db-down:
@@ -237,5 +246,6 @@ clean:
 	    sql/50_wp_codepoints_*.sql \
 	    sql/51_wp_scripts_en.sql \
 	    sql/60_emojis.sql \
+	    sql/70_search_index.sql \
 	    cache/*
 .PHONY: clean

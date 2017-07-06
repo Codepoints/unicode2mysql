@@ -15,7 +15,8 @@ relate to oxen.
 """
 
 from bs4 import BeautifulSoup
-import ConfigParser
+import configparser
+from functools import reduce
 from markdown import markdown
 import MySQLdb
 import nltk
@@ -25,34 +26,34 @@ import sys
 
 
 # get database connection settings
-config = ConfigParser.RawConfigParser()
-config.read((dirname(dirname(__file__)) or '..')+'/db.conf')
+config = configparser.RawConfigParser()
+config.read(dirname(__file__)+'/../data/db.conf')
 
 
 # pre-create the NLP structures for later splitting text
 stopwords = nltk.corpus.stopwords.words('english')
-punctrm = re.compile(ur'[!-/:-@\[-`{-~\u2212\u201C\u201D]', re.UNICODE)
+punctrm = re.compile(r'[!-/:-@\[-`{-~\u2212\u201C\u201D]', re.UNICODE)
 wnl = nltk.WordNetLemmatizer()
 
 
 def sql_convert(s):
     """format a string to be printed in an SQL statement"""
-    if isinstance(s, basestring):
+    if isinstance(s, str):
         s = "'"+s.replace("\\", "\\\\").replace("'", "\\'")+"'"
-        if isinstance(s, str):
-            s = s.decode('utf-8')
-    elif isinstance(s, long):
-        s = int(s)
+    if isinstance(s, bytes):
+        s = "'"+s.decode('utf-8').replace("\\", "\\\\").replace("'", "\\'")+"'"
+    else:
+        s = str(s)
     return s
 
 
 def exec_sql(*sql):
     """execute or store an SQL query"""
-    sql0 = sql[0].decode('UTF-8')
+    sql0 = sql[0]
     if len(sql) > 1:
         params = tuple(map(sql_convert, sql[1]))
         sql0 = sql0 % params
-    print(sql0.encode('UTF-8'))
+    print(sql0)
 
 
 def tokenize(terms):
@@ -105,7 +106,7 @@ def get_decomp(cp):
     dms = cur.fetchall()
 
     if len(dms) and dms[0]['other'] != cp:
-        return reduce(lambda x, y: x + unichr(int(y['other'])), dms, u'').lower()
+        return reduce(lambda x, y: x + chr(int(y['other'])), dms, '').lower()
     return None
 
 
@@ -129,7 +130,7 @@ def get_scripts(cp):
     cur.execute("SELECT sc, `primary` FROM codepoint_script WHERE cp = %s", (cp,))
     r = []
     for row in cur.fetchall():
-        r.append(row[0], int(row[1]))
+        r.append((row['sc'], int(row['primary'])))
     return r
 
 
@@ -153,7 +154,7 @@ def handle_row(item):
     """take a codepoint row from db and create search index terms"""
     cp = item['cp']
 
-    term(cp, u'int:{}'.format(cp), 80)
+    term(cp, 'int:{}'.format(cp), 80)
 
     for j, weight in (('na', 100), ('na1', 90), ('kDefinition', 50)):
         if item[j]:
@@ -173,11 +174,7 @@ def handle_row(item):
             # all other properties get stored as foo:bar pairs, with foo
             # as property and bar as its value
             _i = item[prop]
-            if type(_i) is str:
-                _i = _i.decode('utf-8')
-            elif type(_i) is long:
-                _i = int(_i)
-            term(cp, u'%s:%s' % (prop, _i), 50)
+            term(cp, '%s:%s' % (prop, _i), 50)
 
     for w in get_aliases(cp):
         term(cp, w, 40)
@@ -205,9 +202,9 @@ def handle_row(item):
 
 conn = MySQLdb.connect(
         host='localhost',
-        user=config.get('clientreadonly', 'user'),
-        passwd=config.get('clientreadonly', 'password'),
-        db=config.get('clientreadonly', 'database'))
+        user=config['clientreadonly']['user'],
+        passwd=config['clientreadonly']['password'],
+        db=config['clientreadonly']['database'])
 conn.set_character_set('utf8')
 cur = conn.cursor(MySQLdb.cursors.DictCursor)
 cur.execute('SET NAMES utf8mb4;')
