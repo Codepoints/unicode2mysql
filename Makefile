@@ -184,7 +184,8 @@ sql/40_digraphs.sql: cache/rfc1345.txt
 	    sed -n '/^ [^ ]\{1,6\} \+[0-9A-Fa-f]\{4\}    [^ ].*$$/p' | \
 	    sed 's/^ \([^ ]\{1,6\}\) \+\([0-9A-Fa-f]\{4\}\)    [^ ].*$$/\1\t\2/' | \
 	    sed 's/'"'"'/\\'"'"'/g' | \
-	    perl -p -e 's/^([^\t]+)\t([0-9a-f]{4})$$/"INSERT INTO codepoint_alias (cp, alias, `type`) VALUES (".hex("$$2").", '"'"'".$$1."'"'"', '"'"'digraph'"'"');"/e' > $@
+	    tr '\t\n' '\0' | \
+	    xargs -0 -n 2 sh -c 'printf "INSERT INTO codepoint_alias (cp, alias, \`type\`) VALUES (%s, '"'"'%s'"'"', '"'"'digraph'"'"');\n" "$$(echo $$1| tr a-f A-F | sed s/^/ibase=16\;/ | bc)" "$$0"' > $@
 
 sql/50_wp_codepoints_de.sql \
 sql/50_wp_codepoints_en.sql \
