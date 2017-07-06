@@ -7,6 +7,8 @@ JQ := jq
 
 SAXON := saxonb-xslt
 
+PYTHON := virtualenv/bin/python
+
 EMOJI_VERSION := 5.0
 
 DUMMY_DB := codepoints_dummy
@@ -126,7 +128,7 @@ cache/latex.xml:
 
 
 sql/30_ucd.sql: cache/ucd.all.flat.xml
-	@cat $< | bin/ucd_to_sql.py > $@
+	@< $< $(PYTHON) bin/ucd_to_sql.py > $@
 
 sql/31_htmlentities.sql: cache/htmlentities.json
 	@cat $< | \
@@ -140,7 +142,7 @@ sql/32_confusables.sql: cache/confusables.txt
 	    sed 's/\s*;\s*MA\s.\+//' | \
 	    sed 's/\s*;\s*/;/' | \
 	    while read line; do \
-	        bin/confusables_to_sql.py "$$line" >> $@ ; \
+	        $(PYTHON) bin/confusables_to_sql.py "$$line" >> $@ ; \
 	    done
 
 sql/33_images.sql: cache/noto/NotoSans-Regular.svg
@@ -152,7 +154,7 @@ sql/33_images.sql: cache/noto/NotoSans-Regular.svg
 	@cat "$@".?* > $@ && /bin/rm "$@".?*
 
 sql/34_aliases.sql: cache/unicode/ReadMe.txt
-	@bin/alias_to_sql.py > $@
+	@$(PYTHON) bin/alias_to_sql.py > $@
 
 sql/35_blocks.sql: cache/unicode/ReadMe.txt
 	@sed -n '/^[0-9A-F]/p' cache/unicode/Blocks.txt | \
@@ -164,7 +166,7 @@ sql/35_blocks.sql: cache/unicode/ReadMe.txt
 sql/36_encodings.sql: cache/encoding/README.md
 	@true > $@
 	@for enc in cache/encoding/index-*.txt; do \
-	    bin/encoding_to_sql.py $$enc >> $@; \
+	    $(PYTHON) bin/encoding_to_sql.py $$enc >> $@; \
 	done
 
 sql/37_latex.sql: cache/latex.xml
@@ -213,7 +215,7 @@ sql/60_emojis.sql: cache/emoji-data.txt
 	    > $@
 
 sql/70_search_index.sql: sql-static db-up
-	@bin/create_search_index.py > $@
+	@$(PYTHON) bin/create_search_index.py > $@
 
 
 db-up: db-down db-schema db-data

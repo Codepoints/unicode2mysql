@@ -21,16 +21,25 @@ RUN apt update && apt upgrade -y && apt install -y \
     mariadb-client \
     mariadb-server \
     perl \
-    python3
+    python3 \
+    python3-pip \
+    virtualenv
 
 # set up infrastructure
 RUN mkdir -p /u2m/cache
-WORKDIR /u2m
 
 COPY bin/* /u2m/bin/
+COPY data/* /u2m/data/
 COPY Makefile /u2m/Makefile
+COPY requirements.txt /u2m/requirements.txt
 COPY sql/* /u2m/sql/
 
 RUN chmod +x /bin/*
 
+# make virtualenv
+RUN virtualenv --python=/usr/bin/python3 /u2m/virtualenv
+RUN /u2m/virtualenv/bin/pip install -r /u2m/requirements.txt
+RUN python -m nltk.downloader -d /usr/local/share/nltk_data all
+
+WORKDIR /u2m
 CMD ["make", "-j", "-O"]

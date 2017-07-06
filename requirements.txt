@@ -1,0 +1,4 @@
+beautifulsoup4==4.6.0
+Markdown==2.6.8
+MySQL-python==1.2.5
+nltk==3.2.4
