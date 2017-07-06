@@ -48,4 +48,4 @@ RUN /u2m/virtualenv/bin/pip install -r /u2m/requirements.txt
 RUN /u2m/virtualenv/bin/python -m nltk.downloader wordnet stopwords
 
 WORKDIR /u2m
-CMD ["make", "-j", "-O"]
+CMD service mysql start && make -j -O
