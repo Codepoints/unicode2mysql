@@ -33,6 +33,8 @@ RUN apt update && apt upgrade -y && apt install -y \
 RUN service mysql start
 RUN mkdir -p /u2m/cache
 
+ENV LANG C.UTF-8
+
 COPY bin/* /u2m/bin/
 COPY data/* /u2m/data/
 COPY Makefile /u2m/Makefile
