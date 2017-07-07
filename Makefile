@@ -78,12 +78,16 @@ cache/unicode/ReadMe.txt:
 	    bsdtar -xf- --cd cache/unicode
 .SECONDARY: cache/unicode/ReadMe.txt
 
+# TODO apparently Wikipedia only allows up to three connections here. If we
+# do a parallel run with -j, the unlucky last request here will fail. Boo!
+# Research, if we can tell make to process this rule serially.
 cache/dewiki-latest-all-titles-in-ns0.gz \
 cache/enwiki-latest-all-titles-in-ns0.gz \
 cache/eswiki-latest-all-titles-in-ns0.gz \
 cache/plwiki-latest-all-titles-in-ns0.gz: \
 cache/%wiki-latest-all-titles-in-ns0.gz:
 	@$(CURL) $(CURL_OPTS) https://dumps.wikimedia.org/$*wiki/latest/$*wiki-latest-all-titles-in-ns0.gz > "$@"
+	@if grep -q "503 Service Temporarily Unavailable" $@; then echo "Wikipedia sent an error when fetching $@" >&2; exit 1; fi
 .SECONDARY: cache/dewiki-latest-all-titles-in-ns0.gz
 .SECONDARY: cache/enwiki-latest-all-titles-in-ns0.gz
 .SECONDARY: cache/eswiki-latest-all-titles-in-ns0.gz
