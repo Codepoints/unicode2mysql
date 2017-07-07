@@ -1,5 +1,7 @@
 SHELL := /bin/bash
 
+# executables and their options
+
 CURL := curl
 CURL_OPTS := --silent --show-error --user-agent "Unicode2MySQL,github.com/Codepoints/unicode2mysql"
 
@@ -11,7 +13,13 @@ PYTHON := virtualenv/bin/python
 
 FONTFORGE := fontforge
 
+# control variables
+
 EMOJI_VERSION := 5.0
+
+LANGUAGES := de en es pl
+
+WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.your.org
 
 DUMMY_DB := codepoints_dummy
 
@@ -78,20 +86,15 @@ cache/unicode/ReadMe.txt:
 	    bsdtar -xf- --cd cache/unicode
 .SECONDARY: cache/unicode/ReadMe.txt
 
-# TODO apparently Wikipedia only allows up to three connections here. If we
-# do a parallel run with -j, the unlucky last request here will fail. Boo!
-# Research, if we can tell make to process this rule serially.
-cache/dewiki-latest-all-titles-in-ns0.gz \
-cache/enwiki-latest-all-titles-in-ns0.gz \
-cache/eswiki-latest-all-titles-in-ns0.gz \
-cache/plwiki-latest-all-titles-in-ns0.gz: \
 cache/%wiki-latest-all-titles-in-ns0.gz:
-	@$(CURL) $(CURL_OPTS) https://dumps.wikimedia.org/$*wiki/latest/$*wiki-latest-all-titles-in-ns0.gz > "$@"
-	@if grep -q "503 Service Temporarily Unavailable" $@; then echo "Wikipedia sent an error when fetching $@" >&2; exit 1; fi
-.SECONDARY: cache/dewiki-latest-all-titles-in-ns0.gz
-.SECONDARY: cache/enwiki-latest-all-titles-in-ns0.gz
-.SECONDARY: cache/eswiki-latest-all-titles-in-ns0.gz
-.SECONDARY: cache/plwiki-latest-all-titles-in-ns0.gz
+	@for l in $(LANGUAGES); do \
+	    $(CURL) $(CURL_OPTS) "$(WIKIPEDIA_DUMP_MIRROR)/$${l}wiki/latest/$${l}wiki-latest-all-titles-in-ns0.gz" > "cache/$${l}wiki-latest-all-titles-in-ns0.gz"; \
+	    if grep -q "503 Service Temporarily Unavailable" "cache/$${l}wiki-latest-all-titles-in-ns0.gz"; then \
+	        echo "Wikipedia sent an error when fetching cache/$${l}wiki-latest-all-titles-in-ns0.gz" >&2; \
+	        exit 1; \
+	    fi; \
+	done
+.SECONDARY: cache/*wiki-latest-all-titles-in-ns0.gz
 
 export CURL CURL_OPTS JQ
 cache/abstracts/de/0041 \
