@@ -9,6 +9,8 @@ SAXON := saxonb-xslt
 
 PYTHON := virtualenv/bin/python
 
+FONTFORGE := fontforge
+
 EMOJI_VERSION := 5.0
 
 DUMMY_DB := codepoints_dummy
@@ -102,13 +104,9 @@ cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
 .SECONDARY: cache/abstracts/es/0041
 .SECONDARY: cache/abstracts/pl/0041
 
-export TTF2SVG
 cache/noto/NotoSans-Regular.svg: cache/noto/NotoSans-Regular.ttf
-	@for font in cache/noto/NotoSans*-Regular.ttf; do \
-	    echo "$$TTF2SVG" | /usr/bin/env fontforge -lang=ff -script /dev/stdin "$$font"; \
-	done
-	@for font in cache/noto/NotoSansCJK*-Regular.otf; do \
-	    echo "$$TTF2SVG" | /usr/bin/env fontforge -lang=ff -script /dev/stdin "$$font"; \
+	@for font in cache/noto/NotoSans*-Regular.ttf cache/noto/NotoSansCJK*-Regular.otf; do \
+	    $(FONTFORGE) -lang=ff -script bin/ttf_to_svg.ff "$$font"; \
 	done
 
 cache/noto/NotoSans-Regular.ttf:

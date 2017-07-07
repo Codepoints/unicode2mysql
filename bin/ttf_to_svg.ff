@@ -1,0 +1,6 @@
+#!/usr/bin/env fontforge
+# convert a font to an SVG font with the same filename
+Open($1);
+Reencode("unicode");
+Generate($1:r + ".svg");
+Quit(0);
