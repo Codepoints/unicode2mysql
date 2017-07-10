@@ -3,7 +3,7 @@ SHELL := /bin/bash
 # executables and their options
 
 CURL := curl
-CURL_OPTS := --silent --show-error --user-agent "Unicode2MySQL,github.com/Codepoints/unicode2mysql"
+CURL_OPTS := --silent --show-error --location --max-redirs 3 --user-agent "Unicode2MySQL,github.com/Codepoints/unicode2mysql"
 
 JQ := jq
 
@@ -238,7 +238,7 @@ db-schema:
 .PHONY: db-schema
 
 db-data-static: sql-static
-	@ls sql/[^1-6]*.sql | xargs -P 0 -i sh -c 'mysql $(DUMMY_DB) < {}'
+	@ls sql/[1-6]*.sql | xargs -P 0 -i sh -c 'mysql $(DUMMY_DB) < {}'
 .PHONY: db-data-static
 
 db-down:
