@@ -52,6 +52,7 @@ sql-static: \
 	sql/50_wp_codepoints_es.sql \
 	sql/50_wp_codepoints_pl.sql \
 	sql/51_wp_scripts_en.sql \
+	sql/52_wp_blocks_en.sql \
 	sql/60_emojis.sql
 .PHONY: sql-static
 
@@ -214,8 +215,28 @@ sql/51_wp_scripts_en.sql:
 	        echo -n "INSERT INTO script_abstract ( sc, abstract, lang, src )VALUES ('"; \
 	        echo -n "$${line%;*}"; \
 	        echo -n "', '"; \
-	        $(CURL) $(CURL_OPTS) 'https://en.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles='$${line##*;} | $(JQ) -r '.query.pages[].extract' | sed "s/'/\\\\'/g"; \
+	        $(CURL) $(CURL_OPTS) 'https://en.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles='$${line##*;} | \
+	            $(JQ) -r '.query.pages[].extract' | \
+	            sed "s/'/\\\\'/g"; \
 	        echo  "', 'en', 'https://en.wikipedia.org/wiki/$${line##*;}');"; \
+	        ) >> $@ ; \
+	    done
+
+sql/52_wp_blocks_en.sql:
+	@true > $@
+	@$(CURL) $(CURL_OPTS) 'https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Unicode_blocks&format=json&cmlimit=500&cmprop=title&cmtype=page' | \
+	    $(JQ) -r '.query.categorymembers[].title' | \
+	    sed '/Unicode Block$$/d' | \
+	    sed 's/ (Unicode Block)//' | \
+	    while IFS= read -r line; do \
+	        ( \
+	        echo -n "INSERT INTO block_abstract ( block, abstract, lang )VALUES ('"; \
+	        echo -n "$$line"; \
+	        echo -n "', '"; \
+	        $(CURL) $(CURL_OPTS) "https://en.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles="$$($(PYTHON) -c 'from urllib.parse import quote;print(quote('\""$$line"\"', safe=""))') | \
+	            $(JQ) -r ".query.pages[].extract" | \
+	            sed "s/'/\\\\'/g"; \
+	        echo  "', 'en');"; \
 	        ) >> $@ ; \
 	    done
 
@@ -259,6 +280,7 @@ clean:
 	    sql/40_digraphs.sql \
 	    sql/50_wp_codepoints_*.sql \
 	    sql/51_wp_scripts_en.sql \
+	    sql/52_wp_blocks_en.sql \
 	    sql/60_emojis.sql \
 	    sql/70_search_index.sql \
 	    cache/*
