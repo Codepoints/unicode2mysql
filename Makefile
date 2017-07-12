@@ -1,3 +1,10 @@
+#
+# It's unlikely that this Makefile will run under any other platform than
+# a Debian derivative. Look into the Dockerfile for required packages.
+# Additionally, you will need GNU-compatible bc, nl, tr, sed, xargs, grep,
+# zcat, and a bsdtar that unzips .zip files from stdin.
+#
+
 SHELL := /bin/bash
 
 # executables and their options
@@ -13,6 +20,8 @@ PYTHON := virtualenv/bin/python
 
 FONTFORGE := fontforge
 
+BSDTAR := bsdtar
+
 # control variables
 
 EMOJI_VERSION := 5.0
@@ -22,13 +31,6 @@ LANGUAGES := de en es pl
 WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.your.org
 
 DUMMY_DB := codepoints_dummy
-
-define TTF2SVG
-Open($$1);
-Reencode("unicode");
-Generate($$1:r + ".svg");
-Quit(0);
-endef
 
 
 all: sql
@@ -78,13 +80,13 @@ cache/emoji-data.txt:
 
 cache/ucd.all.flat.xml:
 	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip | \
-	    bsdtar -xf- --cd cache
+	    $(BSDTAR) -xf- --cd cache
 .SECONDARY: cache/ucd.all.flat.xml
 
 cache/unicode/ReadMe.txt:
 	@mkdir -p cache/unicode
 	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/UCD/latest/ucd/UCD.zip | \
-	    bsdtar -xf- --cd cache/unicode
+	    $(BSDTAR) -xf- --cd cache/unicode
 .SECONDARY: cache/unicode/ReadMe.txt
 
 cache/%wiki-latest-all-titles-in-ns0.gz:
@@ -120,12 +122,12 @@ cache/noto/NotoSans-Regular.svg: cache/noto/NotoSans-Regular.ttf
 cache/noto/NotoSans-Regular.ttf:
 	@mkdir -p cache/noto
 	@$(CURL) $(CURL_OPTS) https://noto-website.storage.googleapis.com/pkgs/Noto-unhinted.zip | \
-	    bsdtar -xf- --cd cache/noto
+	    $(BSDTAR) -xf- --cd cache/noto
 .SECONDARY: cache/noto/NotoSans-Regular.ttf
 
 cache/encoding/README.md:
 	@$(CURL) $(CURL_OPTS) https://github.com/whatwg/encoding/archive/master.zip | \
-	    bsdtar -xf- --cd cache/
+	    $(BSDTAR) -xf- --cd cache/
 	@mv cache/encoding-master cache/encoding
 .SECONDARY: cache/encoding
 
@@ -135,7 +137,7 @@ cache/latex.xml:
 
 cache/codepoints.net:
 	@$(CURL) $(CURL_OPTS) https://github.com/Codepoints/Codepoints.net/archive/master.zip | \
-	    bsdtar -xf- --cd cache/
+	    $(BSDTAR) -xf- --cd cache/
 	@mv cache/Codepoints.net-master cache/codepoints.net
 
 
@@ -157,6 +159,9 @@ sql/32_confusables.sql: cache/confusables.txt
 	        $(PYTHON) bin/confusables_to_sql.py "$$line" >> $@ ; \
 	    done
 
+# parallelization: `nl` prefixes each filename with a number, xargs consumes
+# the number and the filename with "-n 2" and makes Saxon create a tmp file
+# with the number attached. Then those files get cat'ed into the target.
 sql/33_images.sql: cache/noto/NotoSans-Regular.svg
 	@#sed 's/<\/svg>/<text id="x" font-family="Noto Sans Rejang" font-size="64" x="32" y="48" text-anchor="middle">\&#xA940;<\/text>&/' cache/noto/NotoSansRejang-Regular.svg | inkscape --export-text-to-path --export-plain-svg=/dev/stdout /dev/stdin | inkscape --select=x --verb SelectionUnGroup --export-plain-svg=/dev/stdout /dev/stdin | rsvg-convert -w 64 -h 64 -f svg | svgo -i - -o - | sed s/64pt/64/g
 	@ls -1 cache/noto/Noto*.svg | \
@@ -184,6 +189,9 @@ sql/36_encodings.sql: cache/encoding/README.md
 sql/37_latex.sql: cache/latex.xml
 	@$(SAXON) -s "$<" -xsl bin/latex_to_sql.xsl > "$@"
 
+# lines containing digraph definitions have a special format in the RFC. We
+# grep for those lines, cut them with tr/xargs and printf a SQL statement from
+# that data.
 sql/40_digraphs.sql: cache/rfc1345.txt
 	@true > $@
 	@cat $< | \
@@ -193,6 +201,8 @@ sql/40_digraphs.sql: cache/rfc1345.txt
 	    tr '\t\n' '\0' | \
 	    xargs -0 -n 2 sh -c 'printf "INSERT INTO codepoint_alias (cp, alias, \`type\`) VALUES (%s, '"'"'%s'"'"', '"'"'digraph'"'"');\n" "$$(echo $$1| tr a-f A-F | sed s/^/ibase=16\;/ | bc)" "$$0"' > $@
 
+# if I'd figure out how to handle quotes nested four levels deep, I could
+# parallelize that recipe with `xargs -P 0 sh -c`.
 sql/50_wp_codepoints_de.sql \
 sql/50_wp_codepoints_en.sql \
 sql/50_wp_codepoints_es.sql \
