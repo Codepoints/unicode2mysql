@@ -295,3 +295,9 @@ clean:
 	    sql/70_search_index.sql \
 	    cache/*
 .PHONY: clean
+
+
+virtualenv:
+	@virtualenv -p /usr/bin/python3 ./virtualenv
+	@./virtualenv/bin/pip install -r requirements.txt
+.PHONY: virtualenv
