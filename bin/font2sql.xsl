@@ -23,6 +23,7 @@
     </apply-templates>
     <text>
       ON DUPLICATE KEY UPDATE
+      font   = VALUES(font),
       width  = VALUES(width),
       height = VALUES(height),
       image  = VALUES(image);
