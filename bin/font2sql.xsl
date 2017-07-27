@@ -22,12 +22,9 @@
       <with-param name="units-per-em" select="./svg:font-face/@units-per-em" />
     </apply-templates>
     <text>
-      ON DUPLICATE KEY UPDATE
-      font   = VALUES(font),
-      width  = VALUES(width),
-      height = VALUES(height),
-      image  = VALUES(image);
+      ON DUPLICATE KEY UPDATE cp=cp;
     </text>
+    <!-- == ignore the new row -->
   </template>
 
   <template match="svg:glyph">
