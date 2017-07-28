@@ -81,7 +81,7 @@ def get_addinfo_tokens(cp):
 
     with open(mdfile, encoding='utf-8') as f:
         abstract = markdown(f.read())
-        terms = BeautifulSoup(abstract).get_text()
+        terms = BeautifulSoup(abstract, 'lxml').get_text()
         tokens = tokenize(terms)
     return tokens
 
@@ -91,7 +91,7 @@ def get_abstract_tokens(cp):
     cur.execute("SELECT abstract FROM codepoint_abstract WHERE cp = %s AND lang = 'en'", (cp,))
     abstract = (cur.fetchone() or {'abstract':None})['abstract']
     if abstract:
-        terms = BeautifulSoup(abstract).get_text()
+        terms = BeautifulSoup(abstract, 'lxml').get_text()
         tokens = tokenize(terms)
     else:
         tokens = []
@@ -160,7 +160,7 @@ def handle_row(item):
         if item[j]:
             # add the full value: "na:foo bar baz"
             term(cp, '%s:%s' % (j, item[j].lower()), weight)
-            for w in re.split(r'\s+', item[j].lower()):
+            for w in re.split(r'\s+', str(item[j]).lower()):
                 term(cp, w, weight)
                 if '-' in w:
                     # we need this to find cps like "TAG HYPHEN-MINUS"
@@ -221,7 +221,7 @@ for item in all_cps:
     handle_row(item)
 
     if i % 1000 == 0:
-        sys.stderr.write('-- U+%04X' % item['cp'])
+        sys.stderr.write('-- U+%04X\n' % item['cp'])
 
 
 cur.close()
