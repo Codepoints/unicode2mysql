@@ -159,7 +159,8 @@ def handle_row(item):
     for j, weight in (('na', 100), ('na1', 90), ('kDefinition', 50)):
         if item[j]:
             # add the full value: "na:foo bar baz"
-            term(cp, '%s:%s' % (j, item[j].lower()), weight)
+            if j != 'kDefinition':
+                term(cp, '%s:%s' % (j, item[j].lower()), weight)
             for w in re.split(r'\s+', str(item[j]).lower()):
                 term(cp, w, weight)
                 if '-' in w:
