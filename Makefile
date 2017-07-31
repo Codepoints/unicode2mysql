@@ -125,7 +125,8 @@ cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
 cache/noto/NotoSans-Regular.svg: cache/noto/NotoSans-Regular.ttf
 	@echo convert Noto fonts to SVG
 	@for font in cache/noto/NotoSans*-Regular.ttf cache/noto/NotoSansCJK*-Regular.otf; do \
-	    $(FONTFORGE) -lang=ff -script bin/ttf_to_svg.ff "$$font"; \
+	    $(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$$font"; \
+	    sed -i 's/ unicode="&#x\(e01[0-9a-f]\|fe0\)[0-9a-f];"//g' "$$(echo "$$font" | sed 's/\.[ot]tf$$/.svg/')"; \
 	done
 
 cache/noto/NotoSans-Regular.ttf:
