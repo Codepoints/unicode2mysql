@@ -261,11 +261,10 @@ sql/52_wp_blocks_en.sql:
 	@$(CURL) $(CURL_OPTS) 'https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Unicode_blocks&format=json&cmlimit=500&cmprop=title&cmtype=page' | \
 	    $(JQ) -r '.query.categorymembers[].title' | \
 	    sed '/Unicode Block$$/d' | \
-	    sed 's/ (Unicode Block)//' | \
 	    while IFS= read -r line; do \
 	        ( \
-	        echo -n "INSERT INTO block_abstract ( block, abstract, lang )VALUES ('"; \
-	        echo -n "$$line"; \
+	        echo -n "INSERT INTO block_abstract ( block, abstract, lang ) VALUES ('"; \
+	        echo -n "$$line" | sed 's/ (Unicode [bB]lock)//'; \
 	        echo -n "', '"; \
 	        $(CURL) $(CURL_OPTS) "https://en.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles="$$($(PYTHON) -c 'from urllib.parse import quote;print(quote('\""$$line"\"', safe=""))') | \
 	            $(JQ) -r ".query.pages[].extract" | \
