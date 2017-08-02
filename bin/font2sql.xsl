@@ -50,7 +50,7 @@
       <value-of select="encode-for-uri(concat(
         ' ',
         abs($descent) + $ascent,
-        '&quot; style=&quot;overflow:visible&quot;>',
+        '&quot;>',
         '&lt;path transform=&quot;translate(0, ',
         $ascent,
         ') scale(1,-1)&quot; d=&quot;',

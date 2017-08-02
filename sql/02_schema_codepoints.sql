@@ -245,7 +245,7 @@ CREATE TABLE codepoint_image (
   font   VARCHAR(127),
   width  INTEGER,
   height INTEGER,
-  UNIQUE ( cp )
+  UNIQUE ( cp, font )
 );
 
 
