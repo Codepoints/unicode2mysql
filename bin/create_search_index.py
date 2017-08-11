@@ -18,6 +18,7 @@ from bs4 import BeautifulSoup
 import configparser
 from functools import reduce
 from markdown import markdown
+import multiprocessing
 import MySQLdb
 import nltk
 from os.path import dirname, isfile, realpath
@@ -28,12 +29,6 @@ import sys
 # get database connection settings
 config = configparser.RawConfigParser()
 config.read(dirname(__file__)+'/../data/db.conf')
-
-
-# pre-create the NLP structures for later splitting text
-stopwords = nltk.corpus.stopwords.words('english')
-punctrm = re.compile(r'[!-/:-@\[-`{-~\u2212\u201C\u201D]', re.UNICODE)
-wnl = nltk.WordNetLemmatizer()
 
 
 def sql_convert(s):
@@ -47,17 +42,11 @@ def sql_convert(s):
     return s
 
 
-def exec_sql(*sql):
-    """execute or store an SQL query"""
-    sql0 = sql[0]
-    if len(sql) > 1:
-        params = tuple(map(sql_convert, sql[1]))
-        sql0 = sql0 % params
-    print(sql0)
-
-
 def tokenize(terms):
     """create a stream of tokens from plain text"""
+    stopwords = nltk.corpus.stopwords.words('english')
+    punctrm = re.compile(r'[!-/:-@\[-`{-~\u2212\u201C\u201D]', re.UNICODE)
+    wnl = nltk.WordNetLemmatizer()
     return [wnl.lemmatize(t) for t in
             set(
                 filter(lambda w: re.sub(punctrm, '', w) != '',
@@ -86,7 +75,7 @@ def get_addinfo_tokens(cp):
     return tokens
 
 
-def get_abstract_tokens(cp):
+def get_abstract_tokens(cur, cp):
     """Fetch abstract for cp and split it in tokens"""
     cur.execute("SELECT abstract FROM codepoint_abstract WHERE cp = %s AND lang = 'en'", (cp,))
     abstract = (cur.fetchone() or {'abstract':None})['abstract']
@@ -98,7 +87,7 @@ def get_abstract_tokens(cp):
     return tokens
 
 
-def get_decomp(cp):
+def get_decomp(cur, cp):
     """get the decomposition mapping of a codepoint"""
     cur.execute("""SELECT `other` FROM codepoint_relation
                    WHERE cp = %s AND relation = 'dm' ORDER BY `order` ASC""",
@@ -110,13 +99,13 @@ def get_decomp(cp):
     return None
 
 
-def get_aliases(cp):
+def get_aliases(cur, cp):
     """get all aliases of a codepoint"""
     cur.execute("SELECT alias FROM codepoint_alias WHERE cp = %s", (cp,))
     return map(lambda s: s['alias'], cur.fetchall())
 
 
-def get_block(cp):
+def get_block(cur, cp):
     """get block name of a codepoint"""
     cur.execute("SELECT name FROM blocks WHERE first <= %s AND last >= %s", (cp,cp))
     blk = cur.fetchone()
@@ -125,7 +114,7 @@ def get_block(cp):
     return blk
 
 
-def get_scripts(cp):
+def get_scripts(cur, cp):
     """get scripts of a codepoint"""
     cur.execute("SELECT sc, `primary` FROM codepoint_script WHERE cp = %s", (cp,))
     r = []
@@ -134,7 +123,7 @@ def get_scripts(cp):
     return r
 
 
-def has_confusables(cp):
+def has_confusables(cur, cp):
     """whether the CP has any confusables"""
     cur.execute('''
             SELECT COUNT(*) AS c
@@ -146,28 +135,38 @@ def has_confusables(cp):
 
 def term(cp, term, weight):
     """create a new search term query"""
-    exec_sql('INSERT INTO search_index (cp, term, weight) '
-             'VALUES (%s, %s, %s);', (cp, term, weight))
+    query = ('INSERT INTO search_index (cp, term, weight) '
+             'VALUES (%s, %s, %s);\n')
+    return query % tuple(map(sql_convert, (cp, term, weight)))
 
 
-def handle_row(item):
+def handle_row(config, item):
     """take a codepoint row from db and create search index terms"""
-    cp = item['cp']
+    conn = MySQLdb.connect(
+            host='localhost',
+            user=config['clientreadonly']['user'],
+            passwd=config['clientreadonly']['password'],
+            db=config['clientreadonly']['database'])
+    conn.set_character_set('utf8')
+    cur = conn.cursor(MySQLdb.cursors.DictCursor)
 
-    term(cp, 'int:{}'.format(cp), 80)
+    cp = item['cp']
+    sql = ''
+
+    sql += term(cp, 'int:{}'.format(cp), 80)
 
     for j, weight in (('na', 100), ('na1', 90), ('kDefinition', 50)):
         if item[j]:
             # add the full value: "na:foo bar baz"
             if j != 'kDefinition':
-                term(cp, '%s:%s' % (j, item[j].lower()), weight)
+                sql += term(cp, '%s:%s' % (j, item[j].lower()), weight)
             for w in re.split(r'\s+', str(item[j]).lower()):
-                term(cp, w, weight)
+                sql += term(cp, w, weight)
                 if '-' in w:
                     # we need this to find cps like "TAG HYPHEN-MINUS"
                     # when searching for "hyphen".
                     for w2 in w.split('-'):
-                        term(cp, w2, weight-20)
+                        sql += term(cp, w2, weight-20)
 
     for prop in item.keys():
         if (prop not in ('na', 'na1', 'kDefinition', 'cp') and
@@ -175,30 +174,35 @@ def handle_row(item):
             # all other properties get stored as foo:bar pairs, with foo
             # as property and bar as its value
             _i = item[prop]
-            term(cp, '%s:%s' % (prop, _i), 50)
+            sql += term(cp, '%s:%s' % (prop, _i), 50)
 
-    for w in get_aliases(cp):
-        term(cp, w, 40)
+    for w in get_aliases(cur, cp):
+        sql += term(cp, w, 40)
 
-    for w in get_abstract_tokens(cp):
-        term(cp, w, 1)
+    for w in get_abstract_tokens(cur, cp):
+        sql += term(cp, w, 1)
 
-    dm = get_decomp(cp)
+    for w in get_addinfo_tokens(cp):
+        sql += term(cp, w, 1)
+
+    dm = get_decomp(cur, cp)
     if dm:
-        term(cp, dm, 30)
+        sql += term(cp, dm, 30)
 
     h = '0'
-    if has_confusables(cp):
+    if has_confusables(cur, cp):
         h = '1'
-    term(cp, 'confusables:'+h, 50)
+    sql += term(cp, 'confusables:'+h, 50)
 
-    block = get_block(cp)
+    block = get_block(cur, cp)
     if block:
-        term(cp, 'blk:%s' % block, 30)
+        sql += term(cp, 'blk:%s' % block, 30)
 
-    for script in get_scripts(cp):
+    for script in get_scripts(cur, cp):
         # scx props get lesser weight than true sc
-        term(cp, 'sc:%s' % script[0], 50 if script[1] else 25)
+        sql += term(cp, 'sc:%s' % script[0], 50 if script[1] else 25)
+
+    return sql
 
 
 conn = MySQLdb.connect(
@@ -214,17 +218,17 @@ cur.execute('SET character_set_connection=utf8mb4;')
 
 cur.execute('SELECT * FROM codepoints;')
 all_cps = cur.fetchall()
-
-i = 0
-for item in all_cps:
-    i += 1
-
-    handle_row(item)
-
-    if i % 1000 == 0:
-        sys.stderr.write('-- U+%04X\n' % item['cp'])
-
-
 cur.close()
+
+def errprint(s):
+    sys.stderr.write('%s\n' % s)
+
+with multiprocessing.Pool(4) as pool:
+    for row in all_cps:
+        pool.apply_async(handle_row, (config, row,), callback=print, error_callback=errprint)
+    pool.close()
+    pool.join()
+
+
 conn.commit()
 conn.close()
