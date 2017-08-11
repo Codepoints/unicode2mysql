@@ -72,7 +72,7 @@
       <text>'</text>
       <text>)</text>
     <choose>
-      <when test="position() mod 500 = 0">
+      <when test="position() mod 500 = 0 and position() != last()">
         <text> ON DUPLICATE KEY UPDATE cp=cp;&#xA;</text>
         <text>INSERT INTO codepoint_image ( cp, font, width, height, image ) VALUES </text>
       </when>
