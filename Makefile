@@ -289,7 +289,7 @@ sql/70_search_index.sql: cache/codepoints.net sql-static db-up
 
 sql/71_font_order.sql: sql-static db-up
 	@echo create $@
-	@$(MYSQL) bin/font_ordering.sql > $@
+	@$(MYSQL) $(DUMMY_DB) < bin/font_ordering.sql > $@
 
 
 db-up: db-schema db-data-static

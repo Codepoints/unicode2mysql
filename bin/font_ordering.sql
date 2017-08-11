@@ -9,7 +9,7 @@ SELECT
         ', ',
         last,
         ');'
-    )
+    ) AS '-- data'
 FROM
     (
         SELECT
