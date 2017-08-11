@@ -70,10 +70,16 @@
           '&quot;/>&lt;/svg>'
           ))"/>
       <text>'</text>
-    <text>)</text>
-    <if test="position() != last()">
-      <text>,</text>
-    </if>
+      <text>)</text>
+    <choose>
+      <when test="position() = 500">
+        <text> ON DUPLICATE KEY UPDATE cp=cp;&#xA;</text>
+        <text>INSERT INTO codepoint_image ( cp, font, width, height, image ) VALUES </text>
+      </when>
+      <when test="position() != last()">
+        <text>,</text>
+      </when>
+    </choose>
   </template>
 
 </stylesheet>
