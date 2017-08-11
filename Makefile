@@ -22,6 +22,8 @@ FONTFORGE := fontforge
 
 BSDTAR := bsdtar
 
+MYSQL := mysql
+
 # control variables
 
 EMOJI_VERSION := 5.0
@@ -287,7 +289,7 @@ sql/70_search_index.sql: cache/codepoints.net sql-static db-up
 
 sql/71_font_order.sql: sql-static db-up
 	@echo create $@
-	@mysql bin/font_ordering.sql > $@
+	@$(MYSQL) bin/font_ordering.sql > $@
 
 
 db-up: db-schema db-data-static
@@ -295,17 +297,17 @@ db-up: db-schema db-data-static
 
 db-schema: db-down
 	@echo create db schema
-	@( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | mysql
+	@( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | $(MYSQL)
 .PHONY: db-schema
 
 db-data-static: sql-static
 	@echo insert static data into db
-	@ls sql/[1-6]*.sql | xargs -P 0 -i sh -c 'mysql $(DUMMY_DB) < {}'
+	@ls sql/[1-6]*.sql | xargs -P 0 -i sh -c '$(MYSQL) $(DUMMY_DB) < {}'
 .PHONY: db-data-static
 
 db-down:
 	@echo tear down db
-	@echo 'DROP DATABASE IF EXISTS $(DUMMY_DB);' | mysql
+	@echo 'DROP DATABASE IF EXISTS $(DUMMY_DB);' | $(MYSQL)
 .PHONY: db-down
 
 
