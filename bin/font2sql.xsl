@@ -9,7 +9,7 @@
   <template match="text() | comment()" />
 
   <template match="svg:font">
-    <text>INSERT INTO codepoint_image ( cp, image, font, width, height ) VALUES </text>
+    <text>INSERT INTO codepoint_image ( cp, font, width, height, image ) VALUES </text>
     <apply-templates select="./svg:glyph[string-length(@unicode) = 1]">
       <with-param name="font" select="./svg:font-face/@font-family" />
       <with-param name="ascent" select="./svg:font-face/@ascent" />
@@ -35,41 +35,41 @@
     <param name="units-per-em" />
 
     <text>&#xA;( </text>
-    <value-of select="string-to-codepoints(@unicode)"/>
-    <text>, </text>
-    <text>'data:image/svg+xml,</text>
-    <value-of select="encode-for-uri('&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 ')"/>
+      <value-of select="string-to-codepoints(@unicode)"/>
+      <text>, '</text>
+      <value-of select="$font"/>
+      <text>', </text>
       <choose>
         <when test="@horiz-adv-x">
           <value-of select="@horiz-adv-x"/>
         </when>
         <otherwise>
-          <value-of select="$units-per-em"/>
+          <value-of select="$default-adv"/>
         </otherwise>
       </choose>
-      <value-of select="encode-for-uri(concat(
-        ' ',
-        abs($descent) + $ascent,
-        '&quot;>',
-        '&lt;path transform=&quot;translate(0, ',
-        $ascent,
-        ') scale(1,-1)&quot; d=&quot;',
-        @d,
-        '&quot;/>&lt;/svg>'
-        ))"/>
-    <text>', '</text>
-    <value-of select="$font"/>
-    <text>', </text>
-    <choose>
-      <when test="@horiz-adv-x">
-        <value-of select="@horiz-adv-x"/>
-      </when>
-      <otherwise>
-        <value-of select="$default-adv"/>
-      </otherwise>
-    </choose>
-    <text>, </text>
-    <value-of select="abs($descent) + $ascent"/>
+      <text>, </text>
+      <value-of select="abs($descent) + $ascent"/>
+      <text>, 'data:image/svg+xml,</text>
+      <value-of select="encode-for-uri('&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 ')"/>
+        <choose>
+          <when test="@horiz-adv-x">
+            <value-of select="@horiz-adv-x"/>
+          </when>
+          <otherwise>
+            <value-of select="$units-per-em"/>
+          </otherwise>
+        </choose>
+        <value-of select="encode-for-uri(concat(
+          ' ',
+          abs($descent) + $ascent,
+          '&quot;>',
+          '&lt;path transform=&quot;translate(0, ',
+          $ascent,
+          ') scale(1,-1)&quot; d=&quot;',
+          @d,
+          '&quot;/>&lt;/svg>'
+          ))"/>
+      <text>'</text>
     <text>)</text>
     <if test="position() != last()">
       <text>,</text>

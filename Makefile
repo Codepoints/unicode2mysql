@@ -285,6 +285,10 @@ sql/70_search_index.sql: cache/codepoints.net sql-static db-up
 	@echo create $@
 	@$(PYTHON) bin/create_search_index.py > $@
 
+sql/71_font_order.sql: sql-static db-up
+	@echo create $@
+	@mysql bin/font_ordering.sql > $@
+
 
 db-up: db-schema db-data-static
 .PHONY: db-up
