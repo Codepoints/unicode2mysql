@@ -60,7 +60,7 @@ sql-static: \
 	sql/60_emojis.sql
 .PHONY: sql-static
 
-sql-dynamic: sql/70_search_index.sql
+sql-dynamic: sql/70_search_index.sql sql/71_font_order.sql
 .PHONY: sql-dynamic
 
 
@@ -327,6 +327,7 @@ clean:
 	    sql/52_wp_blocks_en.sql \
 	    sql/60_emojis.sql \
 	    sql/70_search_index.sql \
+	    sql/71_font_order.sql \
 	    cache/*
 .PHONY: clean
 
