@@ -4,9 +4,6 @@ import sys
 from xml.parsers import expat
 
 template = "INSERT INTO codepoints (%(fields)s) VALUES (%(values)s);\n"
-cp_template = "INSERT INTO codepoint_relation (cp, other, relation) VALUES (%s, %s, '%s');\n"
-cpp_template = "INSERT INTO codepoint_relation (cp, other, relation, `order`) VALUES (%s, %s, '%s', %s);\n"
-sc_template = "INSERT INTO codepoint_script (cp, sc, `primary`) VALUES (%s, '%s', %s);\n"
 
 # boolean fields
 boolfields = (
@@ -39,12 +36,73 @@ intfields = (
 relation_fields = cpfields + cppfields
 
 
+cps_buffer = {}
+def add_to_cps_buffer(fields, values):
+    global cps_buffer
+    if fields not in cps_buffer:
+        cps_buffer[fields] = []
+    cps_buffer[fields].append(values)
+    if len(cps_buffer[fields]) > 500:
+        write_cps_buffer(fields)
+
+def write_cps_buffer(fields=None):
+    global cps_buffer
+    if not fields:
+        while cps_buffer:
+            write_cps_buffer(list(cps_buffer)[0])
+    else:
+        print("INSERT INTO codepoints (%s) VALUES\n(" % fields)
+        print('),\n('.join(cps_buffer[fields]))
+        print(");\n")
+        del(cps_buffer[fields])
+
+
+rel_buffer = []
+def add_to_rel_buffer(*params):
+    global rel_buffer
+    rel_buffer.append(params)
+    if len(rel_buffer) > 500:
+        write_rel_buffer()
+
+def write_rel_buffer():
+    global rel_buffer
+    print("INSERT INTO codepoint_relation (cp, other, relation, `order`) VALUES\n")
+    print(',\n'.join(map(lambda items: "(%s, %s, '%s', %s)" % items, rel_buffer)))
+    print(";\n")
+    rel_buffer = []
+
+
+script_buffer = []
+def add_to_script_buffer(*params):
+    global script_buffer
+    script_buffer.append(params)
+    if len(script_buffer) > 500:
+        write_script_buffer()
+
+def write_script_buffer():
+    global script_buffer
+    print("INSERT INTO codepoint_script (cp, sc, `primary`) VALUES\n")
+    print(',\n'.join(map(lambda items: "(%s, '%s', %s)" % items, script_buffer)))
+    print(";\n")
+    script_buffer = []
+
+
+update_script_buffer = []
+def add_to_update_script_buffer(*params):
+    global update_script_buffer
+    update_script_buffer.append(params)
+
+def write_update_script_buffer():
+    global update_script_buffer
+    print('\n'.join(map(lambda items: "UPDATE codepoint_script SET `primary` = 1 WHERE cp = %s AND sc = '%s';" % items, update_script_buffer)))
+    update_script_buffer = []
+
+
 def handle_cp(hex_cp, attrs):
     cp = int(hex_cp, 16)
     ucp = str(hex_cp)
     fields = ['cp']
     values = [str(cp)]
-    add = ''
     sc = ''
     scx = ''
     for f, v in attrs.items():
@@ -68,29 +126,24 @@ def handle_cp(hex_cp, attrs):
             v = v.replace('#', ucp).split()
             if len(v) > 1:
                 for i, vv in enumerate(v):
-                    add += cpp_template % (cp, int(vv, 16), f, i+1)
+                    add_to_rel_buffer(cp, int(vv, 16), f, i+1)
             elif len(v) == 1:
-                add += cp_template % (cp, int(v[0], 16), f)
+                add_to_rel_buffer(cp, int(v[0], 16), f, 0)
         elif f == 'sc':
             if scx and v in scx:
-                add += "UPDATE codepoint_script SET `primary` = 1 WHERE cp = %s AND sc = '%s';\n" % (cp, v)
+                add_to_update_script_buffer(cp, v)
             else:
-                add += sc_template % (cp, v, 1)
+                add_to_script_buffer(cp, v, 1)
             sc = v
         elif f == 'scx':
             for script in v.split(' '):
                 if not sc or script != sc:
-                    add += sc_template % (cp, script, 0)
+                    add_to_script_buffer(cp, script, 0)
             scx = v
         else:
             fields.append(f)
             values.append("'%s'" % v.replace("'", "''"))
-    print(template % {
-        'fields': ','.join(fields),
-        'values': ','.join(values),
-    })
-    if add:
-        print(add)
+    add_to_cps_buffer(','.join(fields), ','.join(values))
 
 
 def start_element(element, attrs):
@@ -104,3 +157,8 @@ def start_element(element, attrs):
 p = expat.ParserCreate()
 p.StartElementHandler = start_element
 p.Parse(sys.stdin.read())
+
+write_cps_buffer()
+write_rel_buffer()
+write_script_buffer()
+write_update_script_buffer()
