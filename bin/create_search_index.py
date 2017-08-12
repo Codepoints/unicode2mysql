@@ -135,23 +135,18 @@ def has_confusables(cur, cp):
 
 def term(cp, term, weight):
     """create a new search term query"""
-    query = ('INSERT INTO search_index (cp, term, weight) '
-             'VALUES (%s, %s, %s);\n')
-    return query % tuple(map(sql_convert, (cp, term, weight)))
+    return [ (cp, term, weight) ]
+    #query = ('INSERT INTO search_index (cp, term, weight) '
+    #         'VALUES (%s, %s, %s);\n')
+    #return query % tuple(map(sql_convert, (cp, term, weight)))
 
 
 def handle_row(config, item):
     """take a codepoint row from db and create search index terms"""
-    conn = MySQLdb.connect(
-            host='localhost',
-            user=config['clientreadonly']['user'],
-            passwd=config['clientreadonly']['password'],
-            db=config['clientreadonly']['database'])
-    conn.set_character_set('utf8')
-    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur = get_cur(config)
 
     cp = item['cp']
-    sql = ''
+    sql = []
 
     sql += term(cp, 'int:{}'.format(cp), 80)
 
@@ -205,30 +200,56 @@ def handle_row(config, item):
     return sql
 
 
-conn = MySQLdb.connect(
-        host='localhost',
-        user=config['clientreadonly']['user'],
-        passwd=config['clientreadonly']['password'],
-        db=config['clientreadonly']['database'])
-conn.set_character_set('utf8')
-cur = conn.cursor(MySQLdb.cursors.DictCursor)
-cur.execute('SET NAMES utf8mb4;')
-cur.execute('SET CHARACTER SET utf8mb4;')
-cur.execute('SET character_set_connection=utf8mb4;')
+def get_cur(config):
+    """get a database cursor from a new DB connection"""
+    conn = MySQLdb.connect(
+            host='localhost',
+            user=config['clientreadonly']['user'],
+            passwd=config['clientreadonly']['password'],
+            db=config['clientreadonly']['database'])
+    conn.set_character_set('utf8')
+    cur = conn.cursor(MySQLdb.cursors.DictCursor)
+    cur.execute('SET NAMES utf8mb4;')
+    cur.execute('SET CHARACTER SET utf8mb4;')
+    cur.execute('SET character_set_connection=utf8mb4;')
+    return cur
 
-cur.execute('SELECT * FROM codepoints;')
-all_cps = cur.fetchall()
-cur.close()
 
 def errprint(s):
     sys.stderr.write('%s\n' % s)
 
+
+_buffer = []
+def add_to_buffer(*params):
+    global _buffer
+    _buffer.append(params)
+    if len(_buffer) > 1000:
+        write_buffer()
+
+def write_buffer():
+    global _buffer
+    local_buffer = []
+    while len(_buffer) and len(local_buffer) <= 1005:
+        local_buffer.append(_buffer.pop(0))
+    print("INSERT INTO search_index (cp, term, weight) VALUES" +
+          ',\n'.join(map(lambda items: "(%s, %s, %s)" % tuple(map(sql_convert, items)), local_buffer)) +
+          ";")
+
+
 with multiprocessing.Pool(4) as pool:
-    for row in all_cps:
-        pool.apply_async(handle_row, (config, row,), callback=print, error_callback=errprint)
+    cur = get_cur(config)
+    cur.execute('SELECT * FROM codepoints;')
+    all_cps = cur.fetchall()
+    cur.close()
+
+    #for row in all_cps:
+    #    pool.apply_async(handle_row, (config, row,), callback=print, error_callback=errprint)
+
+    for result in pool.starmap(handle_row, map(lambda row: (config, row), all_cps), chunksize=8):
+        for r in result:
+            add_to_buffer(*r)
+
     pool.close()
     pool.join()
 
-
-conn.commit()
-conn.close()
+write_buffer()
