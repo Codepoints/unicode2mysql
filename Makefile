@@ -24,6 +24,8 @@ BSDTAR := bsdtar
 
 MYSQL := mysql
 
+MYSQL_OPTS := --default-character-set=utf8mb4
+
 # control variables
 
 EMOJI_VERSION := 5.0
@@ -289,7 +291,7 @@ sql/70_search_index.sql: cache/codepoints.net sql-static db-up
 
 sql/71_font_order.sql: sql-static db-up
 	@echo create $@
-	@$(MYSQL) $(DUMMY_DB) < bin/font_ordering.sql > $@
+	@$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < bin/font_ordering.sql > $@
 
 
 db-up: db-schema db-data-static
@@ -297,7 +299,7 @@ db-up: db-schema db-data-static
 
 db-schema:
 	@echo create db schema
-	@if ! echo 'SHOW DATABASES LIKE "$(DUMMY_DB)";' | $(MYSQL) | grep -q '$(DUMMY_DB)'; then \
+	@if ! echo 'SHOW DATABASES LIKE "$(DUMMY_DB)";' | $(MYSQL) $(MYSQL_OPTS) | grep -q '$(DUMMY_DB)'; then \
 	    ( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | $(MYSQL); \
 	else \
 	    echo 'Database $(DUMMY_DB) already exists. Use "make db-down" to delete a stale one.'; \
@@ -306,11 +308,11 @@ db-schema:
 
 db-data-static: sql-static
 	@echo insert static data into db
-	@ls sql/[1-6]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(DUMMY_DB) < {}'
+	@ls sql/[1-6]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < {}'
 .PHONY: db-data-static
 
 db-data-dynamic: sql-dynamic
-	@ls sql/7*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(DUMMY_DB) < {}'
+	@ls sql/7*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < {}'
 .PHONY: db-data-dynamic
 
 db-down:
