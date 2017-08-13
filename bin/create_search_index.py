@@ -136,9 +136,6 @@ def has_confusables(cur, cp):
 def term(cp, term, weight):
     """create a new search term query"""
     return [ (cp, term, weight) ]
-    #query = ('INSERT INTO search_index (cp, term, weight) '
-    #         'VALUES (%s, %s, %s);\n')
-    #return query % tuple(map(sql_convert, (cp, term, weight)))
 
 
 def handle_row(config, item):
@@ -236,16 +233,13 @@ def write_buffer():
           ";")
 
 
-with multiprocessing.Pool(4) as pool:
+with multiprocessing.Pool() as pool:
     cur = get_cur(config)
     cur.execute('SELECT * FROM codepoints;')
     all_cps = cur.fetchall()
     cur.close()
 
-    #for row in all_cps:
-    #    pool.apply_async(handle_row, (config, row,), callback=print, error_callback=errprint)
-
-    for result in pool.starmap(handle_row, map(lambda row: (config, row), all_cps), chunksize=8):
+    for result in pool.starmap(handle_row, map(lambda row: (config, row), all_cps)):
         for r in result:
             add_to_buffer(*r)
 
