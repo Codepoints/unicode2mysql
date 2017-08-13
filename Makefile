@@ -309,6 +309,10 @@ db-data-static: sql-static
 	@ls sql/[1-6]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(DUMMY_DB) < {}'
 .PHONY: db-data-static
 
+db-data-dynamic: sql-dynamic
+	@ls sql/7*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(DUMMY_DB) < {}'
+.PHONY: db-data-dynamic
+
 db-down:
 	@echo tear down db
 	@echo 'DROP DATABASE IF EXISTS $(DUMMY_DB);' | $(MYSQL)
