@@ -295,14 +295,18 @@ sql/71_font_order.sql: sql-static db-up
 db-up: db-schema db-data-static
 .PHONY: db-up
 
-db-schema: db-down
+db-schema:
 	@echo create db schema
-	@( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | $(MYSQL)
+	@if ! echo 'SHOW DATABASES LIKE "$(DUMMY_DB)";' | $(MYSQL) | grep -q '$(DUMMY_DB)'; then \
+	    ( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | $(MYSQL); \
+	else \
+	    echo 'Database $(DUMMY_DB) already exists. Use "make db-down" to delete a stale one.'; \
+	fi
 .PHONY: db-schema
 
 db-data-static: sql-static
 	@echo insert static data into db
-	@ls sql/[1-6]*.sql | xargs -P 0 -i sh -c '$(MYSQL) $(DUMMY_DB) < {}'
+	@ls sql/[1-6]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(DUMMY_DB) < {}'
 .PHONY: db-data-static
 
 db-down:
