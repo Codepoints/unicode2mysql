@@ -135,8 +135,12 @@ def has_confusables(cur, cp):
 
 
 def term(cp, term, weight):
-    """create a new search term query"""
-    return [ (cp, term, weight) ]
+    """create a new search term query
+
+    Terms are hard-capped at 254 characters to not exceed the column
+    definition. Also there's no use in using such long terms since they will be
+    searched verbatim."""
+    return [ (cp, term[0:254], weight) ]
 
 
 def handle_row(config, item):
