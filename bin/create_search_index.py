@@ -22,6 +22,7 @@ import multiprocessing
 import MySQLdb
 import nltk
 from os.path import dirname, isfile, realpath
+from os import cpu_count
 import re
 import sys
 
@@ -233,13 +234,15 @@ def write_buffer():
           ";")
 
 
-with multiprocessing.Pool() as pool:
+cpus = cpu_count() or 2
+
+with multiprocessing.Pool(cpus) as pool:
     cur = get_cur(config)
     cur.execute('SELECT * FROM codepoints;')
     all_cps = cur.fetchall()
     cur.close()
 
-    for result in pool.starmap(handle_row, map(lambda row: (config, row), all_cps)):
+    for result in pool.starmap(handle_row, map(lambda row: (config, row), all_cps), chunksize=len(all_cps)//cpus):
         for r in result:
             add_to_buffer(*r)
 
