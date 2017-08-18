@@ -9,6 +9,7 @@ sql/34_aliases.sql
 sql/35_blocks.sql
 sql/36_encodings.sql
 sql/37_latex.sql
+sql/38_emojis.sql
 sql/40_digraphs.sql
 sql/50_wp_codepoints_de.sql
 sql/50_wp_codepoints_en.sql
@@ -16,6 +17,6 @@ sql/50_wp_codepoints_es.sql
 sql/50_wp_codepoints_pl.sql
 sql/51_wp_scripts_en.sql
 sql/52_wp_blocks_en.sql
-sql/60_emojis.sql
+sql/60_font_*.sql
 sql/70_search_index.sql
 sql/71_font_order.sql

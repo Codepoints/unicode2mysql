@@ -52,6 +52,7 @@ sql-static: \
 	sql/35_blocks.sql \
 	sql/36_encodings.sql \
 	sql/37_latex.sql \
+	sql/38_emojis.sql \
 	sql/40_digraphs.sql \
 	sql/50_wp_codepoints_de.sql \
 	sql/50_wp_codepoints_en.sql \
@@ -59,7 +60,12 @@ sql-static: \
 	sql/50_wp_codepoints_pl.sql \
 	sql/51_wp_scripts_en.sql \
 	sql/52_wp_blocks_en.sql \
-	sql/60_emojis.sql
+	sql/60_font_Symbola.sql \
+	sql/60_font_Aegean.sql \
+	sql/60_font_HANNOMB.sql \
+	sql/60_font_HanaMinA.sql \
+	sql/60_font_HanaMinB.sql \
+	sql/60_font_damase_v.2.sql
 .PHONY: sql-static
 
 sql-dynamic: sql/70_search_index.sql sql/71_font_order.sql
@@ -158,6 +164,48 @@ cache/codepoints.net:
 	    $(BSDTAR) -xf- --cd cache/
 	@mv cache/Codepoints.net-master cache/codepoints.net
 
+cache/fonts:
+	@mkdir -p $@
+
+cache/fonts/Symbola.ttf: cache/fonts
+	@echo download font Symbola
+	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/Symbola.zip | \
+	    $(BSDTAR) -xf- --cd cache/fonts
+
+cache/fonts/Aegean.ttf: cache/fonts
+	@echo download font Aegean
+	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/AegeanFonts.zip | \
+	    $(BSDTAR) -xf- --cd cache/fonts
+
+cache/fonts/HANNOMB.ttf: cache/fonts
+	@echo download font Han Nom B
+	@$(CURL) $(CURL_OPTS) https://downloads.sourceforge.net/project/vietunicode/hannom/hannom%20v2005/hannomH.zip | \
+	    $(BSDTAR) -xf- --cd cache/fonts
+	@mv "cache/fonts/HAN NOM B.ttf" "$@"
+
+cache/fonts/HanaMinA.ttf: cache/fonts
+	@echo download font Hanazono
+	@$(CURL) $(CURL_OPTS) http://rwthaachen.dl.osdn.jp/hanazono-font/64385/hanazono-20160201.zip | \
+	    $(BSDTAR) -xf- --cd cache/fonts
+
+cache/fonts/HanaMinB.ttf: cache/fonts/HanaMinA.ttf
+
+cache/fonts/damase_v.2.ttf: cache/fonts
+	@echo download font damase
+	@$(CURL) $(CURL_OPTS) http://www.wazu.jp/downloads/damase_v.2.zip | \
+	    $(BSDTAR) -xf- --cd cache/fonts
+
+cache/fonts/Symbola.svg \
+cache/fonts/Aegean.svg \
+cache/fonts/HANNOMB.svg \
+cache/fonts/HanaMinA.svg \
+cache/fonts/HanaMinB.svg \
+cache/fonts/damase_v.2.svg:
+cache/fonts/%.svg: cache/fonts/%.ttf
+	@echo convert $(notdir $<) to SVG
+	@$(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$<"
+	@sed -i 's/ unicode="&#x\(e01[0-9a-f]\|fe0\)[0-9a-f];"//g' "$@"
+
 
 sql/30_ucd.sql: cache/ucd.all.flat.xml
 	@echo create $@
@@ -212,6 +260,14 @@ sql/36_encodings.sql: cache/encoding/README.md
 sql/37_latex.sql: cache/latex.xml
 	@echo create $@
 	@$(SAXON) -s "$<" -xsl bin/latex_to_sql.xsl > "$@"
+
+sql/38_emojis.sql: cache/emoji-data.txt
+	@echo create $@
+	@sed -n '/^[0-9A-F]/s/\s*#.*//p' $< | \
+	    sed 's/^\([A-F0-9]\+\) /\1..\1 /' | \
+	    sed 's/\s*;\s*/ /' | sed 's/\.\./ /' | \
+	    xargs -n 3 sh -c 'for x in $$(seq $$(echo ibase=16\;$$0|bc) $$(echo ibase=16\;$$1|bc)); do echo UPDATE codepoints SET $$2=1 WHERE cp=$$x\;; done' \
+	    > $@
 
 # lines containing digraph definitions have a special format in the RFC. We
 # grep for those lines, cut them with tr/xargs and printf a SQL statement from
@@ -277,13 +333,14 @@ sql/52_wp_blocks_en.sql:
 	        ) >> $@ ; \
 	    done
 
-sql/60_emojis.sql: cache/emoji-data.txt
-	@echo create $@
-	@sed -n '/^[0-9A-F]/s/\s*#.*//p' $< | \
-	    sed 's/^\([A-F0-9]\+\) /\1..\1 /' | \
-	    sed 's/\s*;\s*/ /' | sed 's/\.\./ /' | \
-	    xargs -n 3 sh -c 'for x in $$(seq $$(echo ibase=16\;$$0|bc) $$(echo ibase=16\;$$1|bc)); do echo UPDATE codepoints SET $$2=1 WHERE cp=$$x\;; done' \
-	    > $@
+sql/60_font_Symbola.sql \
+sql/60_font_Aegean.sql \
+sql/60_font_HANNOMB.sql \
+sql/60_font_HanaMinA.sql \
+sql/60_font_HanaMinB.sql \
+sql/60_font_damase_v.2.sql:
+sql/60_font_%.sql: cache/fonts/%.svg
+	$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
 
 sql/70_search_index.sql: cache/codepoints.net sql-static db-up
 	@echo create $@
@@ -308,7 +365,9 @@ db-schema:
 
 db-data-static: sql-static
 	@echo insert static data into db
-	@ls sql/[1-6]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < {}'
+	@ls sql/[1-5]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < {}'
+	@# those files all access the codepoint_image table, so do them sequencially:
+	@cat sql/60_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB)
 .PHONY: db-data-static
 
 db-data-dynamic: sql-dynamic
@@ -331,11 +390,12 @@ clean:
 	    sql/35_blocks.sql \
 	    sql/36_encodings.sql \
 	    sql/37_latex.sql \
+	    sql/38_emojis.sql \
 	    sql/40_digraphs.sql \
 	    sql/50_wp_codepoints_*.sql \
 	    sql/51_wp_scripts_en.sql \
 	    sql/52_wp_blocks_en.sql \
-	    sql/60_emojis.sql \
+	    sql/60_font_*.sql \
 	    sql/70_search_index.sql \
 	    sql/71_font_order.sql \
 	    cache/*
