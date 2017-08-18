@@ -15,9 +15,17 @@
       <with-param name="ascent" select="./svg:font-face/@ascent" />
       <with-param name="descent" select="./svg:font-face/@descent" />
       <with-param name="default-adv">
-        <if test="@horiz-adv-x">
-          <value-of select="@horiz-adv-x" />
-        </if>
+        <choose>
+          <when test="@horiz-adv-x">
+            <value-of select="@horiz-adv-x"/>
+          </when>
+          <when test="./svg:font-face/@units-per-em">
+            <value-of select="./svg:font-face/@units-per-em"/>
+          </when>
+          <otherwise>
+            <text>2048</text>
+          </otherwise>
+        </choose>
       </with-param>
       <with-param name="units-per-em" select="./svg:font-face/@units-per-em" />
     </apply-templates>
@@ -56,7 +64,7 @@
             <value-of select="@horiz-adv-x"/>
           </when>
           <otherwise>
-            <value-of select="$units-per-em"/>
+            <value-of select="$default-adv"/>
           </otherwise>
         </choose>
         <value-of select="encode-for-uri(concat(

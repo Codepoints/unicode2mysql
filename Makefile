@@ -61,11 +61,15 @@ sql-static: \
 	sql/51_wp_scripts_en.sql \
 	sql/52_wp_blocks_en.sql \
 	sql/60_font_Symbola.sql \
+	sql/60_font_Anatolian.sql \
 	sql/60_font_Aegean.sql \
 	sql/60_font_HANNOMB.sql \
 	sql/60_font_HanaMinA.sql \
 	sql/60_font_HanaMinB.sql \
-	sql/60_font_damase_v.2.sql
+	sql/60_font_damase_v.2.sql \
+	sql/60_font_KikakuiSansPro.ot.sql \
+	sql/60_font_SuttonSignWriting8.sql \
+	sql/60_font_BabelStoneMarchen.sql
 .PHONY: sql-static
 
 sql-dynamic: sql/70_search_index.sql sql/71_font_order.sql
@@ -172,6 +176,11 @@ cache/fonts/Symbola.ttf: cache/fonts
 	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/Symbola.zip | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 
+cache/fonts/Anatolian.ttf: cache/fonts
+	@echo download font Anatolian
+	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/Anatolian.zip | \
+	    $(BSDTAR) -xf- --cd cache/fonts
+
 cache/fonts/Aegean.ttf: cache/fonts
 	@echo download font Aegean
 	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/AegeanFonts.zip | \
@@ -195,12 +204,28 @@ cache/fonts/damase_v.2.ttf: cache/fonts
 	@$(CURL) $(CURL_OPTS) http://www.wazu.jp/downloads/damase_v.2.zip | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 
+cache/fonts/KikakuiSansPro.ot.ttf: cache/fonts
+	@echo download font KikakuiSansPro
+	@$(CURL) $(CURL_OPTS) https://github.com/athinkra/mende-kikakui/raw/master/fonts/src/ot/KikakuiSansPro.ot.ttf > $@
+
+cache/fonts/SuttonSignWriting8.ttf: cache/fonts
+	@echo download font SuttonSignWriting
+	@$(CURL) $(CURL_OPTS) https://cdn.rawgit.com/Slevinski/signwriting_2010_fonts/master/fonts/SuttonSignWriting8.ttf > $@
+
+cache/fonts/BabelStoneMarchen.ttf: cache/fonts
+	@echo download font BabelStoneMarchen
+	@$(CURL) $(CURL_OPTS) http://www.babelstone.co.uk/Fonts/0816/BabelStoneMarchen.ttf > $@
+
 cache/fonts/Symbola.svg \
+cache/fonts/Anatolian.svg \
 cache/fonts/Aegean.svg \
 cache/fonts/HANNOMB.svg \
 cache/fonts/HanaMinA.svg \
 cache/fonts/HanaMinB.svg \
-cache/fonts/damase_v.2.svg:
+cache/fonts/damase_v.2.svg \
+cache/fonts/KikakuiSansPro.ot.svg \
+cache/fonts/SuttonSignWriting8.svg \
+cache/fonts/BabelStoneMarchen.svg:
 cache/fonts/%.svg: cache/fonts/%.ttf
 	@echo convert $(notdir $<) to SVG
 	@$(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$<"
@@ -334,11 +359,15 @@ sql/52_wp_blocks_en.sql:
 	    done
 
 sql/60_font_Symbola.sql \
+sql/60_font_Anatolian.sql \
 sql/60_font_Aegean.sql \
 sql/60_font_HANNOMB.sql \
 sql/60_font_HanaMinA.sql \
 sql/60_font_HanaMinB.sql \
-sql/60_font_damase_v.2.sql:
+sql/60_font_damase_v.2.sql \
+sql/60_font_KikakuiSansPro.ot.sql \
+sql/60_font_SuttonSignWriting8.sql \
+sql/60_font_BabelStoneMarchen.sql:
 sql/60_font_%.sql: cache/fonts/%.svg
 	$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
 
