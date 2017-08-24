@@ -7,6 +7,7 @@ SELECT
         'INSERT INTO font_order ( `order`, font, first, last ) VALUES (',
         CASE
             WHEN font LIKE 'Unifont%' THEN row + 100
+            WHEN font LIKE 'Noto Sans CJK%' THEN row + 50
             WHEN font LIKE 'Noto Sans%' THEN row - 100
             ELSE row
         END,
