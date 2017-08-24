@@ -14,20 +14,17 @@
       <with-param name="font" select="./svg:font-face/@font-family" />
       <with-param name="ascent" select="./svg:font-face/@ascent" />
       <with-param name="descent" select="./svg:font-face/@descent" />
-      <with-param name="default-adv">
+      <with-param name="default-adv" select="@horiz-adv-x" />
+      <with-param name="units-per-em">
         <choose>
-          <when test="@horiz-adv-x">
-            <value-of select="@horiz-adv-x"/>
-          </when>
           <when test="./svg:font-face/@units-per-em">
-            <value-of select="./svg:font-face/@units-per-em"/>
+            <value-of select="./svg:font-face/@units-per-em" />
           </when>
           <otherwise>
             <text>2048</text>
           </otherwise>
         </choose>
       </with-param>
-      <with-param name="units-per-em" select="./svg:font-face/@units-per-em" />
     </apply-templates>
     <text>
       ON DUPLICATE KEY UPDATE cp=cp;
@@ -48,11 +45,14 @@
       <value-of select="$font"/>
       <text>', </text>
       <choose>
-        <when test="@horiz-adv-x">
+        <when test="@horiz-adv-x and (@horiz-adv-x != '0')">
           <value-of select="@horiz-adv-x"/>
         </when>
-        <otherwise>
+        <when test="$default-adv and ($default-adv != '0')">
           <value-of select="$default-adv"/>
+        </when>
+        <otherwise>
+          <value-of select="$units-per-em"/>
         </otherwise>
       </choose>
       <text>, </text>
@@ -60,18 +60,33 @@
       <text>, 'data:image/svg+xml,</text>
       <value-of select="encode-for-uri('&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 ')"/>
         <choose>
-          <when test="@horiz-adv-x">
+          <when test="@horiz-adv-x and @horiz-adv-x != '0'">
             <value-of select="@horiz-adv-x"/>
           </when>
-          <otherwise>
+          <when test="$default-adv and ($default-adv != '0')">
             <value-of select="$default-adv"/>
+          </when>
+          <otherwise>
+            <value-of select="$units-per-em"/>
           </otherwise>
         </choose>
         <value-of select="encode-for-uri(concat(
           ' ',
           abs($descent) + $ascent,
           '&quot;>',
-          '&lt;path transform=&quot;translate(0, ',
+          '&lt;path transform=&quot;translate('))" />
+        <choose>
+          <when test="@horiz-adv-x = '0' or (not(@horiz-adv-x) and $default-adv = '0')">
+            <!-- when the glyph has no horiz-adv, then it's some kind of
+                 modifier. Move it into the middle of the canvas to make it
+                 wholy visible. -->
+            <value-of select="$units-per-em div 2" />
+          </when>
+          <otherwise>
+            <text>0</text>
+          </otherwise>
+        </choose>
+        <value-of select="encode-for-uri(concat(', ',
           $ascent,
           ') scale(1,-1)&quot; d=&quot;',
           @d,
