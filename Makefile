@@ -36,6 +36,8 @@ WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.your.org
 
 DUMMY_DB := codepoints_dummy
 
+UNIFONT_VERSION := 10.0.05
+
 
 all: sql
 .PHONY: all
@@ -69,7 +71,10 @@ sql-static: \
 	sql/60_font_damase_v.2.sql \
 	sql/60_font_KikakuiSansPro.ot.sql \
 	sql/60_font_SuttonSignWriting8.sql \
-	sql/60_font_BabelStoneMarchen.sql
+	sql/60_font_TangutYinchuan.sql \
+	sql/60_font_BabelStoneMarchen.sql \
+	sql/60_font_unifont.sql \
+	sql/60_font_unifont_upper.sql
 .PHONY: sql-static
 
 sql-dynamic: sql/70_search_index.sql sql/71_font_order.sql
@@ -212,9 +217,22 @@ cache/fonts/SuttonSignWriting8.ttf: cache/fonts
 	@echo download font SuttonSignWriting
 	@$(CURL) $(CURL_OPTS) https://cdn.rawgit.com/Slevinski/signwriting_2010_fonts/master/fonts/SuttonSignWriting8.ttf > $@
 
+cache/fonts/TangutYinchuan.ttf: cache/fonts
+	@echo download font TangutYinchuan
+	@$(CURL) $(CURL_OPTS) http://babelstone.co.uk/Fonts/0816/TangutYinchuan.ttf > $@
+
 cache/fonts/BabelStoneMarchen.ttf: cache/fonts
 	@echo download font BabelStoneMarchen
 	@$(CURL) $(CURL_OPTS) http://www.babelstone.co.uk/Fonts/0816/BabelStoneMarchen.ttf > $@
+
+cache/fonts/unifont.ttf: cache/fonts
+	@echo download font Unifont
+	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont-$(UNIFONT_VERSION)/font-builds/unifont-$(UNIFONT_VERSION).ttf > $@
+
+cache/fonts/unifont_upper.ttf: cache/fonts
+	@echo download font Unifont Upper
+	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).ttf > $@
+
 
 cache/fonts/Symbola.svg \
 cache/fonts/Anatolian.svg \
@@ -225,7 +243,10 @@ cache/fonts/HanaMinB.svg \
 cache/fonts/damase_v.2.svg \
 cache/fonts/KikakuiSansPro.ot.svg \
 cache/fonts/SuttonSignWriting8.svg \
-cache/fonts/BabelStoneMarchen.svg:
+cache/fonts/TangutYinchuan.svg \
+cache/fonts/BabelStoneMarchen.svg \
+cache/fonts/unifont.svg \
+cache/fonts/unifont_upper.svg:
 cache/fonts/%.svg: cache/fonts/%.ttf
 	@echo convert $(notdir $<) to SVG
 	@$(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$<"
@@ -367,7 +388,10 @@ sql/60_font_HanaMinB.sql \
 sql/60_font_damase_v.2.sql \
 sql/60_font_KikakuiSansPro.ot.sql \
 sql/60_font_SuttonSignWriting8.sql \
-sql/60_font_BabelStoneMarchen.sql:
+sql/60_font_TangutYinchuan.sql \
+sql/60_font_BabelStoneMarchen.sql \
+sql/60_font_unifont.sql \
+sql/60_font_unifont_upper.sql:
 sql/60_font_%.sql: cache/fonts/%.svg
 	$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
 
