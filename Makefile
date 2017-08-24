@@ -412,15 +412,19 @@ db-schema:
 	@if ! echo 'SHOW DATABASES LIKE "$(DUMMY_DB)";' | $(MYSQL) $(MYSQL_OPTS) | grep -q '$(DUMMY_DB)'; then \
 	    ( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | $(MYSQL); \
 	else \
-	    echo 'Database $(DUMMY_DB) already exists. Use "make db-down" to delete a stale one.'; \
+	    echo 'Database $(DUMMY_DB) already exists. Use "make db-down" to delete a stale one.' >&2; \
 	fi
 .PHONY: db-schema
 
+# the 6[12]*.sql files all access the codepoint_image table, so we do them sequencially
 db-data-static: sql-static
 	@echo insert static data into db
-	@ls sql/[1-5]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < {}'
-	@# those files all access the codepoint_image table, so do them sequencially:
-	@cat sql/60_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB)
+	@if [ $$(echo 'select count(*) from codepoints' | $(MYSQL) $(MYSQL_OPTS) -N $(DUMMY_DB)) == "0" ]; then \
+	    ls sql/[1-5]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < {}'; \
+	    cat sql/60_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
+	else \
+	    echo 'Database $(DUMMY_DB) is already populated. Use "make db-down" to delete a stale one.' >&2; \
+	fi
 .PHONY: db-data-static
 
 db-data-dynamic: sql-dynamic
