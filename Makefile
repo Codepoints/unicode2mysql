@@ -172,11 +172,12 @@ cache/charlist.dtd:
 	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > cache/charlist.dtd
 .SECONDARY: cache/charlist.dtd
 
-cache/codepoints.net:
+cache/codepoints.net/README.md:
 	@echo fetch codepoints.net repo
 	@$(CURL) $(CURL_OPTS) https://github.com/Codepoints/Codepoints.net/archive/master.zip | \
 	    $(BSDTAR) -xf- --cd cache/
 	@mv cache/Codepoints.net-master cache/codepoints.net
+.SECONDARY: cache/codepoints.net/README.md
 
 cache/fonts/Symbola.ttf:
 	@echo download font Symbola
@@ -425,7 +426,7 @@ sql/60_font_%.sql: cache/fonts/%.svg
 	@echo create $@
 	@$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
 
-sql/70_search_index.sql: cache/codepoints.net sql-static db-up
+sql/70_search_index.sql: cache/codepoints.net/README.md sql-static db-up
 	@echo create $@
 	@$(PYTHON) bin/create_search_index.py > $@
 
