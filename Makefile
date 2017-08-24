@@ -165,7 +165,12 @@ cache/encoding/README.md:
 cache/latex.xml:
 	@echo create $@
 	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > cache/latex.xml
+.SECONDARY: cache/latex.xml
+
+cache/charlist.dtd:
+	@echo create $@
 	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > cache/charlist.dtd
+.SECONDARY: cache/charlist.dtd
 
 cache/codepoints.net:
 	@echo fetch codepoints.net repo
@@ -173,65 +178,75 @@ cache/codepoints.net:
 	    $(BSDTAR) -xf- --cd cache/
 	@mv cache/Codepoints.net-master cache/codepoints.net
 
-cache/fonts:
-	@mkdir -p $@
-
-cache/fonts/Symbola.ttf: cache/fonts
+cache/fonts/Symbola.ttf:
 	@echo download font Symbola
 	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/Symbola.zip | \
 	    $(BSDTAR) -xf- --cd cache/fonts
+.SECONDARY: cache/fonts/Symbola.ttf
 
-cache/fonts/Anatolian.ttf: cache/fonts
+cache/fonts/Anatolian.ttf:
 	@echo download font Anatolian
 	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/Anatolian.zip | \
 	    $(BSDTAR) -xf- --cd cache/fonts
+.SECONDARY: cache/fonts/Anatolian.ttf
 
-cache/fonts/Aegean.ttf: cache/fonts
+cache/fonts/Aegean.ttf:
 	@echo download font Aegean
 	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/AegeanFonts.zip | \
 	    $(BSDTAR) -xf- --cd cache/fonts
+.SECONDARY: cache/fonts/Aegean.ttf
 
-cache/fonts/HANNOMB.ttf: cache/fonts
+cache/fonts/HANNOMB.ttf:
 	@echo download font Han Nom B
 	@$(CURL) $(CURL_OPTS) https://downloads.sourceforge.net/project/vietunicode/hannom/hannom%20v2005/hannomH.zip | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 	@mv "cache/fonts/HAN NOM B.ttf" "$@"
+.SECONDARY: cache/fonts/HANNOMB.ttf
 
-cache/fonts/HanaMinA.ttf: cache/fonts
+cache/fonts/HanaMinA.ttf:
 	@echo download font Hanazono
 	@$(CURL) $(CURL_OPTS) http://rwthaachen.dl.osdn.jp/hanazono-font/64385/hanazono-20160201.zip | \
 	    $(BSDTAR) -xf- --cd cache/fonts
+.SECONDARY: cache/fonts/HanaMinA.ttf
 
 cache/fonts/HanaMinB.ttf: cache/fonts/HanaMinA.ttf
+.SECONDARY: cache/fonts/HanaMinB.ttf
 
-cache/fonts/damase_v.2.ttf: cache/fonts
+cache/fonts/damase_v.2.ttf:
 	@echo download font damase
 	@$(CURL) $(CURL_OPTS) http://www.wazu.jp/downloads/damase_v.2.zip | \
 	    $(BSDTAR) -xf- --cd cache/fonts
+.SECONDARY: cache/fonts/damase_v.2.ttf
 
-cache/fonts/KikakuiSansPro.ot.ttf: cache/fonts
+cache/fonts/KikakuiSansPro.ot.ttf:
 	@echo download font KikakuiSansPro
 	@$(CURL) $(CURL_OPTS) https://github.com/athinkra/mende-kikakui/raw/master/fonts/src/ot/KikakuiSansPro.ot.ttf > $@
+.SECONDARY: cache/fonts/KikakuiSansPro.ot.ttf
 
-cache/fonts/SuttonSignWriting8.ttf: cache/fonts
+cache/fonts/SuttonSignWriting8.ttf:
 	@echo download font SuttonSignWriting
 	@$(CURL) $(CURL_OPTS) https://cdn.rawgit.com/Slevinski/signwriting_2010_fonts/master/fonts/SuttonSignWriting8.ttf > $@
+.SECONDARY: cache/fonts/SuttonSignWriting8.ttf
 
-cache/fonts/TangutYinchuan.ttf: cache/fonts
+cache/fonts/TangutYinchuan.ttf:
 	@echo download font TangutYinchuan
 	@$(CURL) $(CURL_OPTS) http://babelstone.co.uk/Fonts/0816/TangutYinchuan.ttf > $@
+.SECONDARY: cache/fonts/TangutYinchuan.ttf
 
-cache/fonts/BabelStoneMarchen.ttf: cache/fonts
+cache/fonts/BabelStoneMarchen.ttf:
 	@echo download font BabelStoneMarchen
 	@$(CURL) $(CURL_OPTS) http://www.babelstone.co.uk/Fonts/0816/BabelStoneMarchen.ttf > $@
+.SECONDARY: cache/fonts/BabelStoneMarchen.ttf
 
-cache/fonts/unifont.ttf: cache/fonts
+cache/fonts/unifont.ttf:
 	@echo download font Unifont
 	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont-$(UNIFONT_VERSION)/font-builds/unifont-$(UNIFONT_VERSION).ttf > $@
+.SECONDARY: cache/fonts/unifont.ttf
 
-cache/fonts/unifont_upper.ttf: cache/fonts
+cache/fonts/unifont_upper.ttf:
 	@echo download font Unifont Upper
 	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).ttf > $@
+.SECONDARY: cache/fonts/unifont_upper.ttf
 
 
 cache/fonts/Symbola.svg \
@@ -251,6 +266,20 @@ cache/fonts/%.svg: cache/fonts/%.ttf
 	@echo convert $(notdir $<) to SVG
 	@$(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$<"
 	@sed -i 's/ unicode="&#x\(e01[0-9a-f]\|fe0\)[0-9a-f];"//g' "$@"
+.SECONDARY: \
+	cache/fonts/Symbola.svg \
+	cache/fonts/Anatolian.svg \
+	cache/fonts/Aegean.svg \
+	cache/fonts/HANNOMB.svg \
+	cache/fonts/HanaMinA.svg \
+	cache/fonts/HanaMinB.svg \
+	cache/fonts/damase_v.2.svg \
+	cache/fonts/KikakuiSansPro.ot.svg \
+	cache/fonts/SuttonSignWriting8.svg \
+	cache/fonts/TangutYinchuan.svg \
+	cache/fonts/BabelStoneMarchen.svg \
+	cache/fonts/unifont.svg \
+	cache/fonts/unifont_upper.svg
 
 
 sql/30_ucd.sql: cache/ucd.all.flat.xml
@@ -393,7 +422,8 @@ sql/60_font_BabelStoneMarchen.sql \
 sql/60_font_unifont.sql \
 sql/60_font_unifont_upper.sql:
 sql/60_font_%.sql: cache/fonts/%.svg
-	$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
+	@echo create $@
+	@$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
 
 sql/70_search_index.sql: cache/codepoints.net sql-static db-up
 	@echo create $@
