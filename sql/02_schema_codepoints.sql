@@ -204,6 +204,7 @@ CREATE TABLE codepoints (
   Emoji_Modifier        BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Modifier_Base   BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Component       BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
+  Extended_Pictographic BOOLEAN NOT NULL DEFAULT 0, -- emoji 11.0
   blk                   VARCHAR(127)
 ) CHARACTER SET utf8mb4;
 CREATE INDEX codepoints_name ON codepoints ( na );

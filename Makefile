@@ -28,7 +28,7 @@ MYSQL_OPTS := --default-character-set=utf8mb4
 
 # control variables
 
-EMOJI_VERSION := 5.0
+EMOJI_VERSION := 11.0
 
 LANGUAGES := de en es pl
 
