@@ -55,6 +55,10 @@ sql-static: \
 	sql/36_encodings.sql \
 	sql/37_latex.sql \
 	sql/38_emojis.sql \
+	sql/39_emoji_annotations_de.sql \
+	sql/39_emoji_annotations_en.sql \
+	sql/39_emoji_annotations_es.sql \
+	sql/39_emoji_annotations_pl.sql \
 	sql/40_digraphs.sql \
 	sql/50_wp_codepoints_de.sql \
 	sql/50_wp_codepoints_en.sql \
@@ -164,12 +168,12 @@ cache/encoding/README.md:
 
 cache/latex.xml:
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > cache/latex.xml
+	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > $@
 .SECONDARY: cache/latex.xml
 
 cache/charlist.dtd:
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > cache/charlist.dtd
+	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > $@
 .SECONDARY: cache/charlist.dtd
 
 cache/codepoints.net/README.md:
@@ -178,6 +182,17 @@ cache/codepoints.net/README.md:
 	    $(BSDTAR) -xf- --cd cache/
 	@mv cache/Codepoints.net-master cache/codepoints.net
 .SECONDARY: cache/codepoints.net/README.md
+
+cache/cldr_annotations_de.xml \
+cache/cldr_annotations_en.xml \
+cache/cldr_annotations_es.xml \
+cache/cldr_annotations_pl.xml:
+cache/cldr_annotations_%.xml:
+	@echo create $@
+	@$(CURL) $(CURL_OPTS) \
+		"https://www.unicode.org/repos/cldr/trunk/common/annotations/$*.xml" | \
+		sed '/<!DOCTYPE/d' > "$@"
+.SECONDARY: cache/cldr_annotations_*.xml
 
 cache/fonts/Symbola.ttf:
 	@echo download font Symbola
@@ -345,6 +360,14 @@ sql/38_emojis.sql: cache/emoji-data.txt
 	    xargs -n 3 sh -c 'for x in $$(seq $$(echo ibase=16\;$$0|bc) $$(echo ibase=16\;$$1|bc)); do echo UPDATE codepoints SET $$2=1 WHERE cp=$$x\;; done' \
 	    > $@
 
+sql/39_emoji_annotations_de.sql \
+sql/39_emoji_annotations_en.sql \
+sql/39_emoji_annotations_es.sql \
+sql/39_emoji_annotations_pl.sql:
+sql/39_emoji_annotations_%.sql: cache/cldr_annotations_%.xml
+	@echo create $@
+	@$(SAXON) -s "$<" -xsl bin/cldrannotations_to_sql.xsl lang="$*" > "$@"
+
 # lines containing digraph definitions have a special format in the RFC. We
 # grep for those lines, cut them with tr/xargs and printf a SQL statement from
 # that data.
@@ -479,6 +502,10 @@ clean:
 	    sql/36_encodings.sql \
 	    sql/37_latex.sql \
 	    sql/38_emojis.sql \
+	    sql/39_emoji_annotations_de.sql \
+	    sql/39_emoji_annotations_en.sql \
+	    sql/39_emoji_annotations_es.sql \
+	    sql/39_emoji_annotations_pl.sql \
 	    sql/40_digraphs.sql \
 	    sql/50_wp_codepoints_*.sql \
 	    sql/51_wp_scripts_en.sql \

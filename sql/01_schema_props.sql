@@ -126,3 +126,6 @@ CREATE TABLE prop_relation ( relation VARCHAR(7) PRIMARY KEY );
 INSERT INTO  prop_relation VALUES ('bmg'), ('dm'), ('FC_NFKC'), ('suc'),
 ('slc'), ('stc'), ('uc'), ('lc'), ('tc'), ('scf'), ('cf'), ('NFKC_CF'),
 ('bpb');
+
+CREATE TABLE prop_annotation_type ( annotation_type VARCHAR(7) PRIMARY KEY );
+INSERT INTO prop_annotation_type VALUES ('tag'), ('tts');

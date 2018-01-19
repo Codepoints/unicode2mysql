@@ -10,6 +10,7 @@ sql/35_blocks.sql
 sql/36_encodings.sql
 sql/37_latex.sql
 sql/38_emojis.sql
+sql/39_emoji_annotations_*.sql
 sql/40_digraphs.sql
 sql/50_wp_codepoints_de.sql
 sql/50_wp_codepoints_en.sql
