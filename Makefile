@@ -166,7 +166,7 @@ cache/encoding/README.md:
 	@mv cache/encoding-master cache/encoding
 .SECONDARY: cache/encoding
 
-cache/latex.xml:
+cache/latex.xml: cache/charlist.dtd
 	@echo create $@
 	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > $@
 .SECONDARY: cache/latex.xml
@@ -208,7 +208,7 @@ cache/fonts/Anatolian.ttf:
 
 cache/fonts/Aegean.ttf:
 	@echo download font Aegean
-	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/AegeanFonts.zip | \
+	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/Aegean.zip | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 .SECONDARY: cache/fonts/Aegean.ttf
 
@@ -221,7 +221,7 @@ cache/fonts/HANNOMB.ttf:
 
 cache/fonts/HanaMinA.ttf:
 	@echo download font Hanazono
-	@$(CURL) $(CURL_OPTS) http://rwthaachen.dl.osdn.jp/hanazono-font/64385/hanazono-20160201.zip | \
+	@$(CURL) $(CURL_OPTS) 'https://de.osdn.net/frs/redir.php?m=rwthaachen&f=hanazono-font%2F64385%2Fhanazono-20160201.zip' | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 .SECONDARY: cache/fonts/HanaMinA.ttf
 
@@ -246,12 +246,12 @@ cache/fonts/SuttonSignWriting8.ttf:
 
 cache/fonts/TangutYinchuan.ttf:
 	@echo download font TangutYinchuan
-	@$(CURL) $(CURL_OPTS) http://babelstone.co.uk/Fonts/0816/TangutYinchuan.ttf > $@
+	@$(CURL) $(CURL_OPTS) http://babelstone.co.uk/Fonts/7932/TangutYinchuan.ttf > $@
 .SECONDARY: cache/fonts/TangutYinchuan.ttf
 
 cache/fonts/BabelStoneMarchen.ttf:
 	@echo download font BabelStoneMarchen
-	@$(CURL) $(CURL_OPTS) http://www.babelstone.co.uk/Fonts/0816/BabelStoneMarchen.ttf > $@
+	@$(CURL) $(CURL_OPTS) http://www.babelstone.co.uk/Fonts/7932/BabelStoneMarchen.ttf > $@
 .SECONDARY: cache/fonts/BabelStoneMarchen.ttf
 
 cache/fonts/unifont.ttf:
