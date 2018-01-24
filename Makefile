@@ -471,9 +471,9 @@ db-schema:
 .PHONY: db-schema
 
 # the 6[12]*.sql files all access the codepoint_image table, so we do them sequencially
-db-data-static: sql-static
+db-data-static: db-schema sql-static
 	@echo insert static data into db
-	@if [ $$(echo 'select count(*) from codepoints' | $(MYSQL) $(MYSQL_OPTS) -N $(DUMMY_DB)) == "0" ]; then \
+	@if [ "$$(echo 'select count(*) from codepoints' | $(MYSQL) $(MYSQL_OPTS) -N $(DUMMY_DB))" == "0" ]; then \
 	    ls sql/[1-5]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < {}'; \
 	    cat sql/60_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
 	else \

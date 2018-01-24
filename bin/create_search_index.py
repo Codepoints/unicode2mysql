@@ -88,6 +88,16 @@ def get_abstract_tokens(cur, cp):
     return tokens
 
 
+def get_emoji_annotation_tokens(cur, cp):
+    """Fetch emoji annotation for cp and split it in tokens"""
+    cur.execute("SELECT annotation FROM codepoint_annotation WHERE cp = %s", (cp,))
+    tokens = []
+    annotations = cur.fetchall() or []
+    for annotation in annotations:
+        tokens += tokenize(annotation['annotation'])
+    return tokens
+
+
 def get_decomp(cur, cp):
     """get the decomposition mapping of a codepoint"""
     cur.execute("""SELECT `other` FROM codepoint_relation
@@ -178,6 +188,9 @@ def handle_row(config, item):
 
     for w in get_abstract_tokens(cur, cp):
         sql += term(cp, w, 1)
+
+    for w in get_emoji_annotation_tokens(cur, cp):
+        sql += term(cp, w, 2)
 
     for w in get_addinfo_tokens(cp):
         sql += term(cp, w, 1)
