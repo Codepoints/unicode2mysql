@@ -60,6 +60,7 @@ sql-static: \
 	sql/39_emoji_annotations_es.sql \
 	sql/39_emoji_annotations_pl.sql \
 	sql/40_digraphs.sql \
+	sql/41_namedsequences.sql \
 	sql/50_wp_codepoints_de.sql \
 	sql/50_wp_codepoints_en.sql \
 	sql/50_wp_codepoints_es.sql \
@@ -117,6 +118,9 @@ cache/unicode/ReadMe.txt:
 	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/UCD/latest/ucd/UCD.zip | \
 	    $(BSDTAR) -xf- --cd cache/unicode
 .SECONDARY: cache/unicode/ReadMe.txt
+
+cache/unicode/NamedSequences.txt: cache/unicode/ReadMe.txt
+.SECONDARY: cache/unicode/NamedSequences.txt
 
 cache/%wiki-latest-all-titles-in-ns0.gz:
 	@echo create $@
@@ -381,6 +385,19 @@ sql/40_digraphs.sql: cache/rfc1345.txt
 	    tr '\t\n' '\0' | \
 	    xargs -0 -n 2 sh -c 'printf "INSERT INTO codepoint_alias (cp, alias, \`type\`) VALUES (%s, '"'"'%s'"'"', '"'"'digraph'"'"');\n" "$$(echo $$1| tr a-f A-F | sed s/^/ibase=16\;/ | bc)" "$$0"' > $@
 
+sql/41_namedsequences.sql: cache/unicode/NamedSequences.txt
+	@echo create $@
+	@cat $< | \
+		sed -n '/^[A-Z]/p' | \
+		while IFS= read -r line; do \
+			NAME="$${line%;*}" ; \
+			I=1 ; \
+			for cp in $${line#*;}; do \
+				printf "INSERT INTO namedsequences (cp, name, \`order\`) VALUES (CAST(0x%s AS UNSIGNED), '$$NAME', %s)\n" "$$cp" "$$I" ; \
+				I=$$((I + 1)) ; \
+			done ; \
+		done > $@
+
 # if I'd figure out how to handle quotes nested four levels deep, I could
 # parallelize that recipe with `xargs -P 0 sh -c`.
 sql/50_wp_codepoints_de.sql \
@@ -507,6 +524,7 @@ clean:
 	    sql/39_emoji_annotations_es.sql \
 	    sql/39_emoji_annotations_pl.sql \
 	    sql/40_digraphs.sql \
+	    sql/41_namedsequences.sql \
 	    sql/50_wp_codepoints_*.sql \
 	    sql/51_wp_scripts_en.sql \
 	    sql/52_wp_blocks_en.sql \
