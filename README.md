@@ -8,7 +8,7 @@
     * the UCD as XML file
     * the UCD as plain text files
     * the emoji data files
-    * the "confusables" data file
+    * the “confusables” data file
 * Wikipedia entries of single characters, scripts and blocks
 * The RFC 1345
 * Encoding information from the WHATWG
@@ -59,6 +59,8 @@ through the night just to create the search index _or_ the images.
 * `sql/07_schema_images.sql`: Create a table to store images of glyphs, mostly
     derived from the Noto Sans fonts, as well as a helper table to determine,
     which glyph to select.
+* `sql/08_schema_cldr.sql`: Create CLDR info tables, currently only annotations
+    for emojis.
 * `sql/09_schema_search_index.sql`: Create the search index table.
 * `sql/10_wellknown_aliases.sql`: Add some well-known aliases, e.g., for ASCII
     control characters.
@@ -73,7 +75,12 @@ through the night just to create the search index _or_ the images.
 * `sql/35_blocks.sql`: Add names and boundaries of Unicode blocks.
 * `sql/36_encodings.sql`: Add character representations in other encodings.
 * `sql/37_latex.sql`: Add LaTeX representations for some characters.
+* `sql/38_emojis.sql`: Add emoji properties.
+* `sql/39_emoji_annotations_LANG.sql`: Add emoji annotations from CLDR for
+    each supported language.
 * `sql/40_digraphs.sql`: Add RFC 1345 digraph representations.
+* `sql/41_namedsequences.sql`: Add Unicode named sequences as described in
+    [TR 34](https://www.unicode.org/reports/tr34/).
 * `sql/50_wp_codepoints_de.sql`: Add Wikipedia abstracts for single characters
     (German).
 * `sql/50_wp_codepoints_en.sql`: Add Wikipedia abstracts for single characters
@@ -84,13 +91,14 @@ through the night just to create the search index _or_ the images.
 * `sql/50_wp_codepoints_pl.sql`: Add Wikipedia abstracts for single characters
     (Polish). This might fail, since the site hosting Wikipedia dumps will
     impose some rate limiting from time to time letting the fourth request in a
-    short time window fail.
+    short time window fail. Try re-running the Makefile after removing the
+    dump from the cache folder.
 * `sql/51_wp_scripts_en.sql`: Add Wikipedia abstracts for scripts. The mapping
     is done based on `data/script_to_wikipedia.csv`.
 * `sql/52_wp_blocks_en.sql`: Add Wikipedia abstracts for Unicode blocks. The
     information is heuristically fetched by examining the entries in the
-    "Unicode block" category.
-* `sql/60_emojis.sql`: Add information about emoji properties.
+    “Unicode block” category.
+* `sql/60_font_*.sql`: Add glyphs from a font in the form of SVG graphics.
 * `sql/70_search_index.sql`: Create the search index. This needs _all_ the
     previous files being generated and put into a temporary MySQL database.
 * `sql/71_font_order.sql`: Create a priority order for which font's glyph to
