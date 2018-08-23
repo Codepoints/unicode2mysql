@@ -36,7 +36,7 @@ WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.your.org
 
 DUMMY_DB := codepoints_dummy
 
-UNIFONT_VERSION := 10.0.05
+UNIFONT_VERSION := 11.0.02
 
 
 all: sql
@@ -67,9 +67,6 @@ sql-static: \
 	sql/50_wp_codepoints_pl.sql \
 	sql/51_wp_scripts_en.sql \
 	sql/52_wp_blocks_en.sql \
-	sql/60_font_Symbola.sql \
-	sql/60_font_Anatolian.sql \
-	sql/60_font_Aegean.sql \
 	sql/60_font_HANNOMB.sql \
 	sql/60_font_HanaMinA.sql \
 	sql/60_font_HanaMinB.sql \
@@ -198,24 +195,6 @@ cache/cldr_annotations_%.xml:
 		sed '/<!DOCTYPE/d' > "$@"
 .SECONDARY: cache/cldr_annotations_*.xml
 
-cache/fonts/Symbola.ttf:
-	@echo download font Symbola
-	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/Symbola.zip | \
-	    $(BSDTAR) -xf- --cd cache/fonts
-.SECONDARY: cache/fonts/Symbola.ttf
-
-cache/fonts/Anatolian.ttf:
-	@echo download font Anatolian
-	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/Anatolian.zip | \
-	    $(BSDTAR) -xf- --cd cache/fonts
-.SECONDARY: cache/fonts/Anatolian.ttf
-
-cache/fonts/Aegean.ttf:
-	@echo download font Aegean
-	@$(CURL) $(CURL_OPTS) http://users.teilar.gr/~g1951d/Aegean.zip | \
-	    $(BSDTAR) -xf- --cd cache/fonts
-.SECONDARY: cache/fonts/Aegean.ttf
-
 cache/fonts/HANNOMB.ttf:
 	@echo download font Han Nom B
 	@$(CURL) $(CURL_OPTS) https://downloads.sourceforge.net/project/vietunicode/hannom/hannom%20v2005/hannomH.zip | \
@@ -269,9 +248,6 @@ cache/fonts/unifont_upper.ttf:
 .SECONDARY: cache/fonts/unifont_upper.ttf
 
 
-cache/fonts/Symbola.svg \
-cache/fonts/Anatolian.svg \
-cache/fonts/Aegean.svg \
 cache/fonts/HANNOMB.svg \
 cache/fonts/HanaMinA.svg \
 cache/fonts/HanaMinB.svg \
@@ -287,9 +263,6 @@ cache/fonts/%.svg: cache/fonts/%.ttf
 	@$(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$<"
 	@sed -i 's/ unicode="&#x\(e01[0-9a-f]\|fe0\)[0-9a-f];"//g' "$@"
 .SECONDARY: \
-	cache/fonts/Symbola.svg \
-	cache/fonts/Anatolian.svg \
-	cache/fonts/Aegean.svg \
 	cache/fonts/HANNOMB.svg \
 	cache/fonts/HanaMinA.svg \
 	cache/fonts/HanaMinB.svg \
@@ -449,9 +422,6 @@ sql/52_wp_blocks_en.sql:
 	        ) >> $@ ; \
 	    done
 
-sql/60_font_Symbola.sql \
-sql/60_font_Anatolian.sql \
-sql/60_font_Aegean.sql \
 sql/60_font_HANNOMB.sql \
 sql/60_font_HanaMinA.sql \
 sql/60_font_HanaMinB.sql \
