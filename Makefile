@@ -28,7 +28,7 @@ MYSQL_OPTS := --default-character-set=utf8mb4
 
 # control variables
 
-EMOJI_VERSION := 11.0
+EMOJI_VERSION := 12.0
 
 LANGUAGES := de en es pl
 
@@ -36,7 +36,7 @@ WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.your.org
 
 DUMMY_DB := codepoints_dummy
 
-UNIFONT_VERSION := 11.0.02
+UNIFONT_VERSION := 11.0.03
 
 
 all: sql
@@ -224,27 +224,27 @@ cache/fonts/KikakuiSansPro.ot.ttf:
 
 cache/fonts/SuttonSignWriting8.ttf:
 	@echo download font SuttonSignWriting
-	@$(CURL) $(CURL_OPTS) https://cdn.rawgit.com/Slevinski/signwriting_2010_fonts/master/fonts/SuttonSignWriting8.ttf > $@
+	@$(CURL) $(CURL_OPTS) https://github.com/Slevinski/signwriting_2010_fonts/raw/master/fonts/SuttonSignWriting8.ttf > $@
 .SECONDARY: cache/fonts/SuttonSignWriting8.ttf
 
 cache/fonts/TangutYinchuan.ttf:
 	@echo download font TangutYinchuan
-	@$(CURL) $(CURL_OPTS) http://babelstone.co.uk/Fonts/7932/TangutYinchuan.ttf > $@
+	@$(CURL) $(CURL_OPTS) http://babelstone.co.uk/Fonts/Download/TangutYinchuan.ttf > $@
 .SECONDARY: cache/fonts/TangutYinchuan.ttf
 
 cache/fonts/BabelStoneMarchen.ttf:
 	@echo download font BabelStoneMarchen
-	@$(CURL) $(CURL_OPTS) http://www.babelstone.co.uk/Fonts/7932/BabelStoneMarchen.ttf > $@
+	@$(CURL) $(CURL_OPTS) http://www.babelstone.co.uk/Fonts/Download/BabelStoneMarchen.ttf > $@
 .SECONDARY: cache/fonts/BabelStoneMarchen.ttf
 
 cache/fonts/unifont.ttf:
 	@echo download font Unifont
-	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont-$(UNIFONT_VERSION)/font-builds/unifont-$(UNIFONT_VERSION).ttf > $@
+	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont-$(UNIFONT_VERSION).ttf > $@
 .SECONDARY: cache/fonts/unifont.ttf
 
 cache/fonts/unifont_upper.ttf:
 	@echo download font Unifont Upper
-	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).ttf > $@
+	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).ttf > $@
 .SECONDARY: cache/fonts/unifont_upper.ttf
 
 
@@ -502,6 +502,8 @@ clean:
 	    sql/70_search_index.sql \
 	    sql/71_font_order.sql \
 	    cache/*
+	@mkdir cache/fonts
+	@touch cache/fonts/.gitignore
 .PHONY: clean
 
 
