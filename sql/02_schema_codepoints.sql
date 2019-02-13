@@ -50,7 +50,7 @@ CREATE TABLE codepoints (
   isc                   TEXT(2047),
   hst                   VARCHAR(3) REFERENCES prop_hst,
   JSN                   VARCHAR(3),
-  InSC                  VARCHAR(26) REFERENCES prop_InSC,    -- 6.0
+  InSC                  VARCHAR(31) REFERENCES prop_InSC,    -- 6.0
   InMC                  VARCHAR(24) REFERENCES prop_InMC,    -- 6.0
   InPC                  VARCHAR(24) REFERENCES prop_InPC,    -- 8.0
   IDS                   BOOLEAN,
@@ -87,7 +87,7 @@ CREATE TABLE codepoints (
   OGr_Ext               BOOLEAN,
   Gr_Link               BOOLEAN,
   GCB                   VARCHAR(4) REFERENCES prop_GCB,
-  WB                    VARCHAR(6) REFERENCES prop_WB,
+  WB                    VARCHAR(9) REFERENCES prop_WB,
   SB                    VARCHAR(2) REFERENCES prop_SB,
   Ideo                  BOOLEAN,
   UIdeo                 BOOLEAN,
@@ -199,6 +199,12 @@ CREATE TABLE codepoints (
   kTGT_MergedSrc        VARCHAR(255), -- 9.0
   kSrc_NushuDuben       VARCHAR(255), -- 10.0
   kReading              VARCHAR(255), -- 10.0
+  EqUIdeo               VARCHAR(255), -- 11.0
+  kJinmeiyoKanji        VARCHAR(255), -- 11.0
+  kJoyoKanji            VARCHAR(255), -- 11.0
+  kKoreanEducationHanja VARCHAR(255), -- 11.0
+  kKoreanName           VARCHAR(255), -- 11.0
+  kTGH                  VARCHAR(255), -- 11.0
   Emoji                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Presentation    BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   Emoji_Modifier        BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0

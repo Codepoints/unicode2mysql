@@ -19,7 +19,7 @@ boolfields = (
 
 # single codepoints (INT, need '#' resolution)
 cpfields = (
-    'cp', 'bmg', 'suc', 'slc', 'stc', 'scf', 'bpb',
+    'cp', 'bmg', 'suc', 'slc', 'stc', 'scf', 'bpb', 'EqUIdeo',
 )
 
 # multiple codepoints (need '#' resolution, 'na' is a special case, here)

@@ -7,7 +7,7 @@
 CREATE TABLE prop_age ( age VARCHAR(4) PRIMARY KEY );
 INSERT INTO  prop_age VALUES ('1.1'), ('2.0'), ('2.1'), ('3.0'), ('3.1'),
 ('3.2'), ('4.0'), ('4.1'), ('5.0'), ('5.1'), ('5.2'), ('6.0'), ('6.1'),
-('6.2'), ('6.3'), ('7.0'), ('8.0'), ('9.0'), ('10.0');
+('6.2'), ('6.3'), ('7.0'), ('8.0'), ('9.0'), ('10.0'), ('11.0');
 
 CREATE TABLE prop_gc ( gc VARCHAR(2) PRIMARY KEY );
 INSERT INTO  prop_gc VALUES ('Cc'), ('Cf'), ('Cn'), ('Ll'), ('Lm'), ('Lo'),
@@ -45,6 +45,7 @@ INSERT INTO  prop_jg VALUES ('African_Feh'), ('African_Noon'), ('African_Qaf'),
 ('Ain'), ('Alaph'), ('Alef'), ('Alef_Maqsurah'), ('Beh'), ('Beth'),
 ('Burushaski_Yeh_Barree'), ('Dal'), ('Dalath_Rish'), ('E'), ('Farsi_Yeh'),
 ('Fe'), ('Feh'), ('Final_Semkath'), ('Gaf'), ('Gamal'), ('Hah'),
+('Hanifi_Rohingya_Kinna_Ya'), ('Hanifi_Rohingya_Pa'),
 ('Hamza_On_Heh_Goal'), ('He'), ('Heh'), ('Heh_Goal'), ('Heth'), ('Kaf'),
 ('Kaph'), ('Khaph'), ('Knotted_Heh'), ('Lam'), ('Lamadh'), ('Malayalam_Nga'),
 ('Malayalam_Ja'), ('Malayalam_Nya'), ('Malayalam_Tta'), ('Malayalam_Nna'),
@@ -90,7 +91,7 @@ INSERT INTO  prop_InSC VALUES ('Avagraha'), ('Bindu'),
 ('Joiner'), ('Modifying_Letter'), ('Non_Joiner'), ('Nukta'), ('Number'),
 ('Number_Joiner'), ('Other'), ('Pure_Killer'), ('Register_Shifter'),
 ('Syllable_Modifier'), ('Tone_Letter'), ('Tone_Mark'), ('Virama'), ('Visarga'),
-('Vowel'), ('Vowel_Dependent'), ('Vowel_Independent');
+('Vowel'), ('Vowel_Dependent'), ('Vowel_Independent'), ('Consonant_Initial_Postfixed');
 
 CREATE TABLE prop_InMC ( InMC VARCHAR(24) PRIMARY KEY );
 INSERT INTO  prop_InMC VALUES ('Right'), ('Left'), ('Visual_Order_Left'),
@@ -116,7 +117,7 @@ INSERT INTO  prop_GCB VALUES ('CN'), ('CR'), ('EB'), ('EBG'), ('EM'), ('EX'),
 CREATE TABLE prop_WB ( WB VARCHAR(6) PRIMARY KEY );
 INSERT INTO  prop_WB VALUES ('CR'), ('DQ'), ('EB'), ('EBG'), ('EM'), ('EX'),
 ('Extend'), ('FO'), ('GAZ'), ('HL'), ('KA'), ('LE'), ('LF'), ('MB'), ('ML'),
-('MN'), ('NL'), ('NU'), ('RI'), ('SQ'), ('XX'), ('ZWJ');
+('MN'), ('NL'), ('NU'), ('RI'), ('SQ'), ('XX'), ('ZWJ'), ('WSegSpace');
 
 CREATE TABLE prop_SB ( SB VARCHAR(2) PRIMARY KEY );
 INSERT INTO  prop_SB VALUES ('AT'), ('CL'), ('CR'), ('EX'), ('FO'), ('LE'),
