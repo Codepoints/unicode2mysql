@@ -173,9 +173,9 @@ cache/noto/NotoSans-Regular.ttf:
 
 cache/encoding/README.md:
 	@echo fetch Encoding spec
-	@$(CURL) $(CURL_OPTS) https://github.com/whatwg/encoding/archive/master.zip | \
+	@$(CURL) $(CURL_OPTS) https://github.com/whatwg/encoding/archive/main.zip | \
 	    $(BSDTAR) -xf- --cd cache/
-	@mv cache/encoding-master cache/encoding
+	@mv cache/encoding-main cache/encoding
 .SECONDARY: cache/encoding
 
 cache/latex.xml: cache/charlist.dtd
@@ -202,7 +202,7 @@ cache/cldr_annotations_pl.xml:
 cache/cldr_annotations_%.xml:
 	@echo create $@
 	@$(CURL) $(CURL_OPTS) \
-		"https://www.unicode.org/repos/cldr/trunk/common/annotations/$*.xml" | \
+		"https://raw.githubusercontent.com/unicode-org/cldr/master/common/annotations/$*.xml" | \
 		sed '/<!DOCTYPE/d' > "$@"
 .SECONDARY: cache/cldr_annotations_*.xml
 
