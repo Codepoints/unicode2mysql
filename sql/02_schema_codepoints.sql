@@ -151,7 +151,7 @@ CREATE TABLE codepoints (
   kIRG_TSource          VARCHAR(255),
   kIRG_USource          VARCHAR(10),
   kIRG_UKSource         VARCHAR(8),
-  kIRG_VSource          VARCHAR(7),
+  kIRG_VSource          VARCHAR(8),
   kJHJ                  TEXT(2047),
   kJIS0213              VARCHAR(7),
   kJa                   VARCHAR(6),    -- 8.0
