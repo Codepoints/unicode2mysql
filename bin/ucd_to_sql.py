@@ -14,7 +14,8 @@ boolfields = (
     'Term', 'STerm', 'Dia', 'Ext', 'SD', 'Alpha', 'OAlpha', 'Math', 'OMath',
     'Hex', 'AHex', 'DI', 'ODI', 'LOE', 'WSpace', 'Gr_Base', 'Gr_Ext',
     'OGr_Ext', 'Gr_Link', 'Ideo', 'UIdeo', 'IDSB', 'IDST', 'Radical', 'Dep',
-    'VS', 'NChar', 'PCM', 'RI',
+    'VS', 'NChar', 'PCM', 'RI', 'Emoji', 'EPres', 'EMod', 'EBase', 'EComp',
+    'ExtPict',
 )
 
 # single codepoints (INT, need '#' resolution)

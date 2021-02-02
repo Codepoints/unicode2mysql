@@ -147,8 +147,10 @@ CREATE TABLE codepoints (
   kIRG_KPSource         VARCHAR(8),
   kIRG_KSource          VARCHAR(8),
   kIRG_MSource          VARCHAR(9),
+  kIRG_SSource          VARCHAR(9),
   kIRG_TSource          VARCHAR(255),
   kIRG_USource          VARCHAR(10),
+  kIRG_UKSource         VARCHAR(8),
   kIRG_VSource          VARCHAR(7),
   kJHJ                  TEXT(2047),
   kJIS0213              VARCHAR(7),
@@ -206,11 +208,11 @@ CREATE TABLE codepoints (
   kKoreanName           VARCHAR(255), -- 11.0
   kTGH                  VARCHAR(255), -- 11.0
   Emoji                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
-  Emoji_Presentation    BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
-  Emoji_Modifier        BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
-  Emoji_Modifier_Base   BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
-  Emoji_Component       BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
-  Extended_Pictographic BOOLEAN NOT NULL DEFAULT 0, -- emoji 11.0
+  EPres                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
+  EMod                  BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
+  EBase                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
+  EComp                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
+  ExtPict               BOOLEAN NOT NULL DEFAULT 0, -- emoji 11.0
   blk                   VARCHAR(127)
 ) CHARACTER SET utf8mb4;
 CREATE INDEX codepoints_name ON codepoints ( na );

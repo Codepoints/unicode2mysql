@@ -377,7 +377,7 @@ sql/41_namedsequences.sql: cache/unicode/NamedSequences.txt
 			NAME="$${line%;*}" ; \
 			I=1 ; \
 			for cp in $${line#*;}; do \
-				printf "INSERT INTO namedsequences (cp, name, \`order\`) VALUES (CAST(0x%s AS UNSIGNED), '$$NAME', %s)\n" "$$cp" "$$I" ; \
+				printf "INSERT INTO namedsequences (cp, name, \`order\`) VALUES (CAST(0x%s AS UNSIGNED), '$$NAME', %s);\n" "$$cp" "$$I" ; \
 				I=$$((I + 1)) ; \
 			done ; \
 		done > $@
