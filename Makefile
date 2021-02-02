@@ -155,9 +155,20 @@ cache/noto/NotoSans-Regular.svg: cache/noto/NotoSans-Regular.ttf
 
 cache/noto/NotoSans-Regular.ttf:
 	@echo fetch Noto fonts
-	@mkdir -p cache/noto
-	@$(CURL) $(CURL_OPTS) https://noto-website.storage.googleapis.com/pkgs/Noto-unhinted.zip | \
-	    $(BSDTAR) -xf- --cd cache/noto
+	@mkdir -p cache
+	@docker run --rm \
+		--volume "$$PWD":/src \
+		--user "$$(id -u)" \
+		jgsqware/svn-client \
+		export --force \
+		https://github.com/googlefonts/noto-fonts/trunk/unhinted/ttf \
+		cache/noto
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansSC-Regular.otf > cache/noto/NotoSansSC-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansTC-Regular.otf > cache/noto/NotoSansTC-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansKR-Regular.otf > cache/noto/NotoSansKR-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansJP-Regular.otf > cache/noto/NotoSansJP-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansHK-Regular.otf > cache/noto/NotoSansHK-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-emoji/raw/master/fonts/NotoColorEmoji.ttf > cache/noto/NotoColorEmoji.ttf
 .SECONDARY: cache/noto/NotoSans-Regular.ttf
 
 cache/encoding/README.md:
