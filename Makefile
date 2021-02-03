@@ -399,6 +399,20 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 	    >> $@; \
 	done
 
+#
+# TODO: Replace the data/*.csv file with this live SPARQL query:
+#
+#     SELECT DISTINCT ?iso ?lang ?name ?article WHERE {
+#       ?script wdt:P506 ?iso .
+#       ?article schema:about ?script ;
+#                   schema:inLanguage ?lang ;
+#                   schema:name ?name ;
+#                   schema:isPartOf [ wikibase:wikiGroup "wikipedia" ] .
+#       FILTER(?lang in ('en', 'de', 'pl', 'es')) .
+#     }
+#
+# Sandbox: https://w.wiki/xTJ
+#
 sql/51_wp_scripts_en.sql:
 	@echo create $@
 	@true > $@
