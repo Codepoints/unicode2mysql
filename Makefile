@@ -429,6 +429,22 @@ sql/51_wp_scripts_en.sql:
 	        ) >> $@ ; \
 	    done
 
+#
+# Fetching WP block articles via SPARQL:
+#
+#     SELECT DISTINCT ?lang ?name ?article WHERE {
+#       ?block wdt:P31 wd:Q3512806 .
+#       ?article schema:about ?block ;
+#                   schema:inLanguage ?lang ;
+#                   schema:name ?name ;
+#                   schema:isPartOf [ wikibase:wikiGroup "wikipedia" ] .
+#       FILTER(?lang in ('en', 'de', 'pl', 'es')) .
+#     }
+#
+# Sandbox: https://w.wiki/xTU
+#
+# TODO with above query: Map Unicode block names to WP article titles.
+#
 sql/52_wp_blocks_en.sql:
 	@echo create $@
 	@true > $@
