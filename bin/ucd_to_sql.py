@@ -2,6 +2,7 @@
 
 import sys
 from xml.parsers import expat
+from block_map import block_map
 
 template = "INSERT INTO codepoints (%(fields)s) VALUES (%(values)s);\n"
 
@@ -141,6 +142,9 @@ def handle_cp(hex_cp, attrs):
                 if not sc or script != sc:
                     add_to_script_buffer(cp, script, 0)
             scx = v
+        elif f == 'blk':
+            fields.append(f)
+            values.append("'%s'" % block_map.get(v, v).replace("'", "''"))
         else:
             fields.append(f)
             values.append("'%s'" % v.replace("'", "''"))
