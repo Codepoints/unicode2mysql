@@ -412,6 +412,7 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 #     }
 #
 # Sandbox: https://w.wiki/xTJ
+# Live URL: 'https://query.wikidata.org/sparql?query=SELECT%20DISTINCT%20%3Fiso%20%3Flang%20%3Fname%20%3Farticle%20WHERE%20%7B%0A%20%20%3Fscript%20wdt%3AP506%20%3Fiso%20.%0A%20%20%3Farticle%20schema%3Aabout%20%3Fscript%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20schema%3AinLanguage%20%3Flang%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20schema%3Aname%20%3Fname%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20schema%3AisPartOf%20%5B%20wikibase%3AwikiGroup%20%22wikipedia%22%20%5D%20.%0A%20%20FILTER(%3Flang%20in%20('"'en'%2C%20'de'%2C%20'pl'%2C%20'es'"'))%20.%0A%7D&format=json'
 #
 sql/51_wp_scripts_en.sql:
 	@echo create $@
