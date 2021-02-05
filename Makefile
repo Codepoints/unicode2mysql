@@ -130,7 +130,6 @@ cache/%wiki-latest-all-titles-in-ns0.gz:
 	done
 .SECONDARY: cache/*wiki-latest-all-titles-in-ns0.gz
 
-export CURL CURL_OPTS JQ
 cache/abstracts/de/0041 \
 cache/abstracts/en/0041 \
 cache/abstracts/es/0041 \
@@ -146,21 +145,21 @@ cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
 .SECONDARY: cache/abstracts/es/0041
 .SECONDARY: cache/abstracts/pl/0041
 
-cache/noto/NotoSans-Regular.svg: cache/noto/NotoSans-Regular.ttf
+cache/noto/NotoSans/NotoSans-Regular.svg: cache/noto/NotoSans/NotoSans-Regular.ttf
 	@echo convert Noto fonts to SVG
-	@for font in cache/noto/NotoSans*-Regular.ttf cache/noto/NotoSansCJK*-Regular.otf; do \
+	@for font in cache/noto/NotoSans*/NotoSans*-Regular.ttf cache/noto/NotoSans*-Regular.otf; do \
 	    $(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$$font"; \
 	    sed -i 's/ unicode="&#x\(e01[0-9a-f]\|fe0\)[0-9a-f];"//g' "$$(echo "$$font" | sed 's/\.[ot]tf$$/.svg/')"; \
 	done
 
-cache/noto/NotoSans-Regular.ttf:
+cache/noto/NotoSans/NotoSans-Regular.ttf:
 	@echo fetch Noto fonts
 	@mkdir -p cache
 	@docker run --rm \
 		--volume "$$PWD":/src \
 		--user "$$(id -u)" \
 		jgsqware/svn-client \
-		export --force \
+		export --force --quiet \
 		https://github.com/googlefonts/noto-fonts/trunk/unhinted/ttf \
 		cache/noto
 	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansSC-Regular.otf > cache/noto/NotoSansSC-Regular.otf
@@ -168,8 +167,14 @@ cache/noto/NotoSans-Regular.ttf:
 	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansKR-Regular.otf > cache/noto/NotoSansKR-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansJP-Regular.otf > cache/noto/NotoSansJP-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansHK-Regular.otf > cache/noto/NotoSansHK-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-emoji/raw/master/fonts/NotoColorEmoji.ttf > cache/noto/NotoColorEmoji.ttf
-.SECONDARY: cache/noto/NotoSans-Regular.ttf
+	@docker run --rm \
+		--volume "$$PWD":/src \
+		--user "$$(id -u)" \
+		jgsqware/svn-client \
+		export --force --quiet \
+		https://github.com/googlefonts/noto-emoji/trunk/svg \
+		cache/noto/emoji
+.SECONDARY: cache/noto/NotoSans/NotoSans-Regular.ttf
 
 cache/encoding/README.md:
 	@echo fetch Encoding spec
@@ -310,7 +315,7 @@ sql/32_confusables.sql: cache/confusables.txt
 # parallelization: `nl` prefixes each filename with a number, xargs consumes
 # the number and the filename with "-n 2" and makes Saxon create a tmp file
 # with the number attached. Then those files get cat'ed into the target.
-sql/33_images.sql: cache/noto/NotoSans-Regular.svg
+sql/33_images.sql: cache/noto/NotoSans/NotoSans-Regular.svg
 	@echo create $@
 	@ls -1 cache/noto/Noto*.svg | \
 	    nl | \
@@ -399,70 +404,13 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 	    >> $@; \
 	done
 
-#
-# TODO: Replace the data/*.csv file with this live SPARQL query:
-#
-#     SELECT DISTINCT ?iso ?lang ?name ?article WHERE {
-#       ?script wdt:P506 ?iso .
-#       ?article schema:about ?script ;
-#                   schema:inLanguage ?lang ;
-#                   schema:name ?name ;
-#                   schema:isPartOf [ wikibase:wikiGroup "wikipedia" ] .
-#       FILTER(?lang in ('en', 'de', 'pl', 'es')) .
-#     }
-#
-# Sandbox: https://w.wiki/xTJ
-# Live URL: 'https://query.wikidata.org/sparql?query=SELECT%20DISTINCT%20%3Fiso%20%3Flang%20%3Fname%20%3Farticle%20WHERE%20%7B%0A%20%20%3Fscript%20wdt%3AP506%20%3Fiso%20.%0A%20%20%3Farticle%20schema%3Aabout%20%3Fscript%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20schema%3AinLanguage%20%3Flang%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20schema%3Aname%20%3Fname%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20schema%3AisPartOf%20%5B%20wikibase%3AwikiGroup%20%22wikipedia%22%20%5D%20.%0A%20%20FILTER(%3Flang%20in%20('"'en'%2C%20'de'%2C%20'pl'%2C%20'es'"'))%20.%0A%7D&format=json'
-#
-sql/51_wp_scripts_en.sql:
+sql/51_wp_scripts.sql:
 	@echo create $@
-	@true > $@
-	@cat data/script_to_wikipedia.csv | \
-	    while IFS= read -r line; do \
-	        ( \
-	        echo -n "INSERT INTO script_abstract ( sc, abstract, lang, src )VALUES ('"; \
-	        echo -n "$${line%;*}"; \
-	        echo -n "', '"; \
-	        $(CURL) $(CURL_OPTS) 'https://en.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles='$${line##*;} | \
-	            $(JQ) -r '.query.pages[].extract' | \
-	            sed "s/'/\\\\'/g"; \
-	        echo  "', 'en', 'https://en.wikipedia.org/wiki/$${line##*;}');"; \
-	        ) >> $@ ; \
-	    done
+	@CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' bin/wp_scripts_to_sql.sh "$@"
 
-#
-# Fetching WP block articles via SPARQL:
-#
-#     SELECT DISTINCT ?lang ?name ?article WHERE {
-#       ?block wdt:P31 wd:Q3512806 .
-#       ?article schema:about ?block ;
-#                   schema:inLanguage ?lang ;
-#                   schema:name ?name ;
-#                   schema:isPartOf [ wikibase:wikiGroup "wikipedia" ] .
-#       FILTER(?lang in ('en', 'de', 'pl', 'es')) .
-#     }
-#
-# Sandbox: https://w.wiki/xTU
-#
-# TODO with above query: Map Unicode block names to WP article titles.
-#
-sql/52_wp_blocks_en.sql:
+sql/52_wp_blocks.sql:
 	@echo create $@
-	@true > $@
-	@$(CURL) $(CURL_OPTS) 'https://en.wikipedia.org/w/api.php?action=query&list=categorymembers&cmtitle=Category:Unicode_blocks&format=json&cmlimit=500&cmprop=title&cmtype=page' | \
-	    $(JQ) -r '.query.categorymembers[].title' | \
-	    sed '/Unicode Block$$/d' | \
-	    while IFS= read -r line; do \
-	        ( \
-	        echo -n "INSERT INTO block_abstract ( block, abstract, lang ) VALUES ('"; \
-	        echo -n "$$line" | sed 's/ (Unicode [bB]lock)//'; \
-	        echo -n "', '"; \
-	        $(CURL) $(CURL_OPTS) "https://en.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles="$$($(PYTHON) -c 'from urllib.parse import quote;print(quote('\""$$line"\"', safe=""))') | \
-	            $(JQ) -r ".query.pages[].extract" | \
-	            sed "s/'/\\\\'/g"; \
-	        echo  "', 'en');"; \
-	        ) >> $@ ; \
-	    done
+	@CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' bin/wp_blocks_to_sql.sh "$@"
 
 sql/60_font_HANNOMB.sql \
 sql/60_font_HanaMinA.sql \
@@ -538,8 +486,8 @@ clean:
 	    sql/40_digraphs.sql \
 	    sql/41_namedsequences.sql \
 	    sql/50_wp_codepoints_*.sql \
-	    sql/51_wp_scripts_en.sql \
-	    sql/52_wp_blocks_en.sql \
+	    sql/51_wp_scripts.sql \
+	    sql/52_wp_blocks.sql \
 	    sql/60_font_*.sql \
 	    sql/70_search_index.sql \
 	    sql/71_font_order.sql \
