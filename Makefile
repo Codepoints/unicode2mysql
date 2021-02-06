@@ -65,8 +65,8 @@ sql-static: \
 	sql/50_wp_codepoints_en.sql \
 	sql/50_wp_codepoints_es.sql \
 	sql/50_wp_codepoints_pl.sql \
-	sql/51_wp_scripts_en.sql \
-	sql/52_wp_blocks_en.sql \
+	sql/51_wp_scripts.sql \
+	sql/52_wp_blocks.sql \
 	sql/60_font_HANNOMB.sql \
 	sql/60_font_HanaMinA.sql \
 	sql/60_font_HanaMinB.sql \
@@ -130,6 +130,14 @@ cache/%wiki-latest-all-titles-in-ns0.gz:
 	done
 .SECONDARY: cache/*wiki-latest-all-titles-in-ns0.gz
 
+# grep localized to use UTF-8 will filter all titles with a single UTF-8
+# character.
+#
+# xargs takes over parallelization. 3 parallel calls, each with a 0.01 s sleep
+# should make sure, that we don't exceed the current limit of 200 API calls per
+# second
+#
+# bin/char_to_abstract.sh calls the WP API and stores the excerpt.
 cache/abstracts/de/0041 \
 cache/abstracts/en/0041 \
 cache/abstracts/es/0041 \
@@ -138,8 +146,9 @@ cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
 	@echo create $@
 	@mkdir -p cache/abstracts/$*
 	@zcat cache/$*wiki-latest-all-titles-in-ns0.gz | \
-	    LANG=C.UTF-8 grep '^.$$' | \
-	    SRCLANG="$*" xargs -d '\n' -i -n 1 -P 0 bin/char_to_abstract.sh '{}'
+		LANG=C.UTF-8 grep '^.$$' | \
+		CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' SRCLANG="$*" \
+			xargs -d '\n' -i -n 1 -P 3 bin/char_to_abstract.sh '{}'
 .SECONDARY: cache/abstracts/de/0041
 .SECONDARY: cache/abstracts/en/0041
 .SECONDARY: cache/abstracts/es/0041
