@@ -6,8 +6,14 @@
 -- Properties that refer to other codepoints are placed in table
 -- codepoint_relation. Scripts are in codepoint_script.
 --
+
 CREATE TABLE codepoints (
   cp                    INTEGER PRIMARY KEY NOT NULL,
+  name                  VARCHAR(255),
+);
+
+CREATE TABLE codepoint_props (
+  cp                    INTEGER REFERENCES codepoints,
   age                   VARCHAR(4) NOT NULL REFERENCES prop_age,
   na                    VARCHAR(255),
   na1                   VARCHAR(255),

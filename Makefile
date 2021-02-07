@@ -300,9 +300,9 @@ cache/fonts/%.svg: cache/fonts/%.ttf
 	cache/fonts/unifont_upper.svg
 
 
-sql/30_ucd.sql: cache/ucd.all.flat.xml
+sql/30_ucd.sql: cache/ucd.all.flat.xml cache/unicode/ReadMe.txt
 	@echo create $@
-	@< $< $(PYTHON) bin/ucd_to_sql.py > $@
+	@$(PYTHON) bin/ucd_to_sql.py "$<" "cache/unicode/NameAliases.txt" > $@
 
 sql/31_htmlentities.sql: cache/htmlentities.json
 	@echo create $@

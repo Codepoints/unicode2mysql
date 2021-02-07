@@ -1,10 +1,11 @@
 #!/usr/bin/python3
 
+import re
 import sys
 from xml.parsers import expat
 from block_map import block_map
 
-template = "INSERT INTO codepoints (%(fields)s) VALUES (%(values)s);\n"
+template = "INSERT INTO codepoint_props (%(fields)s) VALUES (%(values)s);\n"
 
 # boolean fields
 boolfields = (
@@ -38,6 +39,12 @@ intfields = (
 relation_fields = cpfields + cppfields
 
 
+name_map = {}
+def add_to_name_map(cp, na, na1):
+    global name_map
+    name_map[cp] = na if na else na1 + '*' if na1 else ''
+
+
 cps_buffer = {}
 def add_to_cps_buffer(fields, values):
     global cps_buffer
@@ -53,7 +60,7 @@ def write_cps_buffer(fields=None):
         while cps_buffer:
             write_cps_buffer(list(cps_buffer)[0])
     else:
-        print("INSERT INTO codepoints (%s) VALUES\n(" % fields)
+        print("INSERT INTO codepoint_props (%s) VALUES\n(" % fields)
         print('),\n('.join(cps_buffer[fields]))
         print(");\n")
         del(cps_buffer[fields])
@@ -149,6 +156,7 @@ def handle_cp(hex_cp, attrs):
             fields.append(f)
             values.append("'%s'" % v.replace("'", "''"))
     add_to_cps_buffer(','.join(fields), ','.join(values))
+    add_to_name_map(cp, attrs['na'].replace('#', ucp), 'NONCHARACTER' if attrs.get('NChar') == 'Y' else attrs.get('na1', ''))
 
 
 def start_element(element, attrs):
@@ -161,9 +169,25 @@ def start_element(element, attrs):
 
 p = expat.ParserCreate()
 p.StartElementHandler = start_element
-p.Parse(sys.stdin.read())
+with open(sys.argv[1]) as ucd_file:
+    p.Parse(ucd_file.read())
 
 write_cps_buffer()
 write_rel_buffer()
 write_script_buffer()
 write_update_script_buffer()
+
+with open(sys.argv[2]) as alias_file:
+    for line in alias_file:
+        if not line.strip() or not re.match('[0-9A-F]', line):
+            continue
+        hex_cp, alias, type_ = line.strip().split(';')
+        cp = int(hex_cp, 16)
+        if type_ == 'correction':
+            name_map[cp] = alias + '*'
+        elif not name_map[cp] and type_ in ('control', 'figment'):
+            name_map[cp] = alias + '*'
+
+for cp, name in name_map.items():
+    print("INSERT INTO codepoints (cp, name) VALUES ({}, '{}');\n".format(
+        cp, name.replace("'", "''")))
