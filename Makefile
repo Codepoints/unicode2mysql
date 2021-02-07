@@ -156,7 +156,7 @@ cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
 
 cache/noto/NotoSans/NotoSans-Regular.svg: cache/noto/NotoSans/NotoSans-Regular.ttf
 	@echo convert Noto fonts to SVG
-	@for font in cache/noto/NotoSans*/NotoSans*-Regular.ttf cache/noto/NotoSans*-Regular.otf; do \
+	@for font in cache/noto/*/*-Regular.ttf cache/noto/NotoSans*-Regular.otf; do \
 	    $(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$$font"; \
 	    sed -i 's/ unicode="&#x\(e01[0-9a-f]\|fe0\)[0-9a-f];"//g' "$$(echo "$$font" | sed 's/\.[ot]tf$$/.svg/')"; \
 	done
@@ -324,11 +324,16 @@ sql/32_confusables.sql: cache/confusables.txt
 # parallelization: `nl` prefixes each filename with a number, xargs consumes
 # the number and the filename with "-n 2" and makes Saxon create a tmp file
 # with the number attached. Then those files get cat'ed into the target.
+#
+# TODO: This is a bit inefficient. It'd be better, if we could store, which
+# cps we've already handled. Currently double cps both end in the SQL file,
+# but the latter will be simply ignored.
 sql/33_images.sql: cache/noto/NotoSans/NotoSans-Regular.svg
 	@echo create $@
-	@ls -1 cache/noto/Noto*.svg | \
-	    nl | \
-	    xargs -n 2 -P 0 sh -c '$(SAXON) -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
+	@cat data/noto_loading_order.txt | \
+		sed 's#^#cache/noto/#' | \
+		nl | \
+		xargs -n 2 -P 0 sh -c '$(SAXON) -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
 	@cat "$@".?* > $@ && /bin/rm "$@".?*
 
 sql/34_aliases.sql: cache/unicode/ReadMe.txt

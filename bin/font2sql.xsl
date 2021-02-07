@@ -57,8 +57,27 @@
       </choose>
       <text>, </text>
       <value-of select="abs($descent) + $ascent"/>
-      <text>, 'data:image/svg+xml,</text>
-      <value-of select="encode-for-uri('&lt;svg xmlns=&quot;http://www.w3.org/2000/svg&quot; viewBox=&quot;0 0 ')"/>
+      <text>, '&lt;svg xmlns="http://www.w3.org/2000/svg" id="U</text>
+      <variable name="hexcp">
+        <call-template name="ConvertDecToHex">
+          <with-param name="index" select="string-to-codepoints(@unicode)"/>
+        </call-template>
+      </variable>
+      <choose>
+        <when test="string-length($hexcp) = 1">
+          <value-of select="concat('000', $hexcp)"/>
+        </when>
+        <when test="string-length($hexcp) = 2">
+          <value-of select="concat('00', $hexcp)"/>
+        </when>
+        <when test="string-length($hexcp) = 3">
+          <value-of select="concat('0', $hexcp)"/>
+        </when>
+        <otherwise>
+          <value-of select="$hexcp"/>
+        </otherwise>
+      </choose>
+      <text>" viewBox="0 0 </text>
         <choose>
           <when test="@horiz-adv-x and @horiz-adv-x != '0'">
             <value-of select="@horiz-adv-x"/>
@@ -70,11 +89,11 @@
             <value-of select="$units-per-em"/>
           </otherwise>
         </choose>
-        <value-of select="encode-for-uri(concat(
+        <value-of select="concat(
           ' ',
           abs($descent) + $ascent,
           '&quot;>',
-          '&lt;path transform=&quot;translate('))" />
+          '&lt;path transform=&quot;translate(')" />
         <choose>
           <when test="@horiz-adv-x = '0' or (not(@horiz-adv-x) and $default-adv = '0')">
             <!-- when the glyph has no horiz-adv, then it's some kind of
@@ -86,12 +105,12 @@
             <text>0</text>
           </otherwise>
         </choose>
-        <value-of select="encode-for-uri(concat(', ',
+        <value-of select="concat(', ',
           $ascent,
           ') scale(1,-1)&quot; d=&quot;',
           @d,
           '&quot;/>&lt;/svg>'
-          ))"/>
+          )"/>
       <text>'</text>
       <text>)</text>
     <choose>
@@ -103,6 +122,32 @@
         <text>,</text>
       </when>
     </choose>
+  </template>
+
+  <!-- source: https://gist.github.com/xpathr/2653476 -->
+  <template name="ConvertDecToHex">
+    <param name="index" />
+    <if test="$index > 0">
+      <call-template name="ConvertDecToHex">
+        <with-param name="index" select="floor($index div 16)" />
+      </call-template>
+      <choose>
+        <when test="$index mod 16 &lt; 10">
+          <value-of select="$index mod 16" />
+        </when>
+        <otherwise>
+          <choose>
+            <when test="$index mod 16 = 10">A</when>
+            <when test="$index mod 16 = 11">B</when>
+            <when test="$index mod 16 = 12">C</when>
+            <when test="$index mod 16 = 13">D</when>
+            <when test="$index mod 16 = 14">E</when>
+            <when test="$index mod 16 = 15">F</when>
+            <otherwise>A</otherwise>
+          </choose>
+        </otherwise>
+      </choose>
+    </if>
   </template>
 
 </stylesheet>

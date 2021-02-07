@@ -195,7 +195,7 @@ INSERT INTO  prop_SB VALUES
 CREATE TABLE prop_relation ( relation VARCHAR(7) PRIMARY KEY );
 INSERT INTO  prop_relation VALUES ('bmg'), ('dm'), ('FC_NFKC'), ('suc'),
 ('slc'), ('stc'), ('uc'), ('lc'), ('tc'), ('scf'), ('cf'), ('NFKC_CF'),
-('bpb');
+('bpb'), ('EqUIdeo');
 
 CREATE TABLE prop_annotation_type ( annotation_type VARCHAR(7) PRIMARY KEY );
 INSERT INTO prop_annotation_type VALUES ('tag'), ('tts');

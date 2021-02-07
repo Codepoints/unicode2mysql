@@ -144,17 +144,22 @@ CREATE TABLE codepoints (
   kIRG_GSource          VARCHAR(24),
   kIRG_HSource          VARCHAR(8),
   kIRG_JSource          VARCHAR(10),
-  kIRG_KPSource         VARCHAR(8),
+  kIRG_KPSource         VARCHAR(9),
   kIRG_KSource          VARCHAR(8),
   kIRG_MSource          VARCHAR(9),
-  kIRG_SSource          VARCHAR(9),
+  kIRG_SSource          VARCHAR(9),   -- 13.0
   kIRG_TSource          VARCHAR(255),
   kIRG_USource          VARCHAR(10),
-  kIRG_UKSource         VARCHAR(8),
+  kIRG_UKSource         VARCHAR(8),   -- 13.0
   kIRG_VSource          VARCHAR(8),
+  kJa                   VARCHAR(6),   -- 8.0
   kJHJ                  TEXT(2047),
+  kJinmeiyoKanji        VARCHAR(255), -- 11.0
+  kJoyoKanji            VARCHAR(255), -- 11.0
+  kKoreanEducationHanja VARCHAR(255), -- 11.0
+  kKoreanName           VARCHAR(255), -- 11.0
+  kTGH                  VARCHAR(255), -- 11.0
   kJIS0213              VARCHAR(7),
-  kJa                   VARCHAR(6),    -- 8.0
   kJapaneseKun          VARCHAR(255),
   kJapaneseOn           VARCHAR(255),
   kJis0                 VARCHAR(4),
@@ -163,7 +168,7 @@ CREATE TABLE codepoints (
   kKPS1                 VARCHAR(4),
   kKSC0                 VARCHAR(4),
   kKSC1                 VARCHAR(4),
-  kKangXi               VARCHAR(8),
+  kKangXi               VARCHAR(255),
   kKarlgren             VARCHAR(5),
   kKorean               VARCHAR(255),
   kLau                  VARCHAR(255),
@@ -188,10 +193,13 @@ CREATE TABLE codepoints (
   kSemanticVariant      VARCHAR(255),
   kSimplifiedVariant    VARCHAR(255),
   kSpecializedSemanticVariant VARCHAR(255),
+  kSpoofingVariant      VARCHAR(7),   -- 13.0
   kTaiwanTelegraph      VARCHAR(4),
   kTang                 VARCHAR(255),
+  kTGHZ2013             VARCHAR(255), -- 13.0
   kTotalStrokes         VARCHAR(3),
   kTraditionalVariant   VARCHAR(255),
+  kUnihanCore2020       VARCHAR(7),   -- 13.0
   kVietnamese           VARCHAR(255),
   kXHC1983              VARCHAR(255),
   kWubi                 TEXT(2047),
@@ -201,12 +209,6 @@ CREATE TABLE codepoints (
   kTGT_MergedSrc        VARCHAR(255), -- 9.0
   kSrc_NushuDuben       VARCHAR(255), -- 10.0
   kReading              VARCHAR(255), -- 10.0
-  EqUIdeo               VARCHAR(255), -- 11.0
-  kJinmeiyoKanji        VARCHAR(255), -- 11.0
-  kJoyoKanji            VARCHAR(255), -- 11.0
-  kKoreanEducationHanja VARCHAR(255), -- 11.0
-  kKoreanName           VARCHAR(255), -- 11.0
-  kTGH                  VARCHAR(255), -- 11.0
   Emoji                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   EPres                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   EMod                  BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
