@@ -9,7 +9,7 @@
 
 CREATE TABLE codepoints (
   cp                    INTEGER PRIMARY KEY NOT NULL,
-  name                  VARCHAR(255),
+  name                  VARCHAR(255)
 );
 
 CREATE TABLE codepoint_props (
@@ -223,8 +223,8 @@ CREATE TABLE codepoint_props (
   ExtPict               BOOLEAN NOT NULL DEFAULT 0, -- emoji 11.0
   blk                   VARCHAR(127)
 ) CHARACTER SET utf8mb4;
-CREATE INDEX codepoints_name ON codepoints ( na );
-CREATE INDEX codepoints_blk ON codepoints ( blk );
+CREATE INDEX codepoint_props_name ON codepoint_props ( na );
+CREATE INDEX codepoint_props_blk ON codepoint_props ( blk );
 
 
 --
