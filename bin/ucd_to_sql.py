@@ -156,7 +156,10 @@ def handle_cp(hex_cp, attrs):
             fields.append(f)
             values.append("'%s'" % v.replace("'", "''"))
     add_to_cps_buffer(','.join(fields), ','.join(values))
-    add_to_name_map(cp, attrs['na'].replace('#', ucp), 'NONCHARACTER' if attrs.get('NChar') == 'Y' else attrs.get('na1', ''))
+    add_to_name_map(
+        cp,
+        attrs['na'].replace('#', ucp),
+        'NONCHARACTER' if attrs.get('NChar') == 'Y' else attrs.get('na1', ''))
 
 
 def start_element(element, attrs):
