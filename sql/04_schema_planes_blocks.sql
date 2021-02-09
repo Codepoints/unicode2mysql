@@ -15,18 +15,6 @@ CREATE INDEX blocks_cps ON blocks ( first, last );
 
 
 --
--- The block a codepoint belongs to
---
-CREATE TABLE codepoint_block (
-  cp   INTEGER REFERENCES codepoints,
-  blk  VARCHAR(127) REFERENCES blocks,
-  UNIQUE ( cp, blk )
-);
-CREATE INDEX codepoint_block_cp ON codepoint_block ( cp );
-CREATE INDEX codepoint_block_blk ON codepoint_block ( blk );
-
-
---
 -- defined Unicode planes
 --
 CREATE TABLE planes (
