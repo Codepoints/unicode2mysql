@@ -40,9 +40,9 @@ relation_fields = cpfields + cppfields
 
 
 name_map = {}
-def add_to_name_map(cp, na, na1):
+def add_to_name_map(cp, na, na1, gc):
     global name_map
-    name_map[cp] = na if na else na1 + '*' if na1 else ''
+    name_map[cp] = [na if na else na1 + '*' if na1 else '', gc]
 
 
 cps_buffer = {}
@@ -159,7 +159,8 @@ def handle_cp(hex_cp, attrs):
     add_to_name_map(
         cp,
         attrs['na'].replace('#', ucp),
-        'NONCHARACTER' if attrs.get('NChar') == 'Y' else attrs.get('na1', ''))
+        'NONCHARACTER' if attrs.get('NChar') == 'Y' else attrs.get('na1', ''),
+        attrs['gc'])
 
 
 def start_element(element, attrs):
@@ -187,10 +188,10 @@ with open(sys.argv[2]) as alias_file:
         hex_cp, alias, type_ = line.strip().split(';')
         cp = int(hex_cp, 16)
         if type_ == 'correction':
-            name_map[cp] = alias + '*'
-        elif not name_map[cp] and type_ in ('control', 'figment'):
-            name_map[cp] = alias + '*'
+            name_map[cp][0] = alias + '*'
+        elif not name_map[cp][0] and type_ in ('control', 'figment'):
+            name_map[cp][0] = alias + '*'
 
-for cp, name in name_map.items():
-    print("INSERT INTO codepoints (cp, name) VALUES ({}, '{}');\n".format(
-        cp, name.replace("'", "''")))
+for cp, props in name_map.items():
+    print("INSERT INTO codepoints (cp, name, gc) VALUES ({}, '{}', '{}');\n".format(
+        cp, props[0].replace("'", "''"), props[1]))

@@ -9,7 +9,8 @@
 
 CREATE TABLE codepoints (
   cp                    INTEGER PRIMARY KEY NOT NULL,
-  name                  VARCHAR(255)
+  name                  VARCHAR(255),
+  gc                    VARCHAR(2) REFERENCES prop_gc
 );
 
 CREATE TABLE codepoint_props (
