@@ -329,19 +329,20 @@ sql/32_confusables.sql: cache/confusables.txt
 # cps we've already handled. Currently double cps both end in the SQL file,
 # but the latter will be simply ignored.
 sql/33_images.sql: cache/noto/NotoSans/NotoSans-Regular.svg
-	@echo create $@
+	@echo "create $@"
 	@cat data/noto_loading_order.txt | \
 		sed 's#^#cache/noto/#' | \
 		nl | \
 		xargs -n 2 -P 0 sh -c '$(SAXON) -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
-	@cat "$@".?* > $@ && /bin/rm "$@".?*
+	@cat "$@".?* > "$@" && /bin/rm "$@".?*
+	@$(PYTHON) bin/emojis_to_sql.py cache/noto/emojis >> "$@"
 
 sql/34_aliases.sql: cache/unicode/ReadMe.txt
-	@echo create $@
+	@echo "create $@"
 	@$(PYTHON) bin/alias_to_sql.py > $@
 
 sql/35_blocks.sql: cache/unicode/ReadMe.txt
-	@echo create $@
+	@echo "create $@"
 	@sed -n '/^[0-9A-F]/p' cache/unicode/Blocks.txt | \
 	    sed 's/\([0-9A-F]\+\)\.\.\([0-9A-F]\+\); \?\(.\+\)$$/\3\x00\1\x00\2/' | \
 	    tr '\n' '\0' | \
@@ -515,3 +516,8 @@ virtualenv:
 	@virtualenv -p /usr/bin/python3 ./virtualenv
 	@./virtualenv/bin/pip install -r requirements.txt
 .PHONY: virtualenv
+
+find_missing_image_scripts:
+	@echo 'SELECT COUNT(*) as count, sc FROM codepoints c LEFT JOIN codepoint_script s USING (cp) LEFT JOIN `codepoint_image` USING (cp) WHERE image IS NULL GROUP BY sc ORDER BY count DESC ' | \
+		$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB)
+.PHONY: find_missing_image_scripts

@@ -3,3 +3,4 @@ lxml==4.6.2
 Markdown==3.3.3
 mysqlclient==2.0.3
 nltk==3.5
+scour==0.38.2
