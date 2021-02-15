@@ -72,18 +72,26 @@ def compose_images(image_map):
     for cp, initial_data in image_map.items():
         data = {}
         seen_images = []
+        # condense list of possible images to the ones that actually differ
         for key, content in initial_data.items():
             image = content[3]
             if image in seen_images:
                 continue
             data[key] = content
             seen_images.append(image)
+
         keys = list(data.keys())
+
+        # no images at all: on to the next
         if not len(keys):
             continue
+
+        # a single glyph: return it like all others
         if len(keys) == 1:
             print(sql_template.format(*data[keys[0]]))
             continue
+
+        # differences between sc,tc,jp,hk? Animate between them
         joint_image = ''
         offset = 0
         width = 0
@@ -93,6 +101,10 @@ def compose_images(image_map):
             height = height if height > content[2] else content[2]
             image = content[3]
             image = re.sub('id="U([^"]+)"', r'id="U\1{}"'.format(key), image)
+            # the opacity values are a list of 0s and 1s. Each first and last
+            # value in the list have to be the same, otherwise the animation
+            # will jump. Solution: 2 times more opacity values than different
+            # glyphs.
             opacity = ['0'] * len(keys) * 2
             opacity[offset] = '1'
             opacity[offset - 1] = '1'
