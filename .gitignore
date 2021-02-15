@@ -19,7 +19,7 @@ sql/50_wp_codepoints_es.sql
 sql/50_wp_codepoints_pl.sql
 sql/51_wp_scripts.sql
 sql/52_wp_blocks.sql
-sql/60_font_*.sql
+sql/6?_font_*.sql
 sql/70_search_index.sql
 sql/71_font_order.sql
 *.pyc
