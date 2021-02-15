@@ -106,8 +106,8 @@ def compose_images(image_map):
             # will jump. Solution: 2 times more opacity values than different
             # glyphs.
             opacity = ['0'] * len(keys) * 2
-            opacity[offset] = '1'
-            opacity[offset - 1] = '1'
+            opacity[offset*2] = '1'
+            opacity[offset*2 - 1] = '1'
             image = re.sub(
                 '</svg>',
                 '<animate attributeName="opacity" values="{}" dur="{}s" repeatCount="indefinite"/></svg>'.format(
