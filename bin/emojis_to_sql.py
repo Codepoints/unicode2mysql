@@ -13,6 +13,7 @@ sql_template = (
 
 
 class ScourOptions:
+    strip_ids = True
     enable_viewboxing = True
     indent_type = 'none'
     newlines = False
@@ -39,6 +40,8 @@ def main(args):
         with file_path.open() as f:
             content = f.read()
         content = scourString(content, ScourOptions)
+        content = re.sub(' enable-background="[^"]*"', '', content)
+        content = re.sub('<svg', '<svg id="U{}"'.format(hex.upper()), content, count=1)
         width = 128
         height = 128
         dimensions = re.match(
@@ -47,7 +50,7 @@ def main(args):
         if dimensions:
             width = int(dimensions[3]) - int(dimensions[1])
             height = int(dimensions[4]) - int(dimensions[2])
-        print(sql_template.format(dec, width, height, content))
+        print(sql_template.format(dec, width, height, content.replace("'", "''")))
 
 
 if __name__ == '__main__':

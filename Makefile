@@ -36,7 +36,7 @@ WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.your.org
 
 DUMMY_DB := codepoints_dummy
 
-UNIFONT_VERSION := 13.0.05
+UNIFONT_VERSION := 13.0.06
 
 
 all: sql
@@ -49,7 +49,6 @@ sql-static: \
 	sql/30_ucd.sql \
 	sql/31_htmlentities.sql \
 	sql/32_confusables.sql \
-	sql/33_images.sql \
 	sql/34_aliases.sql \
 	sql/35_blocks.sql \
 	sql/36_encodings.sql \
@@ -67,17 +66,26 @@ sql-static: \
 	sql/50_wp_codepoints_pl.sql \
 	sql/51_wp_scripts.sql \
 	sql/52_wp_blocks.sql \
-	sql/60_font_HANNOMB.sql \
-	sql/60_font_HanaMinA.sql \
-	sql/60_font_HanaMinB.sql \
-	sql/60_font_damase_v.2.sql \
-	sql/60_font_KikakuiSansPro.ot.sql \
-	sql/60_font_SuttonSignWriting8.sql \
-	sql/60_font_TangutYinchuan.sql \
-	sql/60_font_BabelStoneMarchen.sql \
-	sql/60_font_unifont.sql \
-	sql/60_font_unifont_upper.sql
+	sql-fonts
 .PHONY: sql-static
+
+sql-fonts: \
+	sql/60_font_noto.sql \
+	sql/60_font_noto_emoji.sql \
+	sql/60_font_noto_cjk.sql \
+	sql/61_font_HanaMinA.sql \
+	sql/61_font_HanaMinB.sql \
+	sql/61_font_BabelStoneKhitanSmallLinear.sql \
+	sql/61_font_ScheherazadeNew-Regular.sql \
+	sql/62_font_unifont.sql \
+	sql/62_font_unifont_upper.sql
+	#sql/61_font_HANNOMB.sql \
+	#sql/61_font_damase_v.2.sql \
+	#sql/61_font_KikakuiSansPro.ot.sql \
+	#sql/61_font_SuttonSignWriting8.sql \
+	#sql/61_font_TangutYinchuan.sql \
+	#sql/61_font_BabelStoneMarchen.sql
+.PHONY: sql-fonts
 
 sql-dynamic: sql/70_search_index.sql sql/71_font_order.sql
 .PHONY: sql-dynamic
@@ -171,11 +179,11 @@ cache/noto/NotoSans/NotoSans-Regular.ttf:
 		export --force --quiet \
 		https://github.com/googlefonts/noto-fonts/trunk/unhinted/ttf \
 		cache/noto
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansSC-Regular.otf > cache/noto/NotoSansSC-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansTC-Regular.otf > cache/noto/NotoSansTC-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansKR-Regular.otf > cache/noto/NotoSansKR-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansJP-Regular.otf > cache/noto/NotoSansJP-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansHK-Regular.otf > cache/noto/NotoSansHK-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansCJKsc-Regular.otf > cache/noto/NotoSansCJKsc-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansCJKtc-Regular.otf > cache/noto/NotoSansCJKtc-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansCJKkr-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansCJKjp-Regular.otf > cache/noto/NotoSansCJKjp-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/master/NotoSansCJKhk-Regular.otf > cache/noto/NotoSansCJKhk-Regular.otf
 	@docker run --rm \
 		--volume "$$PWD":/src \
 		--user "$$(id -u)" \
@@ -229,7 +237,7 @@ cache/fonts/HANNOMB.ttf:
 
 cache/fonts/HanaMinA.ttf:
 	@echo download font Hanazono
-	@$(CURL) $(CURL_OPTS) 'https://de.osdn.net/frs/redir.php?m=rwthaachen&f=hanazono-font%2F64385%2Fhanazono-20160201.zip' | \
+	@$(CURL) $(CURL_OPTS) 'https://de.osdn.net/frs/redir.php?m=rwthaachen&f=hanazono-font%2F68253%2Fhanazono-20170904.zip' | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 .SECONDARY: cache/fonts/HanaMinA.ttf
 
@@ -254,13 +262,18 @@ cache/fonts/SuttonSignWriting8.ttf:
 
 cache/fonts/TangutYinchuan.ttf:
 	@echo download font TangutYinchuan
-	@$(CURL) $(CURL_OPTS) http://babelstone.co.uk/Fonts/Download/TangutYinchuan.ttf > $@
+	@$(CURL) $(CURL_OPTS) https://babelstone.co.uk/Fonts/Download/TangutYinchuan.ttf > $@
 .SECONDARY: cache/fonts/TangutYinchuan.ttf
 
 cache/fonts/BabelStoneMarchen.ttf:
 	@echo download font BabelStoneMarchen
-	@$(CURL) $(CURL_OPTS) http://www.babelstone.co.uk/Fonts/Download/BabelStoneMarchen.ttf > $@
+	@$(CURL) $(CURL_OPTS) https://www.babelstone.co.uk/Fonts/Download/BabelStoneMarchen.ttf > $@
 .SECONDARY: cache/fonts/BabelStoneMarchen.ttf
+
+cache/fonts/BabelStoneKhitanSmallLinear.ttf:
+	@echo download font BabelStoneKhitanSmallLinear
+	@$(CURL) $(CURL_OPTS) https://babelstone.co.uk/Fonts/Download/BabelStoneKhitanSmallLinear.ttf > $@
+.SECONDARY: cache/fonts/BabelStoneKhitanSmallLinear.ttf
 
 cache/fonts/unifont.ttf:
 	@echo download font Unifont
@@ -272,6 +285,13 @@ cache/fonts/unifont_upper.ttf:
 	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).ttf > $@
 .SECONDARY: cache/fonts/unifont_upper.ttf
 
+cache/fonts/ScheherazadeNew-Regular.ttf:
+	@$(CURL) $(CURL_OPTS) 'https://software.sil.org/downloads/r/scheherazade/ScheherazadeNew-3.000.zip' | \
+	    $(BSDTAR) -xf- --cd cache/fonts '*-Regular.ttf'
+	@mv 'cache/fonts/ScheherazadeNew-3.000/ScheherazadeNew-Regular.ttf' cache/fonts/
+	@rmdir 'cache/fonts/ScheherazadeNew-3.000'
+.SECONDARY: cache/fonts/ScheherazadeNew-Regular.ttf
+
 
 cache/fonts/HANNOMB.svg \
 cache/fonts/HanaMinA.svg \
@@ -281,6 +301,8 @@ cache/fonts/KikakuiSansPro.ot.svg \
 cache/fonts/SuttonSignWriting8.svg \
 cache/fonts/TangutYinchuan.svg \
 cache/fonts/BabelStoneMarchen.svg \
+cache/fonts/BabelStoneKhitanSmallLinear.svg \
+cache/fonts/ScheherazadeNew-Regular.svg \
 cache/fonts/unifont.svg \
 cache/fonts/unifont_upper.svg:
 cache/fonts/%.svg: cache/fonts/%.ttf
@@ -296,6 +318,8 @@ cache/fonts/%.svg: cache/fonts/%.ttf
 	cache/fonts/SuttonSignWriting8.svg \
 	cache/fonts/TangutYinchuan.svg \
 	cache/fonts/BabelStoneMarchen.svg \
+	cache/fonts/BabelStoneKhitanSmallLinear.svg \
+	cache/fonts/ScheherazadeNew-Regular.svg \
 	cache/fonts/unifont.svg \
 	cache/fonts/unifont_upper.svg
 
@@ -328,14 +352,21 @@ sql/32_confusables.sql: cache/confusables.txt
 # TODO: This is a bit inefficient. It'd be better, if we could store, which
 # cps we've already handled. Currently double cps both end in the SQL file,
 # but the latter will be simply ignored.
-sql/33_images.sql: cache/noto/NotoSans/NotoSans-Regular.svg
+sql/60_font_noto.sql: cache/noto/NotoSans/NotoSans-Regular.svg
 	@echo "create $@"
 	@cat data/noto_loading_order.txt | \
 		sed 's#^#cache/noto/#' | \
 		nl | \
 		xargs -n 2 -P 0 sh -c '$(SAXON) -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
 	@cat "$@".?* > "$@" && /bin/rm "$@".?*
-	@$(PYTHON) bin/emojis_to_sql.py cache/noto/emojis >> "$@"
+
+sql/60_font_noto_emoji.sql: cache/noto/NotoSans/NotoSans-Regular.svg
+	@echo "create $@"
+	@$(PYTHON) bin/emojis_to_sql.py cache/noto/emoji > "$@"
+
+sql/60_font_noto_cjk.sql: cache/noto/NotoSans/NotoSans-Regular.svg
+	@echo "create $@"
+	@$(PYTHON) bin/cjk_to_sql.py cache/noto > "$@"
 
 sql/34_aliases.sql: cache/unicode/ReadMe.txt
 	@echo "create $@"
@@ -427,17 +458,23 @@ sql/52_wp_blocks.sql:
 	@echo create $@
 	@CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' bin/wp_blocks_to_sql.sh "$@"
 
-sql/60_font_HANNOMB.sql \
-sql/60_font_HanaMinA.sql \
-sql/60_font_HanaMinB.sql \
-sql/60_font_damase_v.2.sql \
-sql/60_font_KikakuiSansPro.ot.sql \
-sql/60_font_SuttonSignWriting8.sql \
-sql/60_font_TangutYinchuan.sql \
-sql/60_font_BabelStoneMarchen.sql \
-sql/60_font_unifont.sql \
-sql/60_font_unifont_upper.sql:
-sql/60_font_%.sql: cache/fonts/%.svg
+sql/61_font_HANNOMB.sql \
+sql/61_font_HanaMinA.sql \
+sql/61_font_HanaMinB.sql \
+sql/61_font_damase_v.2.sql \
+sql/61_font_KikakuiSansPro.ot.sql \
+sql/61_font_SuttonSignWriting8.sql \
+sql/61_font_TangutYinchuan.sql \
+sql/61_font_BabelStoneMarchen.sql \
+sql/61_font_BabelStoneKhitanSmallLinear.sql \
+sql/61_font_ScheherazadeNew-Regular.sql:
+sql/61_font_%.sql: cache/fonts/%.svg
+	@echo create $@
+	@$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
+
+sql/62_font_unifont.sql \
+sql/62_font_unifont_upper.sql:
+sql/62_font_%.sql: cache/fonts/%.svg
 	@echo create $@
 	@$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
 
@@ -468,6 +505,8 @@ db-data-static: db-schema sql-static
 	@if [ "$$(echo 'select count(*) from codepoints' | $(MYSQL) $(MYSQL_OPTS) -N $(DUMMY_DB))" == "0" ]; then \
 	    ls sql/[1-5]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) --force $(DUMMY_DB) < {}'; \
 	    cat sql/60_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
+	    cat sql/61_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
+	    cat sql/62_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
 	else \
 	    echo 'Database $(DUMMY_DB) is already populated. Use "make db-down" to delete a stale one.' >&2; \
 	fi
@@ -488,7 +527,6 @@ clean:
 	    sql/30_ucd.sql \
 	    sql/31_htmlentities.sql \
 	    sql/32_confusables.sql \
-	    sql/33_images.sql \
 	    sql/34_aliases.sql \
 	    sql/35_blocks.sql \
 	    sql/36_encodings.sql \
@@ -504,6 +542,8 @@ clean:
 	    sql/51_wp_scripts.sql \
 	    sql/52_wp_blocks.sql \
 	    sql/60_font_*.sql \
+	    sql/61_font_*.sql \
+	    sql/62_font_*.sql \
 	    sql/70_search_index.sql \
 	    sql/71_font_order.sql \
 	    cache/*
@@ -518,6 +558,6 @@ virtualenv:
 .PHONY: virtualenv
 
 find_missing_image_scripts:
-	@echo 'SELECT COUNT(*) as count, sc FROM codepoints c LEFT JOIN codepoint_script s USING (cp) LEFT JOIN `codepoint_image` USING (cp) WHERE image IS NULL GROUP BY sc ORDER BY count DESC ' | \
+	@echo 'SELECT count, iso, name FROM (SELECT COUNT(*) as count, sc AS iso FROM codepoints c LEFT JOIN codepoint_script s USING (cp) LEFT JOIN `codepoint_image` USING (cp) WHERE image IS NULL GROUP BY sc ORDER BY count DESC) x LEFT JOIN scripts USING (iso)' | \
 		$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB)
 .PHONY: find_missing_image_scripts
