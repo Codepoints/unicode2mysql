@@ -443,10 +443,11 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
 	@echo create $@
 	@true > $@
 	@for file in cache/abstracts/$*/*; do \
-	    printf "INSERT INTO codepoint_abstract ( cp, abstract, lang ) VALUES ( %s, '%s', '%s' );\n" \
+	    printf "INSERT INTO codepoint_abstract ( cp, abstract, lang, src ) VALUES ( %s, '%s', '%s', '%s' );\n" \
 	        $$(basename $$file | tr a-f A-F | sed 's/^/ibase=16;/' | bc) \
-	        "$$(sed "s/'/\\\\'/g" $$file)" \
+	        "$$(sed -n '2,$$p' $$file | sed "s/'/\\\\'/g")" \
 	        "$*" \
+	        "$$(sed -n 1p $$file | tr -d $$'\n')" \
 	    >> $@; \
 	done
 

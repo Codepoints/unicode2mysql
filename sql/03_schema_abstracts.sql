@@ -7,6 +7,8 @@ CREATE TABLE codepoint_abstract (
   cp       INTEGER REFERENCES codepoints,
   abstract BLOB,
   lang     VARCHAR(6) NOT NULL DEFAULT 'en',
+  src      VARCHAR(255), -- explicitly give a source, since the Wikipedia name
+                         -- might not be obvious.
   UNIQUE ( cp, lang )
 ) CHARACTER SET utf8mb4;
 CREATE INDEX codepoint_abstract_cp ON codepoint_abstract ( cp );

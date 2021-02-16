@@ -20,13 +20,16 @@ case "$QCHAR" in
                 QCHAR="${MAP_DE[$QCHAR]}"
                 ;;
             * )
-                QCHAR="$QCHAR_(${MAP_NUMBER[$SRCLANG]})"
+                QCHAR="${QCHAR}_(${MAP_NUMBER[$SRCLANG]})"
                 ;;
         esac
         ;;
 esac
 
-$CURL $CURL_OPTS "$URL$QCHAR" | $JQ -r '.extract_html' > "$(dirname $0)/../cache/abstracts/$SRCLANG/$XCHAR"
+echo "$URL$QCHAR" > "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
+
+$CURL $CURL_OPTS --location "$URL$QCHAR" | \
+    $JQ -r '.extract_html' >> "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
 
 # prevent running into API limits
 sleep 0.01
