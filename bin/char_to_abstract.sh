@@ -26,10 +26,8 @@ case "$QCHAR" in
         ;;
 esac
 
-echo "$URL$QCHAR" > "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
-
 $CURL $CURL_OPTS --location "$URL$QCHAR" | \
-    $JQ -r '.extract_html' >> "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
+    $JQ -r '.content_urls.desktop.page,.extract_html' > "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
 
 # prevent running into API limits
 sleep 0.01
