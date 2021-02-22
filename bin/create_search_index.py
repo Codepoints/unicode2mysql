@@ -255,7 +255,7 @@ cpus = cpu_count() or 2
 
 with multiprocessing.Pool(cpus) as pool:
     cur = get_cur(config)
-    cur.execute('SELECT * FROM codepoints;')
+    cur.execute('SELECT * FROM codepoint_props;')
     all_cps = cur.fetchall()
     cur.close()
 
