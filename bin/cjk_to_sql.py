@@ -108,6 +108,9 @@ def compose_images(image_map):
             opacity = ['0'] * len(keys) * 2
             opacity[offset*2] = '1'
             opacity[offset*2 - 1] = '1'
+            # double the last state to have its duration the same as the
+            # in-between states.
+            opacity.append(opacity[-1])
             image = re.sub(
                 '</svg>',
                 '<animate attributeName="opacity" values="{}" dur="{}s" repeatCount="indefinite"/></svg>'.format(
