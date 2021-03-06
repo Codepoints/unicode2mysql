@@ -1,6 +1,6 @@
 #!/bin/bash
 
-URL="https://$SRCLANG.wikipedia.org/api/rest_v1/page/summary/"
+URL="https://$SRCLANG.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles="
 CHAR="$1"
 
 declare -A MAP_ZERO=( ["en"]="Zero" ["de"]="Null" ["es"]="Cero" ["pl"]="Zero" )
@@ -26,8 +26,9 @@ case "$QCHAR" in
         ;;
 esac
 
+echo "https://$SRCLANG.wikipedia.org/wiki/$QCHAR" > "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
 $CURL $CURL_OPTS --location "$URL$QCHAR" | \
-    $JQ -r '.content_urls.desktop.page,.extract_html' > "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
+    $JQ -r '.query.pages | to_entries [0].value.extract' >> "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
 
 # prevent running into API limits
 sleep 0.01
