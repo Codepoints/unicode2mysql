@@ -87,7 +87,7 @@ sql-fonts: \
 	#sql/61_font_BabelStoneMarchen.sql
 .PHONY: sql-fonts
 
-sql-dynamic: sql/70_search_index.sql sql/71_font_order.sql
+sql-dynamic: sql/70_search_index.sql # sql/71_font_order.sql
 .PHONY: sql-dynamic
 
 
