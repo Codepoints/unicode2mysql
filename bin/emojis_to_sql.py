@@ -41,6 +41,9 @@ def main(args):
             content = f.read()
         content = scourString(content, ScourOptions)
         content = re.sub(' enable-background="[^"]*"', '', content)
+        content = re.sub('id="', 'id="U{}-'.format(hex.upper()), content)
+        content = re.sub(r'url\(#', 'url(#U{}-'.format(hex.upper()), content)
+        content = re.sub('href="#', 'href="#U{}-'.format(hex.upper()), content)
         content = re.sub('<svg', '<svg id="U{}"'.format(hex.upper()), content, count=1)
         width = 128
         height = 128
