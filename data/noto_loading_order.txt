@@ -149,3 +149,4 @@ NotoSansWancho/NotoSansWancho-Regular.svg
 NotoSansMendeKikakui/NotoSansMendeKikakui-Regular.svg
 NotoSansAdlamUnjoined/NotoSansAdlamUnjoined-Regular.svg
 NotoSansIndicSiyaqNumbers/NotoSansIndicSiyaqNumbers-Regular.svg
+NotoNaskhArabic/NotoNaskhArabic-Regular.svg
