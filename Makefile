@@ -53,7 +53,6 @@ sql-static: \
 	sql/35_blocks.sql \
 	sql/36_encodings.sql \
 	sql/37_latex.sql \
-	sql/38_emojis.sql \
 	sql/39_emoji_annotations_de.sql \
 	sql/39_emoji_annotations_en.sql \
 	sql/39_emoji_annotations_es.sql \
@@ -105,11 +104,6 @@ cache/htmlentities.json:
 	@echo create $@
 	@$(CURL) $(CURL_OPTS) https://html.spec.whatwg.org/entities.json > $@
 .SECONDARY: cache/htmlentities.json
-
-cache/emoji-data.txt:
-	@echo create $@
-	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/emoji/$(EMOJI_VERSION)/emoji-data.txt > $@
-.SECONDARY: cache/emoji-data.txt
 
 cache/ucd.all.flat.xml:
 	@echo create $@
@@ -391,14 +385,6 @@ sql/37_latex.sql: cache/latex.xml
 	@echo create $@
 	@$(SAXON) -s "$<" -xsl bin/latex_to_sql.xsl > "$@"
 
-sql/38_emojis.sql: cache/emoji-data.txt
-	@echo create $@
-	@sed -n '/^[0-9A-F]/s/\s*#.*//p' $< | \
-	    sed 's/^\([A-F0-9]\+\) /\1..\1 /' | \
-	    sed 's/\s*;\s*/ /' | sed 's/\.\./ /' | \
-	    xargs -n 3 sh -c 'for x in $$(seq $$(echo ibase=16\;$$0|bc) $$(echo ibase=16\;$$1|bc)); do echo UPDATE codepoints SET $$2=1 WHERE cp=$$x\;; done' \
-	    > $@
-
 sql/39_emoji_annotations_de.sql \
 sql/39_emoji_annotations_en.sql \
 sql/39_emoji_annotations_es.sql \
@@ -532,7 +518,6 @@ clean:
 	    sql/35_blocks.sql \
 	    sql/36_encodings.sql \
 	    sql/37_latex.sql \
-	    sql/38_emojis.sql \
 	    sql/39_emoji_annotations_de.sql \
 	    sql/39_emoji_annotations_en.sql \
 	    sql/39_emoji_annotations_es.sql \
