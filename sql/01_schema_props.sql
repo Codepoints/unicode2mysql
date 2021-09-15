@@ -8,7 +8,7 @@ CREATE TABLE prop_age ( age VARCHAR(4) PRIMARY KEY );
 INSERT INTO  prop_age VALUES ('1.1'), ('2.0'), ('2.1'), ('3.0'), ('3.1'),
 ('3.2'), ('4.0'), ('4.1'), ('5.0'), ('5.1'), ('5.2'), ('6.0'), ('6.1'),
 ('6.2'), ('6.3'), ('7.0'), ('8.0'), ('9.0'), ('10.0'), ('11.0'), ('12.0'),
-('12.1'), ('13.0');
+('12.1'), ('13.0'), ('14.0');
 
 CREATE TABLE prop_gc ( gc VARCHAR(2) PRIMARY KEY );
 INSERT INTO  prop_gc VALUES
@@ -86,7 +86,8 @@ INSERT INTO  prop_jg VALUES
 ('Reh'), ('Reversed_Pe'), ('Rohingya_Yeh'),
 ('Sad'), ('Sadhe'), ('Seen'), ('Semkath'), ('Shin'), ('Straight_Waw'),
 ('Swash_Kaf'), ('Syriac_Waw'),
-('Tah'), ('Taw'), ('Teh_Marbuta'), ('Teh_Marbuta_Goal'), ('Teth'),
+('Tah'), ('Taw'), ('Teh_Marbuta'), ('Teh_Marbuta_Goal'), ('Teth'), ('Thin_Yeh'),
+('Vertical_Tail'),
 ('Waw'),
 ('Yeh'), ('Yeh_Barree'), ('Yeh_With_Tail'), ('Yudh'), ('Yudh_He'),
 ('Zain'), ('Zhain');

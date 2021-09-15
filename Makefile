@@ -28,7 +28,7 @@ MYSQL_OPTS := --default-character-set=utf8mb4
 
 # control variables
 
-EMOJI_VERSION := 13.1
+EMOJI_VERSION := 14.0
 
 LANGUAGES := de en es pl
 
@@ -36,7 +36,7 @@ WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.your.org
 
 DUMMY_DB := codepoints_dummy
 
-UNIFONT_VERSION := 13.0.06
+UNIFONT_VERSION := 14.0.01
 
 
 all: sql
