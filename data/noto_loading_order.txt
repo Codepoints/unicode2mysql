@@ -21,7 +21,6 @@ NotoSansMalayalam/NotoSansMalayalam-Regular.svg
 NotoSansSinhala/NotoSansSinhala-Regular.svg
 NotoSansThai/NotoSansThai-Regular.svg
 NotoSansLao/NotoSansLao-Regular.svg
-NotoLoopedLao/NotoLoopedLao-Regular.svg
 NotoSerifTibetan/NotoSerifTibetan-Regular.svg
 NotoSansMyanmar/NotoSansMyanmar-Regular.svg
 NotoSansGeorgian/NotoSansGeorgian-Regular.svg
@@ -74,7 +73,6 @@ NotoSansJavanese/NotoSansJavanese-Regular.svg
 NotoSansCham/NotoSansCham-Regular.svg
 NotoSansTaiViet/NotoSansTaiViet-Regular.svg
 NotoSansMeeteiMayek/NotoSansMeeteiMayek-Regular.svg
-NotoLoopedThai/NotoLoopedThai-Regular.svg
 NotoSansLinearB/NotoSansLinearB-Regular.svg
 NotoSansLycian/NotoSansLycian-Regular.svg
 NotoSansCarian/NotoSansCarian-Regular.svg
