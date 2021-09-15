@@ -173,11 +173,11 @@ cache/noto/NotoSans/NotoSans-Regular.ttf:
 		export --force --quiet \
 		https://github.com/googlefonts/noto-fonts/trunk/unhinted/ttf \
 		cache/noto
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/NotoSansCJKsc-Regular.otf > cache/noto/NotoSansCJKsc-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/NotoSansCJKtc-Regular.otf > cache/noto/NotoSansCJKtc-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/NotoSansCJKkr-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/NotoSansCJKjp-Regular.otf > cache/noto/NotoSansCJKjp-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/NotoSansCJKhk-Regular.otf > cache/noto/NotoSansCJKhk-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/Sans/SubsetOTF/HK/NotoSansHK-Regular.otf > cache/noto/NotoSansCJKhk-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/Sans/SubsetOTF/JP/NotoSansJP-Regular.otf > cache/noto/NotoSansCJKjp-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/Sans/SubsetOTF/KR/NotoSansKR-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf > cache/noto/NotoSansCJKsc-Regular.otf
+	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/Sans/SubsetOTF/TC/NotoSansTC-Regular.otf > cache/noto/NotoSansCJKtc-Regular.otf
 	@docker run --rm \
 		--volume "$$PWD":/src \
 		--user "$$(id -u)" \
