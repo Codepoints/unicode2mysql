@@ -1,5 +1,5 @@
 beautifulsoup4==4.9.3
-lxml==4.6.3
+lxml==4.6.5
 Markdown==3.3.3
 mysqlclient==2.0.3
 nltk==3.5
