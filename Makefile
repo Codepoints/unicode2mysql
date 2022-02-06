@@ -562,28 +562,17 @@ fill-cache: \
 	cache/confusables.txt \
 	cache/encoding/README.md \
 	cache/fonts/BabelStoneKhitanSmallLinear.svg \
-	cache/fonts/BabelStoneKhitanSmallLinear.ttf \
 	cache/fonts/BabelStoneMarchen.svg \
-	cache/fonts/BabelStoneMarchen.ttf \
 	cache/fonts/damase_v.2.svg \
-	cache/fonts/damase_v.2.ttf \
 	cache/fonts/HanaMinA.svg \
-	cache/fonts/HanaMinA.ttf \
 	cache/fonts/HanaMinB.svg \
 	cache/fonts/HANNOMB.svg \
-	cache/fonts/HANNOMB.ttf \
 	cache/fonts/KikakuiSansPro.ot.svg \
-	cache/fonts/KikakuiSansPro.ot.ttf \
 	cache/fonts/ScheherazadeNew-Regular.svg \
-	cache/fonts/ScheherazadeNew-Regular.ttf \
 	cache/fonts/SuttonSignWriting8.svg \
-	cache/fonts/SuttonSignWriting8.ttf \
 	cache/fonts/TangutYinchuan.svg \
-	cache/fonts/TangutYinchuan.ttf \
 	cache/fonts/unifont.svg \
-	cache/fonts/unifont.ttf \
 	cache/fonts/unifont_upper.svg \
-	cache/fonts/unifont_upper.ttf \
 	cache/htmlentities.json \
 	cache/latex.xml \
 	cache/noto/NotoSans/NotoSans-Regular.ttf \
