@@ -547,3 +547,48 @@ find_missing_image_scripts:
 	@echo 'SELECT count, iso, name FROM (SELECT COUNT(*) as count, sc AS iso FROM codepoints c LEFT JOIN codepoint_script s USING (cp) LEFT JOIN `codepoint_image` USING (cp) WHERE image IS NULL GROUP BY sc ORDER BY count DESC) x LEFT JOIN scripts USING (iso)' | \
 		$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB)
 .PHONY: find_missing_image_scripts
+
+fill-cache: \
+	cache/abstracts/de/0041 \
+	cache/abstracts/en/0041 \
+	cache/abstracts/es/0041 \
+	cache/abstracts/pl/0041 \
+	cache/charlist.dtd \
+	cache/cldr_annotations_de.xml \
+	cache/cldr_annotations_en.xml \
+	cache/cldr_annotations_es.xml \
+	cache/cldr_annotations_pl.xml \
+	cache/codepoints.net/README.md \
+	cache/confusables.txt \
+	cache/encoding/README.md \
+	cache/fonts/BabelStoneKhitanSmallLinear.svg \
+	cache/fonts/BabelStoneKhitanSmallLinear.ttf \
+	cache/fonts/BabelStoneMarchen.svg \
+	cache/fonts/BabelStoneMarchen.ttf \
+	cache/fonts/damase_v.2.svg \
+	cache/fonts/damase_v.2.ttf \
+	cache/fonts/HanaMinA.svg \
+	cache/fonts/HanaMinA.ttf \
+	cache/fonts/HanaMinB.svg \
+	cache/fonts/HANNOMB.svg \
+	cache/fonts/HANNOMB.ttf \
+	cache/fonts/KikakuiSansPro.ot.svg \
+	cache/fonts/KikakuiSansPro.ot.ttf \
+	cache/fonts/ScheherazadeNew-Regular.svg \
+	cache/fonts/ScheherazadeNew-Regular.ttf \
+	cache/fonts/SuttonSignWriting8.svg \
+	cache/fonts/SuttonSignWriting8.ttf \
+	cache/fonts/TangutYinchuan.svg \
+	cache/fonts/TangutYinchuan.ttf \
+	cache/fonts/unifont.svg \
+	cache/fonts/unifont.ttf \
+	cache/fonts/unifont_upper.svg \
+	cache/fonts/unifont_upper.ttf \
+	cache/htmlentities.json \
+	cache/latex.xml \
+	cache/noto/NotoSans/NotoSans-Regular.ttf \
+	cache/rfc1345.txt \
+	cache/ucd.all.flat.xml \
+	cache/unicode/NamedSequences.txt \
+	cache/unicode/ReadMe.txt
+.PHONY: fill-cache
