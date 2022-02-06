@@ -240,7 +240,7 @@ cache/fonts/HanaMinB.ttf: cache/fonts/HanaMinA.ttf
 
 cache/fonts/damase_v.2.ttf:
 	@echo download font damase
-	@$(CURL) $(CURL_OPTS) http://www.wazu.jp/downloads/damase_v.2.zip | \
+	@$(CURL) $(CURL_OPTS) 'https://dl.dafont.com/dl/?f=mph_2b_damase' | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 .SECONDARY: cache/fonts/damase_v.2.ttf
 
