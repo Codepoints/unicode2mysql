@@ -7,9 +7,8 @@ from scour.scour import scourString
 
 
 sql_template = (
-    "INSERT INTO codepoint_image ( cp, font, width, height, image ) "
-    "VALUES ( {}, 'Noto Emoji', {}, {}, '{}') "
-    "ON DUPLICATE KEY UPDATE cp=cp;\n")
+    "INSERT IGNORE INTO codepoint_image ( cp, font, width, height, image ) "
+    "VALUES ( {}, 'Noto Emoji', {}, {}, '{}');\n")
 
 
 class ScourOptions:

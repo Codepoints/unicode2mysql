@@ -10,12 +10,12 @@
   <param name="lang" select="'en'" />
 
   <template match="annotations">
-    <text>INSERT INTO codepoint_annotation ( cp, annotation, `type`, lang ) VALUES </text>
+    <text>INSERT IGNORE INTO codepoint_annotation ( cp, annotation, `type`, lang ) VALUES </text>
     <apply-templates select="./annotation">
       <with-param name="lang" select="$lang" />
     </apply-templates>
     <text>
-     ( 0, '', 'tag', 'x-none') ON DUPLICATE KEY UPDATE cp=cp;
+     ( 0, '', 'tag', 'x-none');
     </text>
   </template>
 

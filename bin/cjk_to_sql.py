@@ -8,9 +8,8 @@ from xml.parsers import expat
 
 
 sql_template = (
-    "INSERT INTO codepoint_image ( cp, font, width, height, image ) "
-    "VALUES ( {}, 'Noto CJK', {}, {}, '{}') "
-    "ON DUPLICATE KEY UPDATE cp=cp;\n")
+    "INSERT IGNORE INTO codepoint_image ( cp, font, width, height, image ) "
+    "VALUES ( {}, 'Noto CJK', {}, {}, '{}');\n")
 
 
 class ScourOptions:

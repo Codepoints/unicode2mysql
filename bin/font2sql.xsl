@@ -9,7 +9,7 @@
   <template match="text() | comment()" />
 
   <template match="svg:font">
-    <text>INSERT INTO codepoint_image ( cp, font, width, height, image ) VALUES </text>
+    <text>INSERT IGNORE INTO codepoint_image ( cp, font, width, height, image ) VALUES </text>
     <apply-templates select="./svg:glyph[string-length(@unicode) = 1]">
       <with-param name="font" select="./svg:font-face/@font-family" />
       <with-param name="ascent" select="./svg:font-face/@ascent" />
@@ -26,10 +26,7 @@
         </choose>
       </with-param>
     </apply-templates>
-    <text>
-      ON DUPLICATE KEY UPDATE cp=cp;
-    </text>
-    <!-- == ignore the new row -->
+    <text>;&#xA;</text>
   </template>
 
   <template match="svg:glyph">
@@ -115,8 +112,8 @@
       <text>)</text>
     <choose>
       <when test="position() mod 500 = 0 and position() != last()">
-        <text> ON DUPLICATE KEY UPDATE cp=cp;&#xA;</text>
-        <text>INSERT INTO codepoint_image ( cp, font, width, height, image ) VALUES </text>
+        <text>;&#xA;</text>
+        <text>INSERT IGNORE INTO codepoint_image ( cp, font, width, height, image ) VALUES </text>
       </when>
       <when test="position() != last()">
         <text>,</text>
