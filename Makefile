@@ -69,9 +69,9 @@ sql-static: \
 .PHONY: sql-static
 
 sql-fonts: \
-	sql/60_font_noto.sql \
-	sql/60_font_noto_emoji.sql \
-	sql/60_font_noto_cjk.sql \
+	sql/60_font_noto_01_core.sql \
+	sql/60_font_noto_02_emoji.sql \
+	sql/60_font_noto_03_cjk.sql \
 	sql/61_font_HanaMinA.sql \
 	sql/61_font_HanaMinB.sql \
 	sql/61_font_BabelStoneKhitanSmallLinear.sql \
@@ -346,7 +346,7 @@ sql/32_confusables.sql: cache/confusables.txt
 # TODO: This is a bit inefficient. It'd be better, if we could store, which
 # cps we've already handled. Currently double cps both end in the SQL file,
 # but the latter will be simply ignored.
-sql/60_font_noto.sql: cache/noto/NotoSans/NotoSans-Regular.svg
+sql/60_font_noto_01_core.sql: cache/noto/NotoSans/NotoSans-Regular.svg
 	@echo "create $@"
 	@cat data/noto_loading_order.txt | \
 		sed 's#^#cache/noto/#' | \
@@ -354,11 +354,11 @@ sql/60_font_noto.sql: cache/noto/NotoSans/NotoSans-Regular.svg
 		xargs -n 2 -P 0 sh -c '$(SAXON) -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
 	@cat "$@".?* > "$@" && /bin/rm "$@".?*
 
-sql/60_font_noto_emoji.sql: cache/noto/NotoSans/NotoSans-Regular.svg
+sql/60_font_noto_02_emoji.sql: cache/noto/NotoSans/NotoSans-Regular.svg
 	@echo "create $@"
 	@$(PYTHON) bin/emojis_to_sql.py cache/noto/emoji > "$@"
 
-sql/60_font_noto_cjk.sql: cache/noto/NotoSans/NotoSans-Regular.svg
+sql/60_font_noto_03_cjk.sql: cache/noto/NotoSans/NotoSans-Regular.svg
 	@echo "create $@"
 	@$(PYTHON) bin/cjk_to_sql.py cache/noto > "$@"
 
