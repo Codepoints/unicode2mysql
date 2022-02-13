@@ -330,14 +330,11 @@ sql/31_htmlentities.sql: cache/htmlentities.json
 
 sql/32_confusables.sql: cache/confusables.txt
 	@echo create $@
-	@true > $@
 	@cat $< | \
 	    sed -e 1d -e '/^#/d' -e '/^\s*$$/d' | \
 	    sed 's/\s*;\s*MA\s.\+//' | \
 	    sed 's/\s*;\s*/;/' | \
-	    while read line; do \
-	        $(PYTHON) bin/confusables_to_sql.py "$$line" >> $@ ; \
-	    done
+	    $(PYTHON) bin/confusables_to_sql.py "$$line" > $@
 
 # parallelization: `nl` prefixes each filename with a number, xargs consumes
 # the number and the filename with "-n 2" and makes Saxon create a tmp file
