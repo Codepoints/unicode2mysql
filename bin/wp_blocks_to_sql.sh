@@ -14,6 +14,9 @@
 #
 # Sandbox: https://w.wiki/xjk
 #
+# Code explanation: see wp_scripts_to_sql.sh, which does more or less the
+# same.
+#
 
 set -euo pipefail
 
