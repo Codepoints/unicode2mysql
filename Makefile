@@ -53,6 +53,7 @@ sql-static: \
 	sql/35_blocks.sql \
 	sql/36_encodings.sql \
 	sql/37_latex.sql \
+	sql/38_agl.sql \
 	sql/39_emoji_annotations_de.sql \
 	sql/39_emoji_annotations_en.sql \
 	sql/39_emoji_annotations_es.sql \
@@ -317,6 +318,17 @@ cache/fonts/%.svg: cache/fonts/%.ttf
 	cache/fonts/unifont.svg \
 	cache/fonts/unifont_upper.svg
 
+cache/agl/glyphlist.txt:
+	@echo fetch AGL data
+	@mkdir -p cache/agl
+	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-1.txt' > cache/agl/adobe-latin-1.txt
+	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-2.txt' > cache/agl/adobe-latin-2.txt
+	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-3.txt' > cache/agl/adobe-latin-3.txt
+	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-4-precomposed.txt' > cache/agl/adobe-latin-4.txt
+	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-5-precomposed.txt' > cache/agl/adobe-latin-5.txt
+	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/agl-aglfn/raw/master/glyphlist.txt' > cache/agl/glyphlist.txt
+.SECONDARY: cache/agl/glyphlist.txt
+
 
 sql/30_ucd.sql: cache/ucd.all.flat.xml cache/unicode/ReadMe.txt
 	@echo create $@
@@ -381,6 +393,19 @@ sql/36_encodings.sql: cache/encoding/README.md
 sql/37_latex.sql: cache/latex.xml
 	@echo create $@
 	@$(SAXON) -s "$<" -xsl bin/latex_to_sql.xsl > "$@"
+
+sql/38_agl.sql: cache/agl/glyphlist.txt
+	@echo create $@
+	@true > "$@"
+	@for x in 1 2 3 4 5; do \
+		cat cache/agl/adobe-latin-$$x.txt | \
+		sed 1d | \
+		awk 'BEGIN { FS="\t" } { print "INSERT INTO codepoint_alias (cp, alias, `type`) VALUES (" "0x" $$1 ", \x22" $$3 "\x22, \x22AGL: Latin-'$$x'\x22);" }'; \
+	done >> $@
+	@cat cache/agl/glyphlist.txt | \
+		sed '/^\(#.*\)\?$$/d' | \
+		sed '/;.* .*$$/d' | \
+		awk 'BEGIN { FS=";" } { print "INSERT INTO codepoint_alias (cp, alias, `type`) VALUES (0x" $$2 ", \x22" $$1 "\x22, \x22Adobe Glyph List\x22);" }' >> $@
 
 sql/39_emoji_annotations_de.sql \
 sql/39_emoji_annotations_en.sql \
@@ -515,6 +540,7 @@ clean:
 	    sql/35_blocks.sql \
 	    sql/36_encodings.sql \
 	    sql/37_latex.sql \
+	    sql/38_agl.sql \
 	    sql/39_emoji_annotations_de.sql \
 	    sql/39_emoji_annotations_en.sql \
 	    sql/39_emoji_annotations_es.sql \
@@ -576,5 +602,6 @@ fill-cache: \
 	cache/rfc1345.txt \
 	cache/ucd.all.flat.xml \
 	cache/unicode/NamedSequences.txt \
-	cache/unicode/ReadMe.txt
+	cache/unicode/ReadMe.txt \
+	cache/agl/glyphlist.txt
 .PHONY: fill-cache
