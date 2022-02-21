@@ -26,6 +26,8 @@ MYSQL := mysql
 
 MYSQL_OPTS := --default-character-set=utf8mb4
 
+NODE := node
+
 # control variables
 
 EMOJI_VERSION := 14.0
@@ -70,24 +72,10 @@ sql-static: \
 .PHONY: sql-static
 
 sql-fonts: \
-	sql/60_font_noto_01_core.sql \
-	sql/60_font_noto_02_emoji.sql \
-	sql/60_font_noto_03_cjk.sql \
-	sql/61_font_HanaMinA.sql \
-	sql/61_font_HanaMinB.sql \
-	sql/61_font_BabelStoneKhitanSmallLinear.sql \
-	sql/61_font_ScheherazadeNew-Regular.sql \
-	sql/62_font_unifont.sql \
-	sql/62_font_unifont_upper.sql
-	#sql/61_font_HANNOMB.sql \
-	#sql/61_font_damase_v.2.sql \
-	#sql/61_font_KikakuiSansPro.ot.sql \
-	#sql/61_font_SuttonSignWriting8.sql \
-	#sql/61_font_TangutYinchuan.sql \
-	#sql/61_font_BabelStoneMarchen.sql
+	sql/60_fonts.sql
 .PHONY: sql-fonts
 
-sql-dynamic: sql/70_search_index.sql # sql/71_font_order.sql
+sql-dynamic: sql/70_search_index.sql
 .PHONY: sql-dynamic
 
 
@@ -156,13 +144,6 @@ cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
 .SECONDARY: cache/abstracts/en/0041
 .SECONDARY: cache/abstracts/es/0041
 .SECONDARY: cache/abstracts/pl/0041
-
-cache/noto/NotoSans/NotoSans-Regular.svg: cache/noto/NotoSans/NotoSans-Regular.ttf
-	@echo convert Noto fonts to SVG
-	@for font in cache/noto/*/*-Regular.ttf cache/noto/NotoSans*-Regular.otf; do \
-	    $(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$$font"; \
-	    sed -i 's/ unicode="&#x\(e01[0-9a-f]\|fe0\)[0-9a-f];"//g' "$$(echo "$$font" | sed 's/\.[ot]tf$$/.svg/')"; \
-	done
 
 cache/noto/NotoSans/NotoSans-Regular.ttf:
 	@echo fetch Noto fonts
@@ -287,37 +268,6 @@ cache/fonts/ScheherazadeNew-Regular.ttf:
 	@rmdir 'cache/fonts/ScheherazadeNew-3.000'
 .SECONDARY: cache/fonts/ScheherazadeNew-Regular.ttf
 
-
-cache/fonts/HANNOMB.svg \
-cache/fonts/HanaMinA.svg \
-cache/fonts/HanaMinB.svg \
-cache/fonts/damase_v.2.svg \
-cache/fonts/KikakuiSansPro.ot.svg \
-cache/fonts/SuttonSignWriting8.svg \
-cache/fonts/TangutYinchuan.svg \
-cache/fonts/BabelStoneMarchen.svg \
-cache/fonts/BabelStoneKhitanSmallLinear.svg \
-cache/fonts/ScheherazadeNew-Regular.svg \
-cache/fonts/unifont.svg \
-cache/fonts/unifont_upper.svg:
-cache/fonts/%.svg: cache/fonts/%.ttf
-	@echo convert $(notdir $<) to SVG
-	@$(FONTFORGE) -quiet -lang=ff -script bin/ttf_to_svg.ff "$<"
-	@sed -i 's/ unicode="&#x\(e01[0-9a-f]\|fe0\)[0-9a-f];"//g' "$@"
-.SECONDARY: \
-	cache/fonts/HANNOMB.svg \
-	cache/fonts/HanaMinA.svg \
-	cache/fonts/HanaMinB.svg \
-	cache/fonts/damase_v.2.svg \
-	cache/fonts/KikakuiSansPro.ot.svg \
-	cache/fonts/SuttonSignWriting8.svg \
-	cache/fonts/TangutYinchuan.svg \
-	cache/fonts/BabelStoneMarchen.svg \
-	cache/fonts/BabelStoneKhitanSmallLinear.svg \
-	cache/fonts/ScheherazadeNew-Regular.svg \
-	cache/fonts/unifont.svg \
-	cache/fonts/unifont_upper.svg
-
 cache/agl/glyphlist.txt:
 	@echo fetch AGL data
 	@mkdir -p cache/agl
@@ -347,29 +297,6 @@ sql/32_confusables.sql: cache/confusables.txt
 	    sed 's/\s*;\s*MA\s.\+//' | \
 	    sed 's/\s*;\s*/;/' | \
 	    $(PYTHON) bin/confusables_to_sql.py "$$line" > $@
-
-# parallelization: `nl` prefixes each filename with a number, xargs consumes
-# the number and the filename with "-n 2" and makes Saxon create a tmp file
-# with the number attached. Then those files get cat'ed into the target.
-#
-# TODO: This is a bit inefficient. It'd be better, if we could store, which
-# cps we've already handled. Currently double cps both end in the SQL file,
-# but the latter will be simply ignored.
-sql/60_font_noto_01_core.sql: cache/noto/NotoSans/NotoSans-Regular.svg
-	@echo "create $@"
-	@cat data/noto_loading_order.txt | \
-		sed 's#^#cache/noto/#' | \
-		nl | \
-		xargs -n 2 -P 0 sh -c '$(SAXON) -s "$$1" -xsl bin/font2sql.xsl > "$@.$$0"'
-	@cat "$@".?* > "$@" && /bin/rm "$@".?*
-
-sql/60_font_noto_02_emoji.sql: cache/noto/NotoSans/NotoSans-Regular.svg
-	@echo "create $@"
-	@$(PYTHON) bin/emojis_to_sql.py cache/noto/emoji > "$@"
-
-sql/60_font_noto_03_cjk.sql: cache/noto/NotoSans/NotoSans-Regular.svg
-	@echo "create $@"
-	@$(PYTHON) bin/cjk_to_sql.py cache/noto > "$@"
 
 sql/34_aliases.sql: cache/unicode/ReadMe.txt
 	@echo "create $@"
@@ -467,33 +394,26 @@ sql/52_wp_blocks.sql:
 	@echo create $@
 	@CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' bin/wp_blocks_to_sql.sh "$@"
 
-sql/61_font_HANNOMB.sql \
-sql/61_font_HanaMinA.sql \
-sql/61_font_HanaMinB.sql \
-sql/61_font_damase_v.2.sql \
-sql/61_font_KikakuiSansPro.ot.sql \
-sql/61_font_SuttonSignWriting8.sql \
-sql/61_font_TangutYinchuan.sql \
-sql/61_font_BabelStoneMarchen.sql \
-sql/61_font_BabelStoneKhitanSmallLinear.sql \
-sql/61_font_ScheherazadeNew-Regular.sql:
-sql/61_font_%.sql: cache/fonts/%.svg
-	@echo create $@
-	@$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
-
-sql/62_font_unifont.sql \
-sql/62_font_unifont_upper.sql:
-sql/62_font_%.sql: cache/fonts/%.svg
-	@echo create $@
-	@$(SAXON) -s "$<" -xsl bin/font2sql.xsl > "$@"
+sql/60_fonts.sql: \
+		cache/noto/NotoSans/NotoSans-Regular.ttf \
+		cache/fonts/BabelStoneKhitanSmallLinear.ttf \
+		cache/fonts/BabelStoneMarchen.ttf \
+		cache/fonts/damase_v.2.ttf \
+		cache/fonts/HanaMinA.ttf \
+		cache/fonts/HanaMinB.ttf \
+		cache/fonts/HANNOMB.ttf \
+		cache/fonts/KikakuiSansPro.ot.ttf \
+		cache/fonts/ScheherazadeNew-Regular.ttf \
+		cache/fonts/SuttonSignWriting8.ttf \
+		cache/fonts/TangutYinchuan.ttf \
+		cache/fonts/unifont.ttf \
+		cache/fonts/unifont_upper.ttf:
+	@echo "create $@"
+	@$(NODE) bin/fonts_to_sql.js > "$@"
 
 sql/70_search_index.sql: cache/codepoints.net/README.md sql-static db-up
 	@echo create $@
 	@$(PYTHON) bin/create_search_index.py > $@
-
-sql/71_font_order.sql: sql-static db-up
-	@echo create $@
-	@$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < bin/font_ordering.sql > $@
 
 
 db-up: db-schema db-data-static
@@ -513,9 +433,7 @@ db-data-static: db-schema sql-static
 	@echo insert static data into db
 	@if [ "$$(echo 'select count(*) from codepoints' | $(MYSQL) $(MYSQL_OPTS) -N $(DUMMY_DB))" == "0" ]; then \
 	    ls sql/[1-5]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) --force $(DUMMY_DB) < {}'; \
-	    cat sql/60_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
-	    cat sql/61_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
-	    cat sql/62_font_*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
+	    cat sql/60_fonts.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
 	else \
 	    echo 'Database $(DUMMY_DB) is already populated. Use "make db-down" to delete a stale one.' >&2; \
 	fi
@@ -550,11 +468,8 @@ clean:
 	    sql/50_wp_codepoints_*.sql \
 	    sql/51_wp_scripts.sql \
 	    sql/52_wp_blocks.sql \
-	    sql/60_font_*.sql \
-	    sql/61_font_*.sql \
-	    sql/62_font_*.sql \
+	    sql/60_fonts.sql \
 	    sql/70_search_index.sql \
-	    sql/71_font_order.sql \
 	    cache/*
 	@mkdir cache/fonts
 	@touch cache/fonts/.gitignore
@@ -584,18 +499,18 @@ fill-cache: \
 	cache/codepoints.net/README.md \
 	cache/confusables.txt \
 	cache/encoding/README.md \
-	cache/fonts/BabelStoneKhitanSmallLinear.svg \
-	cache/fonts/BabelStoneMarchen.svg \
-	cache/fonts/damase_v.2.svg \
-	cache/fonts/HanaMinA.svg \
-	cache/fonts/HanaMinB.svg \
-	cache/fonts/HANNOMB.svg \
-	cache/fonts/KikakuiSansPro.ot.svg \
-	cache/fonts/ScheherazadeNew-Regular.svg \
-	cache/fonts/SuttonSignWriting8.svg \
-	cache/fonts/TangutYinchuan.svg \
-	cache/fonts/unifont.svg \
-	cache/fonts/unifont_upper.svg \
+	cache/fonts/BabelStoneKhitanSmallLinear.ttf \
+	cache/fonts/BabelStoneMarchen.ttf \
+	cache/fonts/damase_v.2.ttf \
+	cache/fonts/HanaMinA.ttf \
+	cache/fonts/HanaMinB.ttf \
+	cache/fonts/HANNOMB.ttf \
+	cache/fonts/KikakuiSansPro.ot.ttf \
+	cache/fonts/ScheherazadeNew-Regular.ttf \
+	cache/fonts/SuttonSignWriting8.ttf \
+	cache/fonts/TangutYinchuan.ttf \
+	cache/fonts/unifont.ttf \
+	cache/fonts/unifont_upper.ttf \
 	cache/htmlentities.json \
 	cache/latex.xml \
 	cache/noto/NotoSans/NotoSans-Regular.ttf \

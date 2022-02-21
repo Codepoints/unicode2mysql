@@ -1,9 +1,0 @@
-#!/usr/bin/env fontforge
-# convert a font to an SVG font with the same filename
-Open($1)
-if (Strstr($1, 'CJK') > -1)
-    CIDFlatten()
-endif
-Reencode("unicode")
-Generate($1:r + ".svg")
-Quit(0)

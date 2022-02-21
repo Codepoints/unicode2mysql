@@ -1,0 +1,24 @@
+{
+  "name": "unicode2mysql",
+  "version": "1.0.0",
+  "description": ":arrow_up: basically the tl;dr: of what this project does.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Codepoints/unicode2mysql.git"
+  },
+  "author": "Manuel Strehl",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Codepoints/unicode2mysql/issues"
+  },
+  "homepage": "https://github.com/Codepoints/unicode2mysql#readme",
+  "devDependencies": {
+    "fast-glob": "^3.2.11",
+    "opentype.js": "^1.3.4",
+    "svgo": "^2.8.0"
+  }
+}
