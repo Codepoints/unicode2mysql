@@ -8,13 +8,14 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
 RUN chmod +x /tini
 ENTRYPOINT ["/tini", "--"]
 
+RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+
 # Install dependencies
-RUN apt update && apt upgrade -y && apt install -y \
+RUN apt update && apt install -y \
     apt-utils \
     bc \
     bsdtar \
     curl \
-    fontforge \
     jq \
     libcurl3-gnutls \
     libmariadb-client-lgpl-dev \
@@ -23,6 +24,7 @@ RUN apt update && apt upgrade -y && apt install -y \
     make \
     mariadb-client \
     mariadb-server \
+    nodejs \
     openjdk-9-jre \
     python3 \
     python3-pip \
