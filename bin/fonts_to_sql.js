@@ -48,9 +48,18 @@ async function main() {
     }
   }
 
-  process.stdout.write('INSERT INTO codepoint_image ( cp, font, width, height, image ) VALUES\n');
-  process.stdout.write(sql.join(',\n'));
-  process.stdout.write(';');
+  let buffer = [];
+  while (sql.length) {
+    buffer.push(sql.shift());
+    if (buffer.length === 500 || !sql.length) {
+      process.stdout.write('INSERT INTO codepoint_image ( cp, font, width, height, image ) VALUES\n');
+      process.stdout.write(buffer.join(',\n'));
+      process.stdout.write(';\n');
+      if (buffer.length === 500) {
+        buffer = [];
+      }
+    }
+  }
 }
 
 /**

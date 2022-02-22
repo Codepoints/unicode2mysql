@@ -18,8 +18,6 @@ SAXON := saxonb-xslt
 
 PYTHON := virtualenv/bin/python
 
-FONTFORGE := fontforge
-
 BSDTAR := bsdtar
 
 MYSQL := mysql
