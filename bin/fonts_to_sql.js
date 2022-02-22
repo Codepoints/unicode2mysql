@@ -180,7 +180,7 @@ async function getCJK(all_glyphs) {
   }
 
   image_map.forEach((cjk_set, cp, map) => {
-    if ((new Set(cjk_set.map(item => item[2]))).length === 1) {
+    if ((new Set(cjk_set.map(item => item[2]))).size === 1) {
       image_map.set(cp, `( ${cp}, 'Noto CJK', ${cjk_set[0][0]}, ${cjk_set[0][1]}, '${cjk_set[0][2]}' )`);
       return;
     }
@@ -199,7 +199,7 @@ function getComposedCJKImage(cp, cjk_set) {
   let width = 0;
   let height = 0;
   let offset = 0;
-  let joint_image = '';
+  const joint_image = [];
   for (const index in cjk_set) {
     const content = cjk_set[index];
     width = Math.max(width, content[0]);
@@ -217,14 +217,13 @@ function getComposedCJKImage(cp, cjk_set) {
     /* double the last state to have its duration the same as the
      * in-between states. */
     opacity.push(opacity[-1]);
-    joint_image += image.replace(
+    joint_image.push(image.replace(
       '</svg>',
       `<animate attributeName="opacity" values="${opacity.join(';')}" dur="${cjk_set.length}s" repeatCount="indefinite"/></svg>`
-    );
+    ));
     offset += 1;
   }
-  joint_image = `<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${joint_image}</svg>`;
-  return [width, height, joint_image];
+  return [width, height, `<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${joint_image.join('')}</svg>`];
 }
 
 main();
