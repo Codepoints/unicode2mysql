@@ -21,7 +21,7 @@ async function main() {
   const all_glyphs = [];
 
   for await (const line of rl) {
-    if (line.charAt(0) === '#') {
+    if (! line.trim() || line.charAt(0) === '#') {
       continue;
     } else if (line === '!EMOJIS') {
       const [emoji_glyphs, emoji_images] = getEmojis(all_glyphs);
@@ -29,7 +29,7 @@ async function main() {
       sql.splice(-1, 0, ...emoji_images);
       continue;
     } else if (line === '!CJK') {
-      const [cjk_glyphs, cjk_images] = getCJK(all_glyphs);
+      const [cjk_glyphs, cjk_images] = await getCJK(all_glyphs);
       all_glyphs.splice(-1, 0, ...cjk_glyphs);
       sql.splice(-1, 0, ...cjk_images);
       continue;
@@ -141,7 +141,7 @@ function getEmojis(handled_glyphs) {
 /**
  *
  */
-function getCJK() {
+async function getCJK(all_glyphs) {
   const sources = {
     hk: 'cache/noto/NotoSansCJKhk-Regular.otf',
     jp: 'cache/noto/NotoSansCJKjp-Regular.otf',
@@ -149,14 +149,73 @@ function getCJK() {
     sc: 'cache/noto/NotoSansCJKsc-Regular.otf',
     tc: 'cache/noto/NotoSansCJKtc-Regular.otf',
   }
-  const images = [];
-  const glyphs = [];
-  const image_map = {};
-  for (const id of sources) {
-    const font = getFont(sources[id]);
-    // TODO
+  const image_map = new Map();
+  for (const id in sources) {
+    const font = await getFont(sources[id]);
+    for(let i = 0; i < font.glyphs.length; i++) {
+      const glyph = font.glyphs.get(i);
+      if (! glyph.unicode || all_glyphs.indexOf(glyph.unicode) > -1) {
+        continue;
+      }
+      if (! image_map.has(glyph.unicode)) {
+        image_map.set(glyph.unicode, []);
+      }
+      const hex = Number(glyph.unicode).toString(16).toUpperCase().padStart(4, '0');
+      const width = glyph.advanceWidth || font.unitsPerEm;
+      const height = font.unitsPerEm; //Math.abs(font.descender) + font.ascender;
+      const tr = glyph.advanceWidth? 0 : font.unitsPerEm / 2;
+      image_map.get(glyph.unicode).push(
+        [width, height, `<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path ', `<path transform="translate(${tr}, ${font.unitsPerEm*0.9}) scale(1,-1)" `)}</svg>`, id]
+      );
+    }
   }
-  return [glyphs, images];
+
+  image_map.forEach((cjk_set, cp, map) => {
+    if ((new Set(cjk_set.map(item => item[2]))).length === 1) {
+      image_map.set(cp, `( ${cp}, 'Noto CJK', ${cjk_set[0][0]}, ${cjk_set[0][1]}, '${cjk_set[0][2]}' )`);
+      return;
+    }
+    const [width, height, image] = getComposedCJKImage(cp, cjk_set);
+    image_map.set(cp, `( ${cp}, 'Noto CJK', ${width}, ${height}, '${image}' )`);
+  });
+
+  return [Array.from(image_map.keys()), Array.from(image_map.values())];
+}
+
+/**
+ *
+ */
+function getComposedCJKImage(cp, cjk_set) {
+  const hex = Number(cp).toString(16).toUpperCase().padStart(4, '0');
+  let width = 0;
+  let height = 0;
+  let offset = 0;
+  let joint_image = '';
+  for (const index in cjk_set) {
+    const content = cjk_set[index];
+    width = Math.max(width, content[0]);
+    height = Math.max(height, content[1]);
+    let image = content[2];
+    const key = content[3];
+    image = image.replace(/id="U([^"]+)"/g, `id="U$1${key}"`);
+    /* the opacity values are a list of 0s and 1s. Each first and last
+     * value in the list have to be the same, otherwise the animation
+     * will jump. Solution: 2 times more opacity values than different
+     * glyphs. */
+    const opacity = Array(cjk_set.length * 2).fill('0');
+    opacity[offset*2] = '1';
+    opacity[offset*2 - 1] = '1';
+    /* double the last state to have its duration the same as the
+     * in-between states. */
+    opacity.push(opacity[-1]);
+    joint_image += image.replace(
+      '</svg>',
+      `<animate attributeName="opacity" values="${opacity.join(';')}" dur="${cjk_set.length}s" repeatCount="indefinite"/></svg>`
+    );
+    offset += 1;
+  }
+  joint_image = `<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${joint_image}</svg>`;
+  return [width, height, joint_image];
 }
 
 main();

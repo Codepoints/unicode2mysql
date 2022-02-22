@@ -71,8 +71,7 @@ sql-static: \
 	sql-fonts
 .PHONY: sql-static
 
-sql-fonts: \
-	sql/60_fonts.sql
+sql-fonts: sql/60_fonts.sql
 .PHONY: sql-fonts
 
 sql-dynamic: sql/70_search_index.sql
@@ -407,7 +406,7 @@ sql/60_fonts.sql: \
 		cache/fonts/SuttonSignWriting8.ttf \
 		cache/fonts/TangutYinchuan.ttf \
 		cache/fonts/unifont.ttf \
-		cache/fonts/unifont_upper.ttf:
+		cache/fonts/unifont_upper.ttf
 	@echo "create $@"
 	@$(NODE) bin/fonts_to_sql.js > "$@"
 
