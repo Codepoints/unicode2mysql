@@ -173,9 +173,16 @@ async function getCJK(all_glyphs) {
       const width = glyph.advanceWidth || font.unitsPerEm;
       const height = font.unitsPerEm; //Math.abs(font.descender) + font.ascender;
       const tr = glyph.advanceWidth? 0 : font.unitsPerEm / 2;
-      image_map.get(glyph.unicode).push(
-        [width, height, `<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path ', `<path transform="translate(${tr}, ${font.unitsPerEm*0.9}) scale(1,-1)" `)}</svg>`, id]
-      );
+      const image = `<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path ', `<path transform="translate(${tr}, ${font.unitsPerEm*0.9}) scale(1,-1)" `)}</svg>`;
+      let seen = false;
+      image_map.get(glyph.unicode).forEach(item => {
+        if (item[2] === image) {
+          seen = true;
+        }
+      });
+      if (! seen) {
+        image_map.get(glyph.unicode).push([width, height, image, id]);
+      }
     }
   }
 
@@ -213,10 +220,14 @@ function getComposedCJKImage(cp, cjk_set) {
      * glyphs. */
     const opacity = Array(cjk_set.length * 2).fill('0');
     opacity[offset*2] = '1';
-    opacity[offset*2 - 1] = '1';
+    if (offset) {
+      opacity[offset*2 - 1] = '1';
+    } else {
+      opacity[opacity.length - 1] = '1';
+    }
     /* double the last state to have its duration the same as the
      * in-between states. */
-    opacity.push(opacity[-1]);
+    opacity.push(opacity[opacity.length - 1]);
     joint_image.push(image.replace(
       '</svg>',
       `<animate attributeName="opacity" values="${opacity.join(';')}" dur="${cjk_set.length}s" repeatCount="indefinite"/></svg>`
