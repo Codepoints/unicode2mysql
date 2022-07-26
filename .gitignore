@@ -13,6 +13,7 @@ sql/38_agl.sql
 sql/39_emoji_annotations_*.sql
 sql/40_digraphs.sql
 sql/41_namedsequences.sql
+sql/42_csur.sql
 sql/50_wp_codepoints_de.sql
 sql/50_wp_codepoints_en.sql
 sql/50_wp_codepoints_es.sql

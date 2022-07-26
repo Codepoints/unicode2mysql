@@ -58,6 +58,7 @@ sql-static: \
 	sql/39_emoji_annotations_pl.sql \
 	sql/40_digraphs.sql \
 	sql/41_namedsequences.sql \
+	sql/42_csur.sql \
 	sql/50_wp_codepoints_de.sql \
 	sql/50_wp_codepoints_en.sql \
 	sql/50_wp_codepoints_es.sql \
@@ -274,6 +275,12 @@ cache/agl/glyphlist.txt:
 	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/agl-aglfn/raw/master/glyphlist.txt' > cache/agl/glyphlist.txt
 .SECONDARY: cache/agl/glyphlist.txt
 
+cache/csur/UnicodeData.txt:
+	@echo fetch ucsur data
+	@mkdir -p cache/csur
+	@$(CURL) $(CURL_OPTS) 'http://www.kreativekorp.com/ucsur/UNIDATA/UnicodeData.txt' > $@
+.SECONDARY: cache/csur/UnicodeData.txt
+
 
 sql/30_ucd.sql: cache/ucd.all.flat.xml cache/unicode/ReadMe.txt
 	@echo create $@
@@ -361,6 +368,15 @@ sql/41_namedsequences.sql: cache/unicode/NamedSequences.txt
 				printf "INSERT INTO namedsequences (cp, name, \`order\`) VALUES (CAST(0x%s AS UNSIGNED), '$$NAME', %s);\n" "$$cp" "$$I" ; \
 				I=$$((I + 1)) ; \
 			done ; \
+		done > $@
+
+sql/42_csur.sql: cache/csur/UnicodeData.txt
+	@echo create $@
+	@cat $< | \
+		sed -n '/^[A-F0-9]/p' | \
+		while IFS= read -r line; do \
+			R2="$${line#*;}" ; \
+			printf "INSERT INTO csur (cp, name) VALUES (%s, '%s');\n" "$$(( 16#$${line%%;*} ))" "$${R2%%;*}"; \
 		done > $@
 
 # if I'd figure out how to handle quotes nested four levels deep, I could
@@ -460,6 +476,7 @@ clean:
 	    sql/39_emoji_annotations_pl.sql \
 	    sql/40_digraphs.sql \
 	    sql/41_namedsequences.sql \
+	    sql/42_csur.sql \
 	    sql/50_wp_codepoints_*.sql \
 	    sql/51_wp_scripts.sql \
 	    sql/52_wp_blocks.sql \
@@ -513,5 +530,6 @@ fill-cache: \
 	cache/ucd.all.flat.xml \
 	cache/unicode/NamedSequences.txt \
 	cache/unicode/ReadMe.txt \
-	cache/agl/glyphlist.txt
+	cache/agl/glyphlist.txt \
+	cache/csur/UnicodeData.txt
 .PHONY: fill-cache
