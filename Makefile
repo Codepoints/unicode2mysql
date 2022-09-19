@@ -30,7 +30,7 @@ NODE := node
 
 LANGUAGES := de en es pl
 
-WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.your.org
+WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.org
 
 DUMMY_DB := codepoints_dummy
 
