@@ -109,6 +109,7 @@ CREATE TABLE codepoint_props (
   kAlternateJEF         TEXT(2047),
   kAlternateKangXi      TEXT(2047),
   kAlternateMorohashi   TEXT(2047),
+  kAlternateTotalStrokes VARCHAR(255), -- 15.0
   kBigFive              VARCHAR(4),
   kCCCII                VARCHAR(6),
   kCNS1986              VARCHAR(6),
