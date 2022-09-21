@@ -201,7 +201,7 @@ CREATE TABLE codepoint_props (
   kSemanticVariant      VARCHAR(255),
   kSimplifiedVariant    VARCHAR(255),
   kSpecializedSemanticVariant VARCHAR(255),
-  kSpoofingVariant      VARCHAR(13),  -- 13.0
+  kSpoofingVariant      VARCHAR(255), -- 13.0
   kStrange              VARCHAR(400), -- 14.0
   kTaiwanTelegraph      VARCHAR(255),
   kTang                 VARCHAR(255),
