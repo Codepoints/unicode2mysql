@@ -106,7 +106,13 @@ cache/unicode/ReadMe.txt:
 cache/unicode/NamedSequences.txt: cache/unicode/ReadMe.txt
 .SECONDARY: cache/unicode/NamedSequences.txt
 
-cache/%wiki-latest-all-titles-in-ns0.gz:
+cache/dewiki-latest-all-titles-in-ns0.gz: intermediate-wiki-all-titles
+cache/enwiki-latest-all-titles-in-ns0.gz: intermediate-wiki-all-titles
+cache/eswiki-latest-all-titles-in-ns0.gz: intermediate-wiki-all-titles
+cache/plwiki-latest-all-titles-in-ns0.gz: intermediate-wiki-all-titles
+.SECONDARY: cache/*wiki-latest-all-titles-in-ns0.gz
+
+intermediate-wiki-all-titles:
 	@echo create $@
 	@for l in $(LANGUAGES); do \
 	    $(CURL) $(CURL_OPTS) "$(WIKIPEDIA_DUMP_MIRROR)/$${l}wiki/latest/$${l}wiki-latest-all-titles-in-ns0.gz" > "cache/$${l}wiki-latest-all-titles-in-ns0.gz"; \
@@ -115,7 +121,7 @@ cache/%wiki-latest-all-titles-in-ns0.gz:
 	        exit 1; \
 	    fi; \
 	done
-.SECONDARY: cache/*wiki-latest-all-titles-in-ns0.gz
+.INTERMEDIATE: intermediate-wiki-all-titles
 
 # grep localized to use UTF-8 will filter all titles with a single UTF-8
 # character.
