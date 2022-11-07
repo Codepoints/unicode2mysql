@@ -14,13 +14,11 @@ for "ox" finds U+1F402 OX before any other codepoint that happens to
 relate to oxen.
 """
 
-from bs4 import BeautifulSoup
 import configparser
 from functools import reduce
 from markdown import markdown
 import multiprocessing
 import MySQLdb
-import nltk
 from os.path import dirname, isfile, realpath
 from os import cpu_count
 import re
@@ -43,59 +41,26 @@ def sql_convert(s):
     return s
 
 
-def tokenize(terms):
-    """create a stream of tokens from plain text"""
-    stopwords = nltk.corpus.stopwords.words('english')
-    punctrm = re.compile(r'[!-/:-@\[-`{-~\u2212\u201C\u201D]', re.UNICODE)
-    wnl = nltk.WordNetLemmatizer()
-    return [wnl.lemmatize(t) for t in
-            set(
-                filter(lambda w: re.sub(punctrm, '', w) != '',
-                    [w for w
-                        in map(lambda s: s.lower(),
-                            nltk.word_tokenize(terms))
-                        if w not in stopwords]
-                )
-            )
-        ]
-
-
-def get_addinfo_tokens(cp):
+def get_addinfo(cp):
     """fetch, if exists, the tokens from the additional Markdown file"""
-    tokens = []
     mdfile = dirname(dirname(realpath(__file__))) + \
              ('/cache/codepoints.net/codepoints.net/data/U+%04X.en.md' % cp)
-
-    if not isfile(mdfile):
-        return tokens
-
-    with open(mdfile, encoding='utf-8') as f:
-        abstract = markdown(f.read())
-        terms = BeautifulSoup(abstract, 'lxml').get_text()
-        tokens = tokenize(terms)
-    return tokens
+    if isfile(mdfile):
+        with open(mdfile, encoding='utf-8') as f:
+            return markdown(f.read())
+    return ''
 
 
-def get_abstract_tokens(cur, cp):
-    """Fetch abstract for cp and split it in tokens"""
+def get_abstract(cur, cp):
+    """Fetch abstract for cp"""
     cur.execute("SELECT abstract FROM codepoint_abstract WHERE cp = %s AND lang = 'en'", (cp,))
-    abstract = (cur.fetchone() or {'abstract':None})['abstract']
-    if abstract:
-        terms = BeautifulSoup(abstract, 'lxml').get_text()
-        tokens = tokenize(terms)
-    else:
-        tokens = []
-    return tokens
+    return (cur.fetchone() or {}).get('abstract', '')
 
 
-def get_emoji_annotation_tokens(cur, cp):
+def get_emoji_annotations(cur, cp):
     """Fetch emoji annotation for cp and split it in tokens"""
     cur.execute("SELECT annotation FROM codepoint_annotation WHERE cp = %s", (cp,))
-    tokens = []
-    annotations = cur.fetchall() or []
-    for annotation in annotations:
-        tokens += tokenize(annotation['annotation'])
-    return tokens
+    return ' '.join(x['annotation'] for x in cur.fetchall() or [])
 
 
 def get_decomp(cur, cp):
@@ -107,7 +72,7 @@ def get_decomp(cur, cp):
 
     if len(dms) and dms[0]['other'] != cp:
         return reduce(lambda x, y: x + chr(int(y['other'])), dms, '').lower()
-    return None
+    return ''
 
 
 def get_aliases(cur, cp):
@@ -122,7 +87,7 @@ def get_block(cur, cp):
     blk = cur.fetchone()
     if blk:
         blk = blk['name']
-    return blk
+    return blk or ''
 
 
 def get_scripts(cur, cp):
@@ -130,7 +95,7 @@ def get_scripts(cur, cp):
     cur.execute("SELECT sc, `primary` FROM codepoint_script WHERE cp = %s", (cp,))
     r = []
     for row in cur.fetchall():
-        r.append((row['sc'], int(row['primary'])))
+        r.append(row['sc'] + ' ' + (row['sc'] if int(row['primary']) else ''))
     return r
 
 
@@ -144,75 +109,52 @@ def has_confusables(cur, cp):
     return cur.fetchone()['c']
 
 
-def term(cp, term, weight):
-    """create a new search term query
-
-    Terms are hard-capped at 254 characters to not exceed the column
-    definition. Also there's no use in using such long terms since they will be
-    searched verbatim."""
-    return [ (cp, term[0:254], weight) ]
-
-
 def handle_row(config, item):
     """take a codepoint row from db and create search index terms"""
     cur = get_cur(config)
 
     cp = item['cp']
-    sql = []
 
-    sql += term(cp, 'int:{}'.format(cp), 80)
-
-    for j, weight in (('na', 100), ('na1', 90), ('kDefinition', 50)):
-        if item[j]:
-            # add the full value: "na:foo bar baz"
-            if j != 'kDefinition':
-                sql += term(cp, '%s:%s' % (j, item[j].lower()), weight)
-            for w in re.split(r'\s+', str(item[j]).lower()):
-                sql += term(cp, w, weight)
-                if '-' in w:
-                    # we need this to find cps like "TAG HYPHEN-MINUS"
-                    # when searching for "hyphen".
-                    for w2 in w.split('-'):
-                        sql += term(cp, w2, weight-20)
-
+    props = ''
     for prop in item.keys():
         if (prop not in ('na', 'na1', 'kDefinition', 'cp') and
             prop is not None and item[prop] is not None):
-            # all other properties get stored as foo:bar pairs, with foo
-            # as property and bar as its value
-            _i = item[prop]
-            sql += term(cp, '%s:%s' % (prop, _i), 50)
+            props += ' prop_%s_%s' % (prop, item[prop])
 
-    for w in get_aliases(cur, cp):
-        sql += term(cp, w, 40)
+    doc = '''
+{na} {na} {na} {na} {na} {na} na_{na}
+{na_no_hyphen}
+{na1} {na1} {na1} {na1} {na1} na1_{na1}
+{kDefinition} {kDefinition} {kDefinition} kDefinition_{kDefinition}
+int_{int}
+{int:X} {int:04X} hex_{int:X} hex_{int:04X} U+{int:04X} U+{int:04X} U+{int:04X}
+{props}
+{aliases} {aliases}
+{abstract}
+{emoji_annotations} {emoji_annotations}
+{addinfo}
+{decomposition}
+confusables_{confusables}
+{block} blk_{block}
+{script} sc_{script}
+    '''.format(
+        na=item['na'],
+        na_no_hyphen=item['na'].replace('-', ''),
+        na1=item['na1'],
+        kDefinition=item['kDefinition'],
+        int=cp,
+        props=props,
+        aliases=' '.join(get_aliases(cur, cp)),
+        abstract=get_abstract(cur, cp),
+        emoji_annotations=get_emoji_annotations(cur, cp),
+        addinfo=get_addinfo(cp),
+        decomposition=get_decomp(cur, cp),
+        confusables=('1' if has_confusables(cur, cp) else '0'),
+        block=get_block(cur, cp),
+        script=' '.join(get_scripts(cur, cp))
+    )
 
-    for w in get_abstract_tokens(cur, cp):
-        sql += term(cp, w, 1)
-
-    for w in get_emoji_annotation_tokens(cur, cp):
-        sql += term(cp, w, 2)
-
-    for w in get_addinfo_tokens(cp):
-        sql += term(cp, w, 1)
-
-    dm = get_decomp(cur, cp)
-    if dm:
-        sql += term(cp, dm, 30)
-
-    h = '0'
-    if has_confusables(cur, cp):
-        h = '1'
-    sql += term(cp, 'confusables:'+h, 50)
-
-    block = get_block(cur, cp)
-    if block:
-        sql += term(cp, 'blk:%s' % block, 30)
-
-    for script in get_scripts(cur, cp):
-        # scx props get lesser weight than true sc
-        sql += term(cp, 'sc:%s' % script[0], 50 if script[1] else 25)
-
-    return sql
+    return [cp, doc]
 
 
 def get_cur(config):
@@ -235,7 +177,7 @@ def errprint(s):
 
 
 _buffer = []
-def add_to_buffer(*params):
+def add_to_buffer(params):
     global _buffer
     _buffer.append(params)
     if len(_buffer) > 1000:
@@ -246,8 +188,8 @@ def write_buffer():
     local_buffer = []
     while len(_buffer) and len(local_buffer) <= 1005:
         local_buffer.append(_buffer.pop(0))
-    print("INSERT INTO search_index (cp, term, weight) VALUES" +
-          ',\n'.join(map(lambda items: "(%s, %s, %s)" % tuple(map(sql_convert, items)), local_buffer)) +
+    print("INSERT INTO search_index (cp, text) VALUES" +
+          ',\n'.join("({}, {})".format(sql_convert(item[0]), sql_convert(item[1])) for item in local_buffer) +
           ";")
 
 
@@ -260,8 +202,7 @@ with multiprocessing.Pool(cpus) as pool:
     cur.close()
 
     for result in pool.starmap(handle_row, map(lambda row: (config, row), all_cps), chunksize=len(all_cps)//cpus):
-        for r in result:
-            add_to_buffer(*r)
+        add_to_buffer(result)
 
     pool.close()
     pool.join()
