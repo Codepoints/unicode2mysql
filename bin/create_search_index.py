@@ -91,11 +91,13 @@ def get_block(cur, cp):
 
 
 def get_scripts(cur, cp):
-    """get scripts of a codepoint"""
+    """get scripts of a codepoint
+
+    The primary script is added twice to boost it in searches."""
     cur.execute("SELECT sc, `primary` FROM codepoint_script WHERE cp = %s", (cp,))
     r = []
     for row in cur.fetchall():
-        r.append(row['sc'] + ' ' + (row['sc'] if int(row['primary']) else ''))
+        r.append('{sc} sc_{sc}'.format(sc=row['sc']) * (1 + int(row['primary'])))
     return r
 
 
@@ -122,6 +124,8 @@ def handle_row(config, item):
             props += ' prop_%s_%s' % (prop, item[prop])
 
     doc = '''
+{rendered} {rendered} {rendered} {rendered}
+{rendered} {rendered} {rendered} {rendered}
 {na} {na} {na} {na} {na} {na} na_{na}
 {na_no_hyphen}
 {na1} {na1} {na1} {na1} {na1} na1_{na1}
@@ -136,8 +140,9 @@ int_{int}
 {decomposition}
 confusables_{confusables}
 {block} blk_{block}
-{script} sc_{script}
+{script}
     '''.format(
+        rendered=(chr(cp) if item['gc'][0] != 'C' else ''),
         na=item['na'],
         na_no_hyphen=item['na'].replace('-', ''),
         na1=item['na1'],
