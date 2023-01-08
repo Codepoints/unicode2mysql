@@ -11,7 +11,7 @@ CREATE TABLE codepoints (
   cp                    INTEGER PRIMARY KEY NOT NULL,
   name                  VARCHAR(255),
   gc                    VARCHAR(2) REFERENCES prop_gc
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE codepoint_props (
   cp                    INTEGER REFERENCES codepoints,
@@ -224,7 +224,7 @@ CREATE TABLE codepoint_props (
   EComp                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   ExtPict               BOOLEAN NOT NULL DEFAULT 0, -- emoji 11.0
   blk                   VARCHAR(127)
-) CHARACTER SET utf8mb4;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_props_name ON codepoint_props ( na );
 CREATE INDEX codepoint_props_blk ON codepoint_props ( blk );
 
@@ -238,7 +238,7 @@ CREATE TABLE codepoint_relation (
   relation VARCHAR(7) REFERENCES prop_relation,
   `order`  INTEGER(3) DEFAULT 0,
   UNIQUE ( cp, other, relation, `order` )
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_relation_cp ON codepoint_relation ( cp );
 CREATE INDEX codepoint_relation_other ON codepoint_relation ( other );
 
@@ -250,7 +250,7 @@ CREATE TABLE codepoint_alias (
   cp     INTEGER REFERENCES codepoints,
   alias  VARCHAR(127),
   `type` VARCHAR(25)
-) CHARACTER SET utf8mb4;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_alias_cp ON codepoint_alias ( cp );
 CREATE INDEX codepoint_alias_alias ON codepoint_alias ( alias );
 
@@ -263,5 +263,5 @@ CREATE TABLE namedsequences (
   name    VARCHAR(127),
   `order` INTEGER(3),
   UNIQUE ( cp, name, `order` )
-) CHARACTER SET utf8mb4;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX namedsequences_cp ON namedsequences ( cp );

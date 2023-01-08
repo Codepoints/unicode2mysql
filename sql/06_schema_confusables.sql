@@ -9,6 +9,6 @@ CREATE TABLE codepoint_confusables (
   other    INTEGER(7) NOT NULL REFERENCES codepoints,
   `order`  INTEGER NOT NULL DEFAULT 1,
   UNIQUE ( id, cp, other, `order` )
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_confusables_cp ON codepoint_confusables ( cp );
 CREATE INDEX codepoint_confusables_other ON codepoint_confusables ( other );

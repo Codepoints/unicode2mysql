@@ -10,7 +10,7 @@ CREATE TABLE codepoint_abstract (
   src      VARCHAR(255), -- explicitly give a source, since the Wikipedia name
                          -- might not be obvious.
   UNIQUE ( cp, lang )
-) CHARACTER SET utf8mb4;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_abstract_cp ON codepoint_abstract ( cp );
 CREATE INDEX codepoint_abstract_cp_lang ON codepoint_abstract ( cp, lang );
 
@@ -24,7 +24,7 @@ CREATE TABLE block_abstract (
   src      VARCHAR(255), -- explicitly give a source, since the Wikipedia name
                          -- might not be obvious.
   UNIQUE ( first, lang )
-) CHARACTER SET utf8mb4;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX block_abstract_first ON block_abstract ( first );
 CREATE INDEX block_abstract_first_lang ON block_abstract ( first, lang );
 
@@ -38,6 +38,6 @@ CREATE TABLE script_abstract (
   src      VARCHAR(255), -- explicitly give a source, since the Wikipedia name
                          -- might not be obvious.
   UNIQUE ( sc, lang )
-) CHARACTER SET utf8mb4;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX script_abstract_sc ON script_abstract ( sc );
 CREATE INDEX script_abstract_sc_lang ON script_abstract ( sc, lang );

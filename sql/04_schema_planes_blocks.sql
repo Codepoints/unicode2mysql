@@ -10,7 +10,7 @@ CREATE TABLE blocks (
   name   VARCHAR(127) PRIMARY KEY,
   first  INTEGER(7),
   last   INTEGER(7)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX blocks_cps ON blocks ( first, last );
 
 
@@ -21,7 +21,7 @@ CREATE TABLE planes (
   name   VARCHAR(127) PRIMARY KEY NOT NULL,
   first  INTEGER(7) NOT NULL,
   last   INTEGER(7) NOT NULL
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX planes_cps ON planes ( first, last );
 INSERT INTO planes (name, first, last) VALUES ('Basic Multilingual Plane',                  0,   0xFFFF);
 INSERT INTO planes (name, first, last) VALUES ('Supplementary Multilingual Plane',    0x10000,  0x1FFFF);

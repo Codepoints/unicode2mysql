@@ -6,7 +6,7 @@
 CREATE TABLE scripts (
   iso  VARCHAR(4) PRIMARY KEY NOT NULL,
   name VARCHAR(255)
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 
 --
@@ -20,6 +20,6 @@ CREATE TABLE codepoint_script (
   sc        VARCHAR(4) REFERENCES scripts,
   `primary` BOOLEAN DEFAULT 1,
   UNIQUE ( cp, sc )
-);
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_script_cp ON codepoint_script ( cp );
 CREATE INDEX codepoint_script_sc ON codepoint_script ( sc );

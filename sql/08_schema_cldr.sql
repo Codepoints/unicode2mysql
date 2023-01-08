@@ -10,6 +10,6 @@ CREATE TABLE codepoint_annotation (
   `type`     VARCHAR(127) NOT NULL DEFAULT 'tag' REFERENCES prop_annotation_type,
   lang       VARCHAR(6) NOT NULL DEFAULT 'en' -- ,
   -- UNIQUE ( cp, annotation, `type`, lang )
-) CHARACTER SET utf8mb4;
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_annotation_cp ON codepoint_annotation ( cp );
 CREATE INDEX codepoint_annotation_cp_lang ON codepoint_annotation ( cp, lang );
