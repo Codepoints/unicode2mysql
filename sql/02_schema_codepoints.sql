@@ -225,6 +225,7 @@ CREATE TABLE codepoint_props (
   ExtPict               BOOLEAN NOT NULL DEFAULT 0, -- emoji 11.0
   blk                   VARCHAR(127)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE INDEX codepoint_props_cp ON codepoint_props ( cp );
 CREATE INDEX codepoint_props_name ON codepoint_props ( na );
 CREATE INDEX codepoint_props_blk ON codepoint_props ( blk );
 
