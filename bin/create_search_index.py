@@ -132,6 +132,7 @@ def handle_row(config, item):
 {kDefinition} {kDefinition} {kDefinition} kDefinition_{kDefinition}
 int_{int}
 {int:X} {int:04X} hex_{int:X} hex_{int:04X} U+{int:04X} U+{int:04X} U+{int:04X}
+0x{int:04X} 0x{int:X}
 {props}
 {aliases} {aliases}
 {abstract}
