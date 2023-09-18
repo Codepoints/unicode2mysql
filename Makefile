@@ -254,15 +254,15 @@ cache/fonts/BabelStoneKhitanSmallLinear.ttf:
 	@$(CURL) $(CURL_OPTS) https://babelstone.co.uk/Fonts/Download/BabelStoneKhitanSmallLinear.ttf > $@
 .SECONDARY: cache/fonts/BabelStoneKhitanSmallLinear.ttf
 
-cache/fonts/unifont.ttf:
+cache/fonts/unifont.otf:
 	@echo download font Unifont
-	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont-$(UNIFONT_VERSION).ttf > $@
-.SECONDARY: cache/fonts/unifont.ttf
+	@$(CURL) $(CURL_OPTS) https://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont-$(UNIFONT_VERSION).otf > $@
+.SECONDARY: cache/fonts/unifont.otf
 
-cache/fonts/unifont_upper.ttf:
+cache/fonts/unifont_upper.otf:
 	@echo download font Unifont Upper
-	@$(CURL) $(CURL_OPTS) http://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).ttf > $@
-.SECONDARY: cache/fonts/unifont_upper.ttf
+	@$(CURL) $(CURL_OPTS) https://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).otf > $@
+.SECONDARY: cache/fonts/unifont_upper.otf
 
 cache/fonts/ScheherazadeNew-Regular.ttf:
 	@$(CURL) $(CURL_OPTS) 'https://software.sil.org/downloads/r/scheherazade/ScheherazadeNew-3.000.zip' | \
@@ -396,7 +396,7 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/sentinel
 	@echo create $@
 	@true > $@
 	@for file in cache/abstracts/$*/*; do \
-	    if [[ $$(basename $$file) == 'sentinel' ]]; then continue; fi \
+	    if [[ $$(basename $$file) == 'sentinel' ]]; then continue; fi; \
 	    printf "INSERT INTO codepoint_abstract ( cp, abstract, lang, src ) VALUES ( %s, '%s', '%s', '%s' );\n" \
 	        $$(basename $$file | tr a-f A-F | sed 's/^/ibase=16;/' | bc) \
 	        "$$(sed -n '2,$$p' $$file | sed "s/'/\\\\'/g")" \
@@ -425,8 +425,8 @@ sql/60_fonts.sql: \
 		cache/fonts/ScheherazadeNew-Regular.ttf \
 		cache/fonts/SuttonSignWriting8.ttf \
 		cache/fonts/TangutYinchuan.ttf \
-		cache/fonts/unifont.ttf \
-		cache/fonts/unifont_upper.ttf
+		cache/fonts/unifont.otf \
+		cache/fonts/unifont_upper.otf
 	@echo "create $@"
 	@$(NODE) bin/fonts_to_sql.js > "$@"
 
@@ -529,8 +529,8 @@ fill-cache: \
 	cache/fonts/ScheherazadeNew-Regular.ttf \
 	cache/fonts/SuttonSignWriting8.ttf \
 	cache/fonts/TangutYinchuan.ttf \
-	cache/fonts/unifont.ttf \
-	cache/fonts/unifont_upper.ttf \
+	cache/fonts/unifont.otf \
+	cache/fonts/unifont_upper.otf \
 	cache/htmlentities.json \
 	cache/latex.xml \
 	cache/noto/NotoSans/NotoSans-Regular.ttf \

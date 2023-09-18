@@ -161,5 +161,5 @@ cache/fonts/TangutYinchuan.ttf
 cache/fonts/BabelStoneMarchen.ttf
 cache/fonts/BabelStoneKhitanSmallLinear.ttf
 cache/fonts/ScheherazadeNew-Regular.ttf
-cache/fonts/unifont.ttf
-cache/fonts/unifont_upper.ttf
+cache/fonts/unifont.otf
+cache/fonts/unifont_upper.otf
