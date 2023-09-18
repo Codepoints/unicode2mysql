@@ -396,6 +396,7 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/sentinel
 	@echo create $@
 	@true > $@
 	@for file in cache/abstracts/$*/*; do \
+	    if [[ $$(basename $$file) == 'sentinel' ]]; then continue; fi \
 	    printf "INSERT INTO codepoint_abstract ( cp, abstract, lang, src ) VALUES ( %s, '%s', '%s', '%s' );\n" \
 	        $$(basename $$file | tr a-f A-F | sed 's/^/ibase=16;/' | bc) \
 	        "$$(sed -n '2,$$p' $$file | sed "s/'/\\\\'/g")" \
