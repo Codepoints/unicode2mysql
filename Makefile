@@ -131,21 +131,22 @@ intermediate-wiki-all-titles:
 # second
 #
 # bin/char_to_abstract.sh calls the WP API and stores the excerpt.
-cache/abstracts/de/0041 \
-cache/abstracts/en/0041 \
-cache/abstracts/es/0041 \
-cache/abstracts/pl/0041: \
-cache/abstracts/%/0041: cache/%wiki-latest-all-titles-in-ns0.gz
+cache/abstracts/de/sentinel \
+cache/abstracts/en/sentinel \
+cache/abstracts/es/sentinel \
+cache/abstracts/pl/sentinel: \
+cache/abstracts/%/sentinel: cache/%wiki-latest-all-titles-in-ns0.gz
 	@echo create $@
 	@mkdir -p cache/abstracts/$*
 	@zcat cache/$*wiki-latest-all-titles-in-ns0.gz | \
 		LANG=C.UTF-8 grep '^.$$' | \
 		CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' SRCLANG="$*" \
 			xargs -d '\n' -i -n 1 -P 3 bin/char_to_abstract.sh '{}'
-.SECONDARY: cache/abstracts/de/0041
-.SECONDARY: cache/abstracts/en/0041
-.SECONDARY: cache/abstracts/es/0041
-.SECONDARY: cache/abstracts/pl/0041
+	@touch "$@"
+.SECONDARY: cache/abstracts/de/sentinel
+.SECONDARY: cache/abstracts/en/sentinel
+.SECONDARY: cache/abstracts/es/sentinel
+.SECONDARY: cache/abstracts/pl/sentinel
 
 cache/noto/NotoSans/NotoSans-Regular.ttf:
 	@echo fetch Noto fonts
@@ -391,7 +392,7 @@ sql/50_wp_codepoints_de.sql \
 sql/50_wp_codepoints_en.sql \
 sql/50_wp_codepoints_es.sql \
 sql/50_wp_codepoints_pl.sql: \
-sql/50_wp_codepoints_%.sql: cache/abstracts/%/0041
+sql/50_wp_codepoints_%.sql: cache/abstracts/%/sentinel
 	@echo create $@
 	@true > $@
 	@for file in cache/abstracts/$*/*; do \
@@ -505,10 +506,10 @@ find_missing_image_scripts:
 .PHONY: find_missing_image_scripts
 
 fill-cache: \
-	cache/abstracts/de/0041 \
-	cache/abstracts/en/0041 \
-	cache/abstracts/es/0041 \
-	cache/abstracts/pl/0041 \
+	cache/abstracts/de/sentinel \
+	cache/abstracts/en/sentinel \
+	cache/abstracts/es/sentinel \
+	cache/abstracts/pl/sentinel \
 	cache/charlist.dtd \
 	cache/cldr_annotations_de.xml \
 	cache/cldr_annotations_en.xml \
