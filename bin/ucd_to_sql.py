@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import json
 import re
 import sys
 from xml.parsers import expat
@@ -60,9 +61,9 @@ def write_cps_buffer(fields=None):
         while cps_buffer:
             write_cps_buffer(list(cps_buffer)[0])
     else:
-        print("INSERT INTO codepoint_props (%s) VALUES\n(" % fields)
-        print('),\n('.join(cps_buffer[fields]))
-        print(");\n")
+        print("INSERT INTO codepoint_props (%s) VALUES\n(" % fields, end='')
+        print('),\n('.join(cps_buffer[fields]), end='')
+        print(");")
         del(cps_buffer[fields])
 
 
@@ -75,9 +76,9 @@ def add_to_rel_buffer(*params):
 
 def write_rel_buffer():
     global rel_buffer
-    print("INSERT INTO codepoint_relation (cp, other, relation, `order`) VALUES\n")
-    print(',\n'.join(map(lambda items: "(%s, %s, '%s', %s)" % items, rel_buffer)))
-    print(";\n")
+    print("INSERT INTO codepoint_relation (cp, other, relation, `order`) VALUES")
+    print(',\n'.join(map(lambda items: "(%s, %s, '%s', %s)" % items, rel_buffer)), end='')
+    print(";")
     rel_buffer = []
 
 
@@ -90,9 +91,9 @@ def add_to_script_buffer(*params):
 
 def write_script_buffer():
     global script_buffer
-    print("INSERT INTO codepoint_script (cp, sc, `primary`) VALUES\n")
-    print(',\n'.join(map(lambda items: "(%s, '%s', %s)" % items, script_buffer)))
-    print(";\n")
+    print("INSERT INTO codepoint_script (cp, sc, `primary`) VALUES")
+    print(',\n'.join(map(lambda items: "(%s, '%s', %s)" % items, script_buffer)), end='')
+    print(";")
     script_buffer = []
 
 
@@ -112,6 +113,7 @@ def handle_cp(hex_cp, attrs):
     ucp = str(hex_cp)
     fields = ['cp']
     values = [str(cp)]
+    unihan = {}
     sc = ''
     scx = ''
     for f, v in attrs.items():
@@ -152,9 +154,14 @@ def handle_cp(hex_cp, attrs):
         elif f == 'blk':
             fields.append(f)
             values.append("'%s'" % block_map.get(v, v).replace("'", "''"))
+        elif f[0] == 'k':
+            unihan[f] = v
         else:
             fields.append(f)
             values.append("'%s'" % v.replace("'", "''"))
+    if unihan:
+        fields.append('unihan')
+        values.append("'%s'" % json.dumps(unihan).replace("'", "''"))
     add_to_cps_buffer(','.join(fields), ','.join(values))
     add_to_name_map(
         cp,
@@ -192,6 +199,12 @@ with open(sys.argv[2]) as alias_file:
         elif not name_map[cp][0] and type_ in ('control', 'figment'):
             name_map[cp][0] = alias + '*'
 
-for cp, props in name_map.items():
-    print("INSERT INTO codepoints (cp, name, gc) VALUES ({}, '{}', '{}');\n".format(
-        cp, props[0].replace("'", "''"), props[1]))
+def chunks(lst):
+    for i in range(0, len(lst), 500):
+        yield lst[i:i + 500]
+
+for chunk in chunks(list(name_map.items())):
+    print("INSERT INTO codepoints (cp, name, gc) VALUES ", end='')
+    print(','.join("({}, '{}', '{}')".format(
+            cp, props[0].replace("'", "''"), props[1]) for cp, props in chunk), end='')
+    print(";")

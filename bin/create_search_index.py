@@ -16,6 +16,7 @@ relate to oxen.
 
 import configparser
 from functools import reduce
+import json
 from markdown import markdown
 import multiprocessing
 import MySQLdb
@@ -116,6 +117,9 @@ def handle_row(config, item):
     cur = get_cur(config)
 
     cp = item['cp']
+    item['kDefinition'] = ''
+    if item['unihan']:
+        item['kDefinition'] = json.loads(item['unihan']).get('kDefinition', '')
 
     props = ''
     for prop in item.keys():
