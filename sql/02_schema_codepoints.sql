@@ -111,7 +111,7 @@ CREATE TABLE codepoint_props (
   kAlternateKangXi      TEXT(2047),
   kAlternateMorohashi   TEXT(2047),
   kAlternateTotalStrokes VARCHAR(255), -- 15.0
-  kBigFive              VARCHAR(4),
+  kBigFive              VARCHAR(5),
   kCCCII                VARCHAR(6),
   kCNS1986              VARCHAR(6),
   kCNS1992              VARCHAR(6),
@@ -186,7 +186,7 @@ CREATE TABLE codepoint_props (
   kMandarin             VARCHAR(255),
   kMatthews             VARCHAR(6),
   kMeyerWempe           VARCHAR(255),
-  kMorohashi            VARCHAR(6),
+  kMorohashi            VARCHAR(255),
   kNelson               VARCHAR(255),
   kOtherNumeric         VARCHAR(255),
   kPhonetic             VARCHAR(255),
