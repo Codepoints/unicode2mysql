@@ -17,7 +17,7 @@ boolfields = (
     'Hex', 'AHex', 'DI', 'ODI', 'LOE', 'WSpace', 'Gr_Base', 'Gr_Ext',
     'OGr_Ext', 'Gr_Link', 'Ideo', 'UIdeo', 'IDSB', 'IDST', 'Radical', 'Dep',
     'VS', 'NChar', 'PCM', 'RI', 'Emoji', 'EPres', 'EMod', 'EBase', 'EComp',
-    'ExtPict',
+    'ExtPict', 'ID_Compat_Math_Start', 'ID_Compat_Math_Continue', 'IDSU',
 )
 
 # single codepoints (INT, need '#' resolution)
@@ -27,7 +27,7 @@ cpfields = (
 
 # multiple codepoints (need '#' resolution, 'na' is a special case, here)
 cppfields = (
-    'dm', 'FC_NFKC', 'uc', 'lc', 'tc', 'cf', 'NFKC_CF',
+    'dm', 'FC_NFKC', 'uc', 'lc', 'tc', 'cf', 'NFKC_CF', 'NFKC_SCF',
 )
 
 # integer fields

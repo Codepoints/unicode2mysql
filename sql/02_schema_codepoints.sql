@@ -60,6 +60,7 @@ CREATE TABLE codepoint_props (
   InSC                  VARCHAR(31) REFERENCES prop_InSC,    -- 6.0
   InMC                  VARCHAR(24) REFERENCES prop_InMC,    -- 6.0
   InPC                  VARCHAR(24) REFERENCES prop_InPC,    -- 8.0
+  InCB                  VARCHAR(24) REFERENCES prop_InCB,    -- 15.1
   IDS                   BOOLEAN,
   OIDS                  BOOLEAN,
   XIDS                  BOOLEAN,
@@ -170,6 +171,7 @@ CREATE TABLE codepoint_props (
   kJIS0213              VARCHAR(7),
   kJapaneseKun          VARCHAR(255),
   kJapaneseOn           VARCHAR(255),
+  kJapanese             VARCHAR(255), -- 15.1
   kJis0                 VARCHAR(4),
   kJis1                 VARCHAR(4),
   kKPS0                 VARCHAR(4),
@@ -217,12 +219,20 @@ CREATE TABLE codepoint_props (
   kTGT_MergedSrc        VARCHAR(255), -- 9.0
   kSrc_NushuDuben       VARCHAR(255), -- 10.0
   kReading              VARCHAR(255), -- 10.0
+  kMojiJoho             VARCHAR(255), -- 15.1
+  kSMSZD2003Index       VARCHAR(255), -- 15.1
+  kSMSZD2003Readings    VARCHAR(255), -- 15.1
+  kVietnameseNumeric    VARCHAR(255), -- 15.1
+  kZhuangNumeric        VARCHAR(255), -- 15.1
   Emoji                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   EPres                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   EMod                  BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   EBase                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   EComp                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   ExtPict               BOOLEAN NOT NULL DEFAULT 0, -- emoji 11.0
+  ID_Compat_Math_Start  BOOLEAN NOT NULL DEFAULT 0, -- 15.1
+  ID_Compat_Math_Continue BOOLEAN NOT NULL DEFAULT 0, -- 15.1
+  IDSU                  BOOLEAN NOT NULL DEFAULT 0, -- 15.1
   blk                   VARCHAR(127)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_props_cp ON codepoint_props ( cp );
@@ -236,7 +246,7 @@ CREATE INDEX codepoint_props_blk ON codepoint_props ( blk );
 CREATE TABLE codepoint_relation (
   cp       INTEGER(7) REFERENCES codepoints,
   other    INTEGER(7) REFERENCES codepoints,
-  relation VARCHAR(7) REFERENCES prop_relation,
+  relation VARCHAR(8) REFERENCES prop_relation,
   `order`  INTEGER(3) DEFAULT 0,
   UNIQUE ( cp, other, relation, `order` )
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

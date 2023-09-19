@@ -8,7 +8,7 @@ CREATE TABLE prop_age ( age VARCHAR(4) PRIMARY KEY );
 INSERT INTO  prop_age VALUES ('1.1'), ('2.0'), ('2.1'), ('3.0'), ('3.1'),
 ('3.2'), ('4.0'), ('4.1'), ('5.0'), ('5.1'), ('5.2'), ('6.0'), ('6.1'),
 ('6.2'), ('6.3'), ('7.0'), ('8.0'), ('9.0'), ('10.0'), ('11.0'), ('12.0'),
-('12.1'), ('13.0'), ('14.0'), ('15.0');
+('12.1'), ('13.0'), ('14.0'), ('15.0'), ('15.1');
 
 CREATE TABLE prop_gc ( gc VARCHAR(2) PRIMARY KEY );
 INSERT INTO  prop_gc VALUES
@@ -94,7 +94,7 @@ INSERT INTO  prop_jg VALUES
 
 CREATE TABLE prop_lb ( lb VARCHAR(3) PRIMARY KEY );
 INSERT INTO  prop_lb VALUES
-('AI'), ('AL'),
+('AI'), ('AK'), ('AL'), ('AP'), ('AS'),
 ('B2'), ('BA'), ('BB'), ('BK'),
 ('CB'), ('CJ'), ('CL'), ('CM'), ('CP'), ('CR'),
 ('EB'), ('EM'), ('EX'),
@@ -109,6 +109,7 @@ INSERT INTO  prop_lb VALUES
 ('QU'),
 ('RI'),
 ('SA'), ('SG'), ('SP'), ('SY'),
+('VF'), ('VI'),
 ('WJ'),
 ('XX'),
 ('ZW'), ('ZWJ');
@@ -145,6 +146,10 @@ INSERT INTO  prop_InPC VALUES ('Bottom'), ('Bottom_And_Left'),
 ('Right'), ('Top'), ('Top_And_Bottom'), ('Top_And_Bottom_And_Left'),
 ('Top_And_Bottom_And_Right'), ('Top_And_Left'), ('Top_And_Left_And_Right'),
 ('Top_And_Right'), ('Visual_Order_Left');
+
+CREATE TABLE prop_InCB ( InCB VARCHAR(24) PRIMARY KEY );
+INSERT INTO  prop_InCB VALUES ('None'), ('Linker'),
+('Consonant'), ('Extend');
 
 CREATE TABLE prop_vo ( vo VARCHAR(2) PRIMARY KEY );
 INSERT INTO  prop_vo VALUES ('U'), ('R'), ('Tu'), ('Tr');
@@ -193,10 +198,10 @@ INSERT INTO  prop_SB VALUES
 ('UP'),
 ('XX');
 
-CREATE TABLE prop_relation ( relation VARCHAR(7) PRIMARY KEY );
+CREATE TABLE prop_relation ( relation VARCHAR(8) PRIMARY KEY );
 INSERT INTO  prop_relation VALUES ('bmg'), ('dm'), ('FC_NFKC'), ('suc'),
 ('slc'), ('stc'), ('uc'), ('lc'), ('tc'), ('scf'), ('cf'), ('NFKC_CF'),
-('bpb'), ('EqUIdeo');
+('bpb'), ('EqUIdeo'), ('NFKC_SCF');
 
 CREATE TABLE prop_annotation_type ( annotation_type VARCHAR(7) PRIMARY KEY );
 INSERT INTO prop_annotation_type VALUES ('tag'), ('tts');
