@@ -120,7 +120,7 @@ INSERT INTO  prop_ea VALUES ('A'), ('F'), ('H'), ('N'), ('Na'), ('W');
 CREATE TABLE prop_hst ( hst VARCHAR(3) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO  prop_hst VALUES ('L'), ('LV'), ('LVT'), ('T'), ('V'), ('NA');
 
-CREATE TABLE prop_InSC ( InSC VARCHAR(27) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE TABLE prop_InSC ( InSC VARCHAR(31) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO  prop_InSC VALUES
 ('Avagraha'), ('Bindu'), ('Brahmi_Joining_Number'), ('Cantillation_Mark'),
 ('Consonant'), ('Consonant_Dead'), ('Consonant_Final'),

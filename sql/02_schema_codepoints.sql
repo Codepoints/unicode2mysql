@@ -94,7 +94,7 @@ CREATE TABLE codepoint_props (
   Gr_Ext                BOOLEAN,
   OGr_Ext               BOOLEAN,
   Gr_Link               BOOLEAN,
-  GCB                   VARCHAR(4) REFERENCES prop_GCB,
+  GCB                   VARCHAR(3) REFERENCES prop_GCB,
   WB                    VARCHAR(9) REFERENCES prop_WB,
   SB                    VARCHAR(2) REFERENCES prop_SB,
   Ideo                  BOOLEAN,
