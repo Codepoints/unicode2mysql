@@ -205,6 +205,8 @@ def write_buffer():
 
 cpus = cpu_count() or 2
 
+print("SET NAMES 'utf8mb4' COLLATE 'utf8mb4_unicode_ci';\n")
+
 with multiprocessing.Pool(cpus) as pool:
     cur = get_cur(config)
     cur.execute('SELECT * FROM codepoint_props;')
