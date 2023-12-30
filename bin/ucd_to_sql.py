@@ -1,5 +1,6 @@
 #!/usr/bin/python3
 
+import io
 import json
 import re
 import sys
@@ -40,6 +41,9 @@ intfields = (
 relation_fields = cpfields + cppfields
 
 
+GLOBAL_BUFFER = io.StringIO()
+
+
 name_map = {}
 def add_to_name_map(cp, na, na1, gc):
     global name_map
@@ -61,9 +65,9 @@ def write_cps_buffer(fields=None):
         while cps_buffer:
             write_cps_buffer(list(cps_buffer)[0])
     else:
-        print("INSERT INTO codepoint_props (%s) VALUES\n(" % fields, end='')
-        print('),\n('.join(cps_buffer[fields]), end='')
-        print(");")
+        print("INSERT INTO codepoint_props (%s) VALUES\n(" % fields, end='', file=GLOBAL_BUFFER)
+        print('),\n('.join(cps_buffer[fields]), end='', file=GLOBAL_BUFFER)
+        print(");", file=GLOBAL_BUFFER)
         del(cps_buffer[fields])
 
 
@@ -76,9 +80,9 @@ def add_to_rel_buffer(*params):
 
 def write_rel_buffer():
     global rel_buffer
-    print("INSERT INTO codepoint_relation (cp, other, relation, `order`) VALUES")
-    print(',\n'.join(map(lambda items: "(%s, %s, '%s', %s)" % items, rel_buffer)), end='')
-    print(";")
+    print("INSERT INTO codepoint_relation (cp, other, relation, `order`) VALUES", file=GLOBAL_BUFFER)
+    print(',\n'.join(map(lambda items: "(%s, %s, '%s', %s)" % items, rel_buffer)), end='', file=GLOBAL_BUFFER)
+    print(";", file=GLOBAL_BUFFER)
     rel_buffer = []
 
 
@@ -91,9 +95,9 @@ def add_to_script_buffer(*params):
 
 def write_script_buffer():
     global script_buffer
-    print("INSERT INTO codepoint_script (cp, sc, `primary`) VALUES")
-    print(',\n'.join(map(lambda items: "(%s, '%s', %s)" % items, script_buffer)), end='')
-    print(";")
+    print("INSERT INTO codepoint_script (cp, sc, `primary`) VALUES", file=GLOBAL_BUFFER)
+    print(',\n'.join(map(lambda items: "(%s, '%s', %s)" % items, script_buffer)), end='', file=GLOBAL_BUFFER)
+    print(";", file=GLOBAL_BUFFER)
     script_buffer = []
 
 
@@ -104,7 +108,7 @@ def add_to_update_script_buffer(*params):
 
 def write_update_script_buffer():
     global update_script_buffer
-    print('\n'.join(map(lambda items: "UPDATE codepoint_script SET `primary` = 1 WHERE cp = %s AND sc = '%s';" % items, update_script_buffer)))
+    print('\n'.join(map(lambda items: "UPDATE codepoint_script SET `primary` = 1 WHERE cp = %s AND sc = '%s';" % items, update_script_buffer)), file=GLOBAL_BUFFER)
     update_script_buffer = []
 
 
@@ -208,3 +212,6 @@ for chunk in chunks(list(name_map.items())):
     print(','.join("({}, '{}', '{}')".format(
             cp, props[0].replace("'", "''"), props[1]) for cp, props in chunk), end='')
     print(";")
+
+print(GLOBAL_BUFFER.getvalue())
+GLOBAL_BUFFER.close()
