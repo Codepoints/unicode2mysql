@@ -44,7 +44,7 @@ sql: sql-static sql-dynamic
 .PHONY: sql
 
 sql-static: \
-	sql/30_ucd.sql \
+	sql/10_ucd.sql \
 	sql/31_htmlentities.sql \
 	sql/32_confusables.sql \
 	sql/34_aliases.sql \
@@ -289,7 +289,7 @@ cache/csur/UnicodeData.txt:
 .SECONDARY: cache/csur/UnicodeData.txt
 
 
-sql/30_ucd.sql: cache/ucd.all.flat.xml cache/unicode/ReadMe.txt
+sql/10_ucd.sql: cache/ucd.all.flat.xml cache/unicode/ReadMe.txt
 	@echo create $@
 	@$(PYTHON) bin/ucd_to_sql.py "$<" "cache/unicode/NameAliases.txt" > $@
 
@@ -470,7 +470,7 @@ db-down:
 
 clean:
 	@-/bin/rm -fr \
-	    sql/30_ucd.sql \
+	    sql/10_ucd.sql \
 	    sql/31_htmlentities.sql \
 	    sql/32_confusables.sql \
 	    sql/34_aliases.sql \

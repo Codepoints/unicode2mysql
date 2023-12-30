@@ -49,6 +49,12 @@ INSERT INTO  prop_nfc_qc VALUES ('M'), ('N'), ('Y');
 CREATE TABLE prop_nfd_qc ( nfd_qc VARCHAR(1) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO  prop_nfd_qc VALUES ('N'), ('Y');
 
+CREATE TABLE prop_nfkc_qc ( nfkc_qc VARCHAR(1) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+INSERT INTO  prop_nfkc_qc VALUES ('M'), ('N'), ('Y');
+
+CREATE TABLE prop_nfkd_qc ( nfkd_qc VARCHAR(1) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+INSERT INTO  prop_nfkd_qc VALUES ('N'), ('Y');
+
 CREATE TABLE prop_nt ( nt VARCHAR(4) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO  prop_nt VALUES ('De'), ('Di'), ('None'), ('Nu');
 
@@ -203,5 +209,5 @@ INSERT INTO  prop_relation VALUES ('bmg'), ('dm'), ('FC_NFKC'), ('suc'),
 ('slc'), ('stc'), ('uc'), ('lc'), ('tc'), ('scf'), ('cf'), ('NFKC_CF'),
 ('bpb'), ('EqUIdeo'), ('NFKC_SCF');
 
-CREATE TABLE prop_annotation_type ( annotation_type VARCHAR(7) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE TABLE prop_annotation_type ( annotation_type VARCHAR(7) NOT NULL PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO prop_annotation_type VALUES ('tag'), ('tts');

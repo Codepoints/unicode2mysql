@@ -62,11 +62,11 @@ through the night just to create the search index _or_ the images.
 * `sql/08_schema_cldr.sql`: Create CLDR info tables, currently only annotations
     for emojis.
 * `sql/09_schema_search_index.sql`: Create the search index table.
-* `sql/10_wellknown_aliases.sql`: Add some well-known aliases, e.g., for ASCII
+* `sql/10_ucd.sql`: This is the most important import, putting basically all
+    info derived from the UCD XML file from Unicode into the DB.
+* `sql/11_wellknown_aliases.sql`: Add some well-known aliases, e.g., for ASCII
     control characters.
 * `sql/11_wellknown_scripts.sql`: Add names and IDs of ISO-defined scripts.
-* `sql/30_ucd.sql`: This is the most important import, putting basically all
-    info derived from the UCD XML file from Unicode into the DB.
 * `sql/31_htmlentities.sql`: Add HTML entities as aliases.
 * `sql/32_confusables.sql`: Add information about which characters can be
     confused with one another.

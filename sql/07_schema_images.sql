@@ -4,8 +4,11 @@
 --
 -- graphical representation as string (base64 PNG or SVG)
 --
+-- We do not reference the codepoints table, since we have images for PU
+-- code points, too.
+--
 CREATE TABLE codepoint_image (
-  cp     INTEGER PRIMARY KEY REFERENCES codepoints,
+  cp     INTEGER NOT NULL,
   image  MEDIUMTEXT,
   font   VARCHAR(127),
   width  INTEGER,

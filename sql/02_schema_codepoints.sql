@@ -10,12 +10,12 @@
 CREATE TABLE codepoints (
   cp                    INTEGER PRIMARY KEY NOT NULL,
   name                  VARCHAR(255),
-  gc                    VARCHAR(2) REFERENCES prop_gc
+  gc                    VARCHAR(2) REFERENCES prop_gc(gc)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 
 CREATE TABLE codepoint_props (
-  cp                    INTEGER REFERENCES codepoints,
-  age                   VARCHAR(4) NOT NULL REFERENCES prop_age,
+  cp                    INTEGER NOT NULL REFERENCES codepoints,
+  age                   VARCHAR(4) REFERENCES prop_age,
   na                    VARCHAR(255),
   na1                   VARCHAR(255),
   gc                    VARCHAR(2) REFERENCES prop_gc,
@@ -29,8 +29,8 @@ CREATE TABLE codepoint_props (
   Comp_Ex               BOOLEAN,
   NFC_QC                VARCHAR(1) REFERENCES prop_nfc_qc,
   NFD_QC                VARCHAR(1) REFERENCES prop_nfd_qc,
-  NFKC_QC               VARCHAR(1) REFERENCES prop_nfc_qc,
-  NFKD_QC               VARCHAR(1) REFERENCES prop_nfd_qc,
+  NFKC_QC               VARCHAR(1) REFERENCES prop_nfkc_qc,
+  NFKD_QC               VARCHAR(1) REFERENCES prop_nfkd_qc,
   XO_NFC                BOOLEAN,
   XO_NFD                BOOLEAN,
   XO_NFKC               BOOLEAN,
@@ -126,11 +126,23 @@ CREATE INDEX codepoint_props_blk ON codepoint_props ( blk );
 -- cross-references between codepoints
 --
 CREATE TABLE codepoint_relation (
-  cp       INTEGER(7) REFERENCES codepoints,
-  other    INTEGER(7) REFERENCES codepoints,
-  relation VARCHAR(8) REFERENCES prop_relation,
+  cp       INTEGER NOT NULL,
+  other    INTEGER NOT NULL,
+  relation VARCHAR(8),
   `order`  INTEGER(3) DEFAULT 0,
-  UNIQUE ( cp, other, relation, `order` )
+  UNIQUE ( cp, other, relation, `order` ),
+  CONSTRAINT `fk_codepoint_relation_cp`
+    FOREIGN KEY (cp) REFERENCES codepoints (cp)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_codepoint_relation_other`
+    FOREIGN KEY (other) REFERENCES codepoints (cp)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT,
+  CONSTRAINT `fk_codepoint_relation_relation`
+    FOREIGN KEY (relation) REFERENCES prop_relation (relation)
+    ON DELETE CASCADE
+    ON UPDATE RESTRICT
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_relation_cp ON codepoint_relation ( cp );
 CREATE INDEX codepoint_relation_other ON codepoint_relation ( other );
@@ -139,8 +151,11 @@ CREATE INDEX codepoint_relation_other ON codepoint_relation ( other );
 --
 -- alias names for a codepoint
 --
+-- We do not reference the codepoints table, since we have aliases for PU
+-- code points, too.
+--
 CREATE TABLE codepoint_alias (
-  cp     INTEGER REFERENCES codepoints,
+  cp     INTEGER NOT NULL,
   alias  VARCHAR(127),
   `type` VARCHAR(25)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
@@ -152,7 +167,7 @@ CREATE INDEX codepoint_alias_alias ON codepoint_alias ( alias );
 -- named sequences of characters, TR #34
 --
 CREATE TABLE namedsequences (
-  cp      INTEGER(7) REFERENCES codepoints,
+  cp      INTEGER NOT NULL REFERENCES codepoints(cp),
   name    VARCHAR(127),
   `order` INTEGER(3),
   UNIQUE ( cp, name, `order` )

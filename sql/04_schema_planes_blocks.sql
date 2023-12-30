@@ -40,3 +40,17 @@ INSERT INTO planes (name, first, last) VALUES ('Plane 14 (unassigned)',         
 INSERT INTO planes (name, first, last) VALUES ('Supplementary Special-purpose Plane', 0xE0000,  0xEFFFF);
 INSERT INTO planes (name, first, last) VALUES ('Supplementary Private Use Area - A',  0xF0000,  0xFFFFF);
 INSERT INTO planes (name, first, last) VALUES ('Supplementary Private Use Area - B', 0x100000, 0x10FFFF);
+
+--
+-- Wikipedia abstract of a Unicode block
+--
+CREATE TABLE block_abstract (
+  first    INTEGER(7) REFERENCES blocks(first),
+  abstract BLOB,
+  lang     VARCHAR(6) NOT NULL DEFAULT 'en',
+  src      VARCHAR(255), -- explicitly give a source, since the Wikipedia name
+                         -- might not be obvious.
+  UNIQUE ( first, lang )
+) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE INDEX block_abstract_first ON block_abstract ( first );
+CREATE INDEX block_abstract_first_lang ON block_abstract ( first, lang );

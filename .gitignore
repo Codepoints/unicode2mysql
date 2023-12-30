@@ -1,7 +1,7 @@
 __pycache__
 /sql/50_wikipedia.sql
 /virtualenv
-sql/30_ucd.sql
+sql/10_ucd.sql
 sql/31_htmlentities.sql
 sql/32_confusables.sql
 sql/33_images.sql
