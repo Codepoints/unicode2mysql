@@ -2,53 +2,38 @@ FROM ubuntu
 
 LABEL net.codepoints.version="0.1"
 
-# Add tini
-ENV TINI_VERSION v0.15.0
-ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /tini
-RUN chmod +x /tini
-ENTRYPOINT ["/tini", "--"]
-
-RUN curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
-
-# Install dependencies
-RUN apt update && apt install -y \
-    apt-utils \
-    bc \
-    bsdtar \
-    curl \
-    jq \
-    libcurl3-gnutls \
-    libmariadb-client-lgpl-dev \
-    libmariadb-client-lgpl-dev-compat \
-    libsaxonb-java \
-    make \
-    mariadb-client \
-    mariadb-server \
-    nodejs \
-    openjdk-9-jre \
-    python3 \
-    python3-pip \
-    virtualenv
-
-# set up infrastructure
-RUN service mysql start
-RUN mkdir -p /u2m/cache
-
 ENV LANG C.UTF-8
+WORKDIR /app
 
-COPY bin/* /u2m/bin/
-COPY data/* /u2m/data/
-COPY Makefile /u2m/Makefile
-COPY requirements.txt /u2m/requirements.txt
-COPY sql/* /u2m/sql/
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD service mariadb start && make -j -O PYTHON=/virtualenv/bin/python
 
-RUN chmod +x /bin/*
-RUN ln -s /usr/bin/mariadb_config /usr/bin/mysql_config
+RUN <<EOF
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt update
+    apt install -y \
+        apt-utils \
+        bc \
+        libarchive-tools \
+        curl \
+        jq \
+        libcurl3-gnutls \
+        libmariadb-dev \
+        libmariadb-dev-compat \
+        libsaxonb-java \
+        make \
+        mariadb-client \
+        mariadb-server \
+        nodejs \
+        pkg-config \
+        python3 \
+        python3-pip \
+        tini \
+        virtualenv
+    ln -s /usr/bin/mariadb_config /usr/bin/mysql_config
+    /usr/bin/virtualenv --python=/usr/bin/python3 /virtualenv
+EOF
 
-# make virtualenv
-RUN virtualenv --python=/usr/bin/python3 /u2m/virtualenv
-RUN /u2m/virtualenv/bin/pip install -r /u2m/requirements.txt
-RUN /u2m/virtualenv/bin/python -m nltk.downloader wordnet stopwords
-
-WORKDIR /u2m
-CMD service mysql start && make -j -O
+# prepare virtualenv
+COPY requirements.txt /requirements.txt
+RUN /virtualenv/bin/pip install -r /requirements.txt

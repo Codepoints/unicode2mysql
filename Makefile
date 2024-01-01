@@ -451,8 +451,7 @@ db-schema:
 db-data-static: db-schema sql-static
 	@echo insert static data into db
 	@if [ "$$(echo 'select count(*) from codepoints' | $(MYSQL) $(MYSQL_OPTS) -N $(DUMMY_DB))" == "0" ]; then \
-	    ls sql/[1-5]*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) --force $(DUMMY_DB) < {}'; \
-	    cat sql/60_fonts.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
+	    cat sql/[1-6]*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
 	else \
 	    echo 'Database $(DUMMY_DB) is already populated. Use "make db-down" to delete a stale one.' >&2; \
 	fi

@@ -55,7 +55,12 @@ def get_addinfo(cp):
 def get_abstract(cur, cp):
     """Fetch abstract for cp"""
     cur.execute("SELECT abstract FROM codepoint_abstract WHERE cp = %s AND lang = 'en'", (cp,))
-    return (cur.fetchone() or {}).get('abstract', '')
+    abstract = (cur.fetchone() or {}).get('abstract', b'').decode('UTF-8')
+    # strip HTML. We assume benign markup, hence this simple regexp suffices
+    abstract = re.sub('<[^>]*>', '', abstract)
+    # harmonize whitespace for smaller DB entries
+    abstract = re.sub(r'\s+', ' ', abstract)
+    return abstract
 
 
 def get_emoji_annotations(cur, cp):
@@ -120,6 +125,7 @@ def handle_row(config, item):
     item['kDefinition'] = ''
     if item['unihan']:
         item['kDefinition'] = json.loads(item['unihan']).get('kDefinition', '')
+        del item['unihan']
 
     props = ''
     for prop in item.keys():
