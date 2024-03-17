@@ -143,7 +143,7 @@ def handle_row(config, item):
 int_{int}
 {int:X} {int:04X} hex_{int:X} hex_{int:04X} U+{int:04X} U+{int:04X} U+{int:04X}
 0x{int:04X} 0x{int:X}
-{props}
+{props} {props} {props}
 {aliases} {aliases}
 {abstract}
 {emoji_annotations} {emoji_annotations}
@@ -176,7 +176,7 @@ confusables_{confusables}
 def get_cur(config):
     """get a database cursor from a new DB connection"""
     conn = MySQLdb.connect(
-            host='localhost',
+            host=config['clientreadonly']['host'],
             user=config['clientreadonly']['user'],
             passwd=config['clientreadonly']['password'],
             db=config['clientreadonly']['database'])
