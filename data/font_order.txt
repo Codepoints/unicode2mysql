@@ -1,4 +1,4 @@
-!EMOJIS
+data/NotoEmoji-Bold.ttf
 cache/noto/NotoSans/NotoSans-Regular.ttf
 cache/noto/NotoSansSymbols2/NotoSansSymbols2-Regular.ttf
 cache/noto/NotoSansCoptic/NotoSansCoptic-Regular.ttf

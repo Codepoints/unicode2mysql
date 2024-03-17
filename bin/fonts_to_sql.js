@@ -23,11 +23,6 @@ async function main() {
   for await (const line of rl) {
     if (! line.trim() || line.charAt(0) === '#') {
       continue;
-    } else if (line === '!EMOJIS') {
-      const [emoji_glyphs, emoji_images] = getEmojis(all_glyphs);
-      all_glyphs.splice(-1, 0, ...emoji_glyphs);
-      sql.splice(-1, 0, ...emoji_images);
-      continue;
     } else if (line === '!CJK') {
       const [cjk_glyphs, cjk_images] = await getCJK(all_glyphs);
       all_glyphs.splice(-1, 0, ...cjk_glyphs);
@@ -96,55 +91,6 @@ function getImage(glyph, font) {
    * wholy visible. */
   const tr = glyph.advanceWidth? 0 : font.unitsPerEm / 2;
   return `( ${glyph.unicode}, '${font.names.fontFamily.en}', ${width}, ${height}, '<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path ', `<path transform="translate(${tr}, ${font.unitsPerEm*0.9}) scale(1,-1)" `)}</svg>' )`;
-}
-
-/**
- *
- */
-function getEmojis(handled_glyphs) {
-  const sourcePath = 'cache/noto/emoji';
-  const glyphs = [];
-  const images = [];
-  const sources = glob.sync('emoji_u*.svg', { cwd: sourcePath });
-  for (const source of sources) {
-    if (! /emoji_u([0-9a-f]+)\.svg$/.test(source)) {
-      continue;
-    }
-    const hex = RegExp.$1.toUpperCase();
-    const dec = parseInt(hex, 16);
-    if (isNaN(dec)) {
-      console.error(`problem with emoji ${source}`);
-      continue;
-    }
-    if (dec < 255) {
-      /* no ASCII emojis! */
-      continue;
-    }
-    if (handled_glyphs.indexOf(dec) > -1) {
-      console.error(`emoji ${source} already handled`);
-      continue;
-    }
-    let content = fs.readFileSync(sourcePath + '/' + source);
-    content = optimize(content, {
-      multipass: true,
-    }).data;
-    content = content.replace(/ enable-background="[^"]*"/g, '');
-    content = content.replace(/ style="enable-background:[^";]*;?"/g, '');
-    content = content.replace(/id="/g, `id="U${hex}-`);
-    content = content.replace(/url\(#/g, `url(#U${hex}-`);
-    content = content.replace(/href="#/g, `href="#U${hex}-`);
-    content = content.replace('<svg', `<svg id="U${hex}"`);
-    let width = 128
-    let height = 128
-    let dimensions = /<svg[^>]* viewBox="(-?[0-9]+) (-?[0-9]+) (-?[0-9]+) (-?[0-9]+)"/.exec(content);
-    if (dimensions) {
-        width = Number(dimensions[3]) - Number(dimensions[1]);
-        height = Number(dimensions[4]) - Number(dimensions[2]);
-    }
-    glyphs.push(dec);
-    images.push(`( ${dec}, 'Noto Emoji', ${width}, ${height}, '${content.replace(/'/g, "''")}' )`);
-  }
-  return [glyphs, images];
 }
 
 /**

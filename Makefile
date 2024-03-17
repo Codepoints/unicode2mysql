@@ -163,13 +163,6 @@ cache/noto/NotoSans/NotoSans-Regular.ttf:
 	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/Sans/SubsetOTF/KR/NotoSansKR-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf > cache/noto/NotoSansCJKsc-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/googlefonts/noto-cjk/raw/main/Sans/SubsetOTF/TC/NotoSansTC-Regular.otf > cache/noto/NotoSansCJKtc-Regular.otf
-	@docker run --rm \
-		--volume "$$PWD":/src \
-		--user "$$(id -u)" \
-		jgsqware/svn-client \
-		export --force --quiet \
-		https://github.com/googlefonts/noto-emoji/trunk/svg \
-		cache/noto/emoji
 .SECONDARY: cache/noto/NotoSans/NotoSans-Regular.ttf
 
 cache/encoding/README.md:
