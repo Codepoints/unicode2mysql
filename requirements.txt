@@ -1,3 +1,2 @@
 lxml==4.9.3
 Markdown==3.4.4
-mysqlclient==2.2.0

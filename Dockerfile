@@ -1,17 +1,14 @@
-FROM ubuntu
+FROM ubuntu:23.10
 
-LABEL net.codepoints.version="0.1"
+LABEL net.codepoints.unicode2mysql.version="15.1"
 
 ENV LANG C.UTF-8
+ENV TARGET all
 WORKDIR /app
 
-ENTRYPOINT ["/usr/bin/tini", "--"]
-CMD service mariadb start && make -j -O PYTHON=/virtualenv/bin/python
-
 RUN <<EOF
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-    apt update
-    apt install -y \
+    apt-get update
+    apt-get install -y \
         apt-utils \
         bc \
         libarchive-tools \
@@ -22,18 +19,20 @@ RUN <<EOF
         libmariadb-dev-compat \
         libsaxonb-java \
         make \
-        mariadb-client \
-        mariadb-server \
-        nodejs \
         pkg-config \
         python3 \
         python3-pip \
         tini \
         virtualenv
-    ln -s /usr/bin/mariadb_config /usr/bin/mysql_config
+    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
+    apt-get install -y nodejs
     /usr/bin/virtualenv --python=/usr/bin/python3 /virtualenv
+    curl -fsSL https://get.docker.com | bash -
 EOF
 
 # prepare virtualenv
 COPY requirements.txt /requirements.txt
 RUN /virtualenv/bin/pip install -r /requirements.txt
+
+ENTRYPOINT ["/usr/bin/tini", "--"]
+CMD sleep 5 && make -j -O PYTHON=/virtualenv/bin/python "$TARGET"
