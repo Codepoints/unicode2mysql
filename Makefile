@@ -20,10 +20,6 @@ PYTHON := virtualenv/bin/python
 
 BSDTAR := bsdtar
 
-MYSQL := mysql
-
-MYSQL_OPTS := --default-character-set=utf8mb4
-
 NODE := node
 
 # control variables
@@ -32,7 +28,7 @@ LANGUAGES := de en es pl
 
 WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.org
 
-DUMMY_DB := codepoints_dummy
+DUMMY_DB := codepts
 
 UNIFONT_VERSION := 15.1.01
 
@@ -40,10 +36,7 @@ UNIFONT_VERSION := 15.1.01
 all: sql
 .PHONY: all
 
-sql: sql-static sql-dynamic
-.PHONY: sql
-
-sql-static: \
+sql: \
 	sql/10_ucd.sql \
 	sql/31_htmlentities.sql \
 	sql/32_confusables.sql \
@@ -66,13 +59,10 @@ sql-static: \
 	sql/51_wp_scripts.sql \
 	sql/52_wp_blocks.sql \
 	sql-fonts
-.PHONY: sql-static
+.PHONY: sql
 
 sql-fonts: sql/60_fonts.sql
 .PHONY: sql-fonts
-
-sql-dynamic: sql/70_search_index.sql
-.PHONY: sql-dynamic
 
 
 cache/confusables.txt:
@@ -181,13 +171,6 @@ cache/charlist.dtd:
 	@echo create $@
 	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > $@
 .SECONDARY: cache/charlist.dtd
-
-cache/codepoints.net/README.md:
-	@echo fetch codepoints.net repo
-	@$(CURL) $(CURL_OPTS) https://github.com/Codepoints/Codepoints.net/archive/master.zip | \
-	    $(BSDTAR) -xf- --cd cache/
-	@mv cache/Codepoints.net-master cache/codepoints.net
-.SECONDARY: cache/codepoints.net/README.md
 
 cache/cldr_annotations_de.xml \
 cache/cldr_annotations_en.xml \
@@ -423,42 +406,6 @@ sql/60_fonts.sql: \
 	@echo "create $@"
 	@$(NODE) bin/fonts_to_sql.js > "$@"
 
-sql/70_search_index.sql: cache/codepoints.net/README.md sql-static db-up
-	@echo create $@
-	@$(PYTHON) bin/create_search_index.py > $@
-
-
-db-up: db-schema db-data-static
-.PHONY: db-up
-
-db-schema:
-	@echo create db schema
-	@if ! echo 'SHOW DATABASES LIKE "$(DUMMY_DB)";' | $(MYSQL) $(MYSQL_OPTS) | grep -q '$(DUMMY_DB)'; then \
-	    ( echo 'CREATE DATABASE $(DUMMY_DB); use $(DUMMY_DB);' ; cat sql/0*.sql ) | $(MYSQL); \
-	else \
-	    echo 'Database $(DUMMY_DB) already exists. Use "make db-down" to delete a stale one.' >&2; \
-	fi
-.PHONY: db-schema
-
-# the 6[12]*.sql files all access the codepoint_image table, so we do them sequencially
-db-data-static: db-schema sql-static
-	@echo insert static data into db
-	@if [ "$$(echo 'select count(*) from codepoints' | $(MYSQL) $(MYSQL_OPTS) -N $(DUMMY_DB))" == "0" ]; then \
-	    cat sql/[1-6]*.sql | $(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB); \
-	else \
-	    echo 'Database $(DUMMY_DB) is already populated. Use "make db-down" to delete a stale one.' >&2; \
-	fi
-.PHONY: db-data-static
-
-db-data-dynamic: sql-dynamic
-	@ls sql/7*.sql | xargs -n 1 -P 0 -i sh -c '$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB) < {}'
-.PHONY: db-data-dynamic
-
-db-down:
-	@echo tear down db
-	@echo 'DROP DATABASE IF EXISTS $(DUMMY_DB);' | $(MYSQL)
-.PHONY: db-down
-
 
 clean:
 	@-/bin/rm -fr \
@@ -481,7 +428,6 @@ clean:
 	    sql/51_wp_scripts.sql \
 	    sql/52_wp_blocks.sql \
 	    sql/60_fonts.sql \
-	    sql/70_search_index.sql \
 	    cache/*
 	@mkdir cache/fonts
 	@touch cache/fonts/.gitignore
@@ -494,8 +440,7 @@ virtualenv:
 .PHONY: virtualenv
 
 find_missing_image_scripts:
-	@echo 'SELECT count, iso, name FROM (SELECT COUNT(*) as count, sc AS iso FROM codepoints c LEFT JOIN codepoint_script s USING (cp) LEFT JOIN `codepoint_image` USING (cp) WHERE image IS NULL GROUP BY sc ORDER BY count DESC) x LEFT JOIN scripts USING (iso)' | \
-		$(MYSQL) $(MYSQL_OPTS) $(DUMMY_DB)
+	@echo -e '-- run the following query:\nSELECT count, iso, name FROM (SELECT COUNT(*) as count, sc AS iso FROM codepoints c LEFT JOIN codepoint_script s USING (cp) LEFT JOIN `codepoint_image` USING (cp) WHERE image IS NULL GROUP BY sc ORDER BY count DESC) x LEFT JOIN scripts USING (iso)'
 .PHONY: find_missing_image_scripts
 
 fill-cache: \
@@ -508,7 +453,6 @@ fill-cache: \
 	cache/cldr_annotations_en.xml \
 	cache/cldr_annotations_es.xml \
 	cache/cldr_annotations_pl.xml \
-	cache/codepoints.net/README.md \
 	cache/confusables.txt \
 	cache/encoding/README.md \
 	cache/fonts/BabelStoneKhitanSmallLinear.ttf \
