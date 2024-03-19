@@ -165,7 +165,7 @@ def handle_cp(hex_cp, attrs):
             values.append("'%s'" % v.replace("'", "''"))
     if unihan:
         fields.append('unihan')
-        values.append("'%s'" % json.dumps(unihan).replace("'", "''"))
+        values.append("'%s'" % json.dumps(unihan).replace('\\', '\\\\').replace("'", "''"))
     add_to_cps_buffer(','.join(fields), ','.join(values))
     add_to_name_map(
         cp,
