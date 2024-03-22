@@ -14,3 +14,4 @@ CREATE TABLE codepoint_image (
   width  INTEGER,
   height INTEGER
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE INDEX codepoint_image_cp ON codepoint_image ( cp );
