@@ -1,5 +1,9 @@
 #!/bin/bash
 
+set -euo pipefail
+
+DIR="$(dirname "$(dirname "$0")")"
+
 URL="https://$SRCLANG.wikipedia.org/w/api.php?action=query&redirects&format=json&prop=extracts&exintro&titles="
 CHAR="$1"
 
@@ -26,9 +30,4 @@ case "$QCHAR" in
         ;;
 esac
 
-echo "https://$SRCLANG.wikipedia.org/wiki/$QCHAR" > "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
-$CURL $CURL_OPTS --location "$URL$QCHAR" | \
-    $JQ -r '.query.pages | to_entries [0].value.extract' >> "$(dirname "$0")/../cache/abstracts/$SRCLANG/$XCHAR"
-
-# prevent running into API limits
-sleep 0.01
+"$DIR/bin/fetch_abstract.sh" "$SRCLANG" "$QCHAR" "$DIR/cache/abstracts/$SRCLANG/$XCHAR"

@@ -121,6 +121,9 @@ intermediate-wiki-all-titles:
 # second
 #
 # bin/char_to_abstract.sh calls the WP API and stores the excerpt.
+# Some characters have their own Wikipedia page under a special name, i.e. they
+# do not appear in the list of single-char titles. We fetch their excerpts by
+# manually curating data/wikipedia_map.json.
 cache/abstracts/de/sentinel \
 cache/abstracts/en/sentinel \
 cache/abstracts/es/sentinel \
@@ -130,8 +133,12 @@ cache/abstracts/%/sentinel: cache/%wiki-latest-all-titles-in-ns0.gz
 	@mkdir -p cache/abstracts/$*
 	@zcat cache/$*wiki-latest-all-titles-in-ns0.gz | \
 		LANG=C.UTF-8 grep '^.$$' | \
-		CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' SRCLANG="$*" \
+		CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' PYTHON='$(PYTHON)' SRCLANG="$*" \
 			xargs -d '\n' -i -n 1 -P 3 bin/char_to_abstract.sh '{}'
+	@cat ./data/wikipedia_map.json | \
+		$(JQ) -r 'to_entries[] | select(.key == "$*") | .value | to_entries[] | "$* \(.value) cache/abstracts/$*/\(.key)"' | \
+		CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' PYTHON='$(PYTHON)' \
+			xargs -n 3 bin/fetch_abstract.sh
 	@touch "$@"
 .SECONDARY: cache/abstracts/de/sentinel
 .SECONDARY: cache/abstracts/en/sentinel
