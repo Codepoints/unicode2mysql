@@ -162,13 +162,6 @@ cache/noto/NotoSans/NotoSans-Regular.ttf:
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/TC/NotoSansTC-Regular.otf > cache/noto/NotoSansCJKtc-Regular.otf
 .SECONDARY: cache/noto/NotoSans/NotoSans-Regular.ttf
 
-cache/encoding/README.md:
-	@echo fetch Encoding spec
-	@$(CURL) $(CURL_OPTS) https://github.com/whatwg/encoding/archive/main.zip | \
-	    $(BSDTAR) -xf- --cd cache/
-	@mv cache/encoding-main cache/encoding
-.SECONDARY: cache/encoding
-
 cache/latex.xml: cache/charlist.dtd
 	@echo create $@
 	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > $@
@@ -302,12 +295,9 @@ sql/35_blocks.sql: cache/unicode/ReadMe.txt
 	    xargs -0 -n 3 sh -c 'printf "INSERT INTO blocks (name, first, last) VALUES ('"'%s'"', %s, %s);\n" "$$0" "$$(echo $$1| tr a-f A-F | sed "s/^/ibase=16;/" | bc)" "$$(echo $$2| tr a-f A-F | sed "s/^/ibase=16;/" | bc)"' \
 	    > $@
 
-sql/36_encodings.sql: cache/encoding/README.md
-	@echo create $@
-	@true > $@
-	@for enc in cache/encoding/index-*.txt; do \
-	    $(PYTHON) bin/encoding_to_sql.py $$enc >> $@; \
-	done
+sql/36_encodings.sql:
+	@echo "create $@"
+	@$(PYTHON) bin/encoding_to_sql.py > $@
 
 sql/37_latex.sql: cache/latex.xml
 	@echo create $@
@@ -461,7 +451,6 @@ fill-cache: \
 	cache/cldr_annotations_es.xml \
 	cache/cldr_annotations_pl.xml \
 	cache/confusables.txt \
-	cache/encoding/README.md \
 	cache/fonts/BabelStoneKhitanSmallLinear.ttf \
 	cache/fonts/BabelStoneMarchen.ttf \
 	cache/fonts/damase_v.2.ttf \
