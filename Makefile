@@ -40,6 +40,7 @@ sql: \
 	sql/10_ucd.sql \
 	sql/31_htmlentities.sql \
 	sql/32_confusables.sql \
+	sql/32_unikemet.sql \
 	sql/34_aliases.sql \
 	sql/35_blocks.sql \
 	sql/36_encodings.sql \
@@ -283,6 +284,10 @@ sql/32_confusables.sql: cache/confusables.txt
 	    sed 's/\s*;\s*/;/' | \
 	    $(PYTHON) bin/confusables_to_sql.py "$$line" > $@
 
+sql/32_unikemet.sql: cache/unicode/ReadMe.txt
+	@echo create $@
+	@$(PYTHON) bin/unikemet_to_sql.py > $@
+
 sql/34_aliases.sql: cache/unicode/ReadMe.txt
 	@echo "create $@"
 	@$(PYTHON) bin/alias_to_sql.py > $@
@@ -409,6 +414,7 @@ clean:
 	    sql/10_ucd.sql \
 	    sql/31_htmlentities.sql \
 	    sql/32_confusables.sql \
+	    sql/32_unikemet.sql \
 	    sql/34_aliases.sql \
 	    sql/35_blocks.sql \
 	    sql/36_encodings.sql \

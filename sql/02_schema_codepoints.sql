@@ -105,7 +105,8 @@ CREATE TABLE codepoint_props (
   Dep                   BOOLEAN,
   VS                    BOOLEAN,
   NChar                 BOOLEAN,
-  unihan                TEXT, -- JSON blob to store all k* properties
+  unihan                TEXT, -- JSON blob to store all k* properties apart from Unikemet
+  unikemet              TEXT, -- 16.0, JSON blob to store Unikemet properties
   Emoji                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   EPres                 BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
   EMod                  BOOLEAN NOT NULL DEFAULT 0, -- emoji 5.0
