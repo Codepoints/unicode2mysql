@@ -72,7 +72,7 @@ INSERT INTO  prop_jg VALUES
 ('Gaf'), ('Gamal'),
 ('Hah'), ('Hamza_On_Heh_Goal'), ('Hanifi_Rohingya_Kinna_Ya'), ('Hanifi_Rohingya_Pa'),
 ('He'), ('Heh'), ('Heh_Goal'), ('Heth'),
-('Kaf'), ('Kaph'), ('Khaph'), ('Knotted_Heh'),
+('Kaf'), ('Kaph'), ('Kashmiri_Yeh'), ('Khaph'), ('Knotted_Heh'),
 ('Lam'), ('Lamadh'),
 ('Malayalam_Nga'), ('Malayalam_Ja'), ('Malayalam_Nya'), ('Malayalam_Tta'),
 ('Malayalam_Nna'), ('Malayalam_Nnna'), ('Malayalam_Bha'), ('Malayalam_Ra'),
@@ -137,6 +137,7 @@ INSERT INTO  prop_InSC VALUES
 ('Consonant_With_Stacker'), ('Gemination_Mark'), ('Invisible_Stacker'),
 ('Joiner'), ('Modifying_Letter'), ('Non_Joiner'), ('Nukta'), ('Number'),
 ('Number_Joiner'), ('Other'), ('Pure_Killer'), ('Register_Shifter'),
+('Reordering_Killer'),
 ('Syllable_Modifier'), ('Tone_Letter'), ('Tone_Mark'), ('Virama'), ('Visarga'),
 ('Vowel'), ('Vowel_Dependent'), ('Vowel_Independent');
 
