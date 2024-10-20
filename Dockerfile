@@ -19,6 +19,7 @@ RUN <<EOF
         libmariadb-dev-compat \
         libsaxonb-java \
         make \
+        openjdk-21-jre \
         pkg-config \
         python3 \
         python3-pip \

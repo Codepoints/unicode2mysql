@@ -40,6 +40,6 @@ $CURL $CURL_OPTS 'https://query.wikidata.org/sparql?query=SELECT%20DISTINCT%20%3
             sed 's#/wiki/#/api/rest_v1/page/summary/#')" | \
             jq -r '.extract_html' | \
             sed "s/'/\\\\'/g" )"
-        printf "INSERT INTO script_abstract ( sc, abstract, lang, src ) VALUES ( '%s', '%s', '%s', '%s' );\n" \
-            "${PARTS[0]}" "$ABSTRACT" "${PARTS[2]}" "${PARTS[1]}"
+        printf "INSERT INTO script_abstract ( sc, lang, abstract, src ) VALUES ( '%s', '%s', '%s', '%s' );\n" \
+            "${PARTS[0]}" "${PARTS[2]}" "$ABSTRACT" "${PARTS[1]}"
     done > "$TARGET"
