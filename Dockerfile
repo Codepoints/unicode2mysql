@@ -1,9 +1,9 @@
-FROM ubuntu:23.10
+FROM ubuntu:24.04
 
-LABEL net.codepoints.unicode2mysql.version="15.1"
+LABEL net.codepoints.unicode2mysql.version="16.0"
 
-ENV LANG C.UTF-8
-ENV TARGET all
+ENV LANG=C.UTF-8
+ENV TARGET=all
 WORKDIR /app
 
 RUN <<EOF
@@ -27,7 +27,6 @@ RUN <<EOF
     curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
     apt-get install -y nodejs
     /usr/bin/virtualenv --python=/usr/bin/python3 /virtualenv
-    curl -fsSL https://get.docker.com | bash -
 EOF
 
 # prepare virtualenv

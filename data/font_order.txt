@@ -152,8 +152,9 @@ cache/noto/NotoSansChorasmian/NotoSansChorasmian-Regular.ttf
 cache/noto/NotoNaskhArabic/NotoNaskhArabic-Regular.ttf
 !CJK
 cache/fonts/HANNOMB.ttf
-cache/fonts/HanaMinA.ttf
-cache/fonts/HanaMinB.ttf
+cache/fonts/HanaMinA.otf
+cache/fonts/HanaMinB.otf
+cache/fonts/HanaMinC.otf
 cache/fonts/damase_v.2.ttf
 cache/fonts/KikakuiSansPro.ot.ttf
 #cache/fonts/SuttonSignWriting8.ttf

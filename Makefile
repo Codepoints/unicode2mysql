@@ -148,14 +148,11 @@ cache/abstracts/%/sentinel: cache/%wiki-latest-all-titles-in-ns0.gz
 
 cache/noto/NotoSans/NotoSans-Regular.ttf:
 	@echo fetch Noto fonts
-	@mkdir -p cache
-	@docker run --rm \
-		--volume "$$PWD":/src \
-		--user "$$(id -u)" \
-		jgsqware/svn-client \
-		export --force --quiet \
-		https://github.com/notofonts/notofonts.github.io/trunk/unhinted/ttf \
-		cache/noto
+	@mkdir -p cache/noto/NotoSans
+	@cd cache/noto/NotoSans && \
+		$(CURL) $(CURL_OPTS) 'https://notofonts.github.io/' | \
+		grep -Eo 'https://cdn\.jsdelivr\.net/gh/notofonts/notofonts\.github\.io/fonts/.*/unhinted/ttf/.*-Regular\.ttf' | \
+		xargs -n 1 $(CURL) $(CURL_OPTS) -O
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/HK/NotoSansHK-Regular.otf > cache/noto/NotoSansCJKhk-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/JP/NotoSansJP-Regular.otf > cache/noto/NotoSansCJKjp-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/KR/NotoSansKR-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
@@ -193,12 +190,17 @@ cache/fonts/HANNOMB.ttf:
 
 cache/fonts/HanaMinA.ttf:
 	@echo download font Hanazono
-	@$(CURL) $(CURL_OPTS) 'https://de.osdn.net/frs/redir.php?m=rwthaachen&f=hanazono-font%2F68253%2Fhanazono-20170904.zip' | \
-	    $(BSDTAR) -xf- --cd cache/fonts
+	@cd cache/fonts && \
+		$(CURL) $(CURL_OPTS) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinA.otf' > HanaMinA.otf && \
+		$(CURL) $(CURL_OPTS) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinB.otf' > HanaMinB.otf && \
+		$(CURL) $(CURL_OPTS) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinC.otf' > HanaMinC.otf
 .SECONDARY: cache/fonts/HanaMinA.ttf
 
 cache/fonts/HanaMinB.ttf: cache/fonts/HanaMinA.ttf
 .SECONDARY: cache/fonts/HanaMinB.ttf
+
+cache/fonts/HanaMinC.ttf: cache/fonts/HanaMinA.ttf
+.SECONDARY: cache/fonts/HanaMinC.ttf
 
 cache/fonts/damase_v.2.ttf:
 	@echo download font damase
@@ -398,6 +400,7 @@ sql/60_fonts.sql: \
 		cache/fonts/damase_v.2.ttf \
 		cache/fonts/HanaMinA.ttf \
 		cache/fonts/HanaMinB.ttf \
+		cache/fonts/HanaMinC.ttf \
 		cache/fonts/HANNOMB.ttf \
 		cache/fonts/KikakuiSansPro.ot.ttf \
 		cache/fonts/ScheherazadeNew-Regular.ttf \
@@ -462,6 +465,7 @@ fill-cache: \
 	cache/fonts/damase_v.2.ttf \
 	cache/fonts/HanaMinA.ttf \
 	cache/fonts/HanaMinB.ttf \
+	cache/fonts/HanaMinC.ttf \
 	cache/fonts/HANNOMB.ttf \
 	cache/fonts/KikakuiSansPro.ot.ttf \
 	cache/fonts/ScheherazadeNew-Regular.ttf \
