@@ -116,6 +116,7 @@ CREATE TABLE codepoint_props (
   ID_Compat_Math_Start  BOOLEAN NOT NULL DEFAULT 0, -- 15.1
   ID_Compat_Math_Continue BOOLEAN NOT NULL DEFAULT 0, -- 15.1
   IDSU                  BOOLEAN NOT NULL DEFAULT 0, -- 15.1
+  MCM                   BOOLEAN, -- 16.0
   blk                   VARCHAR(127)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE INDEX codepoint_props_cp ON codepoint_props ( cp );

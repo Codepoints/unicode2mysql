@@ -20,6 +20,7 @@ boolfields = (
     'OGr_Ext', 'Gr_Link', 'Ideo', 'UIdeo', 'IDSB', 'IDST', 'Radical', 'Dep',
     'VS', 'NChar', 'PCM', 'RI', 'Emoji', 'EPres', 'EMod', 'EBase', 'EComp',
     'ExtPict', 'ID_Compat_Math_Start', 'ID_Compat_Math_Continue', 'IDSU',
+    'MCM',
 )
 
 # single codepoints (INT, need '#' resolution)
