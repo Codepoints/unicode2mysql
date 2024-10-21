@@ -146,10 +146,10 @@ cache/abstracts/%/sentinel: cache/%wiki-latest-all-titles-in-ns0.gz
 .SECONDARY: cache/abstracts/es/sentinel
 .SECONDARY: cache/abstracts/pl/sentinel
 
-cache/noto/NotoSans/NotoSans-Regular.ttf:
+cache/noto/NotoSans-Regular.ttf:
 	@echo fetch Noto fonts
-	@mkdir -p cache/noto/NotoSans
-	@cd cache/noto/NotoSans && \
+	@mkdir -p cache/noto
+	@cd cache/noto && \
 		$(CURL) $(CURL_OPTS) 'https://notofonts.github.io/' | \
 		grep -Eo 'https://cdn\.jsdelivr\.net/gh/notofonts/notofonts\.github\.io/fonts/.*/unhinted/ttf/.*-Regular\.ttf' | \
 		xargs -n 1 $(CURL) $(CURL_OPTS) -O
@@ -158,7 +158,7 @@ cache/noto/NotoSans/NotoSans-Regular.ttf:
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/KR/NotoSansKR-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf > cache/noto/NotoSansCJKsc-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/TC/NotoSansTC-Regular.otf > cache/noto/NotoSansCJKtc-Regular.otf
-.SECONDARY: cache/noto/NotoSans/NotoSans-Regular.ttf
+.SECONDARY: cache/noto/NotoSans-Regular.ttf
 
 cache/latex.xml: cache/charlist.dtd
 	@echo create $@
@@ -394,7 +394,7 @@ sql/52_wp_blocks.sql:
 	@CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' bin/wp_blocks_to_sql.sh "$@"
 
 sql/60_fonts.sql: \
-		cache/noto/NotoSans/NotoSans-Regular.ttf \
+		cache/noto/NotoSans-Regular.ttf \
 		cache/fonts/BabelStoneKhitanSmallLinear.ttf \
 		cache/fonts/BabelStoneMarchen.ttf \
 		cache/fonts/damase_v.2.ttf \
@@ -475,7 +475,7 @@ fill-cache: \
 	cache/fonts/unifont_upper.otf \
 	cache/htmlentities.json \
 	cache/latex.xml \
-	cache/noto/NotoSans/NotoSans-Regular.ttf \
+	cache/noto/NotoSans-Regular.ttf \
 	cache/rfc1345.txt \
 	cache/ucd.all.flat.xml \
 	cache/unicode/NamedSequences.txt \
