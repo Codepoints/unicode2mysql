@@ -153,6 +153,7 @@ cache/noto/NotoSans-Regular.ttf:
 		$(CURL) $(CURL_OPTS) 'https://notofonts.github.io/' | \
 		grep -Eo 'https://cdn\.jsdelivr\.net/gh/notofonts/notofonts\.github\.io/fonts/.*/unhinted/ttf/.*-Regular\.ttf' | \
 		xargs -n 1 $(CURL) $(CURL_OPTS) -O
+	@cd cache/noto && $(CURL) $(CURL_OPTS) 'https://github.com/googlefonts/Arimo/raw/refs/heads/main/fonts/ttf/Arimo-Regular.ttf' > cache/noto/Arimo-Regular.ttf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/HK/NotoSansHK-Regular.otf > cache/noto/NotoSansCJKhk-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/JP/NotoSansJP-Regular.otf > cache/noto/NotoSansCJKjp-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/KR/NotoSansKR-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
