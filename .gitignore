@@ -4,6 +4,7 @@ __pycache__
 sql/10_ucd.sql
 sql/31_htmlentities.sql
 sql/32_confusables.sql
+sql/32_unikemet.sql
 sql/33_images.sql
 sql/34_aliases.sql
 sql/35_blocks.sql
