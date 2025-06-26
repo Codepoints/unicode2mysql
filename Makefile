@@ -149,16 +149,16 @@ cache/abstracts/%/sentinel: cache/%wiki-latest-all-titles-in-ns0.gz
 cache/noto/NotoSans-Regular.ttf:
 	@echo fetch Noto fonts
 	@mkdir -p cache/noto
-	@cd cache/noto && \
-		$(CURL) $(CURL_OPTS) 'https://notofonts.github.io/' | \
-		grep -Eo 'https://cdn\.jsdelivr\.net/gh/notofonts/notofonts\.github\.io/fonts/.*/unhinted/ttf/.*-Regular\.ttf' | \
-		xargs -n 1 $(CURL) $(CURL_OPTS) -O
-	@cd cache/noto && $(CURL) $(CURL_OPTS) 'https://github.com/googlefonts/Arimo/raw/refs/heads/main/fonts/ttf/Arimo-Regular.ttf' > cache/noto/Arimo-Regular.ttf
+	@cd cache/noto && $(CURL) $(CURL_OPTS) 'https://github.com/googlefonts/Arimo/raw/refs/heads/main/fonts/ttf/Arimo-Regular.ttf' > Arimo-Regular.ttf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/HK/NotoSansHK-Regular.otf > cache/noto/NotoSansCJKhk-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/JP/NotoSansJP-Regular.otf > cache/noto/NotoSansCJKjp-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/KR/NotoSansKR-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf > cache/noto/NotoSansCJKsc-Regular.otf
 	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/TC/NotoSansTC-Regular.otf > cache/noto/NotoSansCJKtc-Regular.otf
+	@cd cache/noto && \
+		$(CURL) $(CURL_OPTS) 'https://notofonts.github.io/' | \
+		grep -Eo 'https://cdn\.jsdelivr\.net/gh/notofonts/notofonts\.github\.io/fonts/.*/unhinted/ttf/.*-Regular\.ttf' | \
+		xargs -n 1 $(CURL) $(CURL_OPTS) -O
 .SECONDARY: cache/noto/NotoSans-Regular.ttf
 
 cache/latex.xml: cache/charlist.dtd
