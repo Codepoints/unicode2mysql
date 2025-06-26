@@ -163,7 +163,7 @@ cache/noto/NotoSans-Regular.ttf:
 
 cache/latex.xml: cache/charlist.dtd
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/unicode.xml > $@
+	@$(CURL) $(CURL_OPTS) 'https://raw.githubusercontent.com/w3c/xml-entities/refs/heads/gh-pages/unicode.xml' > $@
 .SECONDARY: cache/latex.xml
 
 cache/charlist.dtd:
