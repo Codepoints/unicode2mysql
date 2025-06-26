@@ -2,6 +2,8 @@
 
 <output method="text" />
 
+<template match="text()"/>
+
 <template match="character">
   <if test="not(contains(@dec, '-')) and ./latex">
     <if test="./latex != codepoints-to-string(@dec)">

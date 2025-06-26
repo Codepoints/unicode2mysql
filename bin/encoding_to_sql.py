@@ -1,6 +1,7 @@
 #!/usr/bin/python
 
-import binascii, codecs, logging, ebcdic, sys
+import binascii, codecs, logging, ebcdic
+#import sys
 
 logger = logging.getLogger('enc')
 
@@ -107,8 +108,8 @@ def print_batch():
 
 print('DELETE FROM codepoint_alias WHERE `type` LIKE "enc:%";')
 for enc in encs:
-    sys.stderr.write(f'{enc}\n')
-    sys.stderr.flush()
+    #sys.stderr.write(f'{enc}\n')
+    #sys.stderr.flush()
     for cp in range(0x10FFFF):
         try:
             encoded_value = binascii.b2a_hex(
