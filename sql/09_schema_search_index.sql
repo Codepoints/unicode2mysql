@@ -11,3 +11,4 @@ CREATE TABLE search_index (
     CONSTRAINT search_index_unique_cp UNIQUE (cp)
 ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE FULLTEXT INDEX search_index_text ON search_index ( text );
+CREATE INDEX search_index_version ON search_index ( version );
