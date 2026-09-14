@@ -30,7 +30,7 @@ WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.org
 
 DUMMY_DB := codepts
 
-UNIFONT_VERSION := 16.0.01
+UNIFONT_VERSION := 17.0.01
 
 
 all: sql

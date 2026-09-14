@@ -159,7 +159,7 @@ def handle_cp(hex_cp, attrs):
         elif f == 'blk':
             fields.append(f)
             values.append("'%s'" % block_map.get(v, v).replace("'", "''"))
-        elif f[0] == 'k':
+        elif f[0] == 'k' and f[0:2] != 'kEH':
             unihan[f] = v
         else:
             fields.append(f)

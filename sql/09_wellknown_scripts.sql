@@ -12,6 +12,7 @@ INSERT INTO scripts (iso, name) VALUES ('Bamu', 'Bamum');
 INSERT INTO scripts (iso, name) VALUES ('Bass', 'Bassa Vah');
 INSERT INTO scripts (iso, name) VALUES ('Batk', 'Batak');
 INSERT INTO scripts (iso, name) VALUES ('Beng', 'Bengali');
+INSERT INTO scripts (iso, name) VALUES ('Berf', 'Beria Erfe');
 INSERT INTO scripts (iso, name) VALUES ('Bhks', 'Bhaiksuki');
 INSERT INTO scripts (iso, name) VALUES ('Blis', 'Bliss');
 INSERT INTO scripts (iso, name) VALUES ('Bopo', 'Bopomofo');

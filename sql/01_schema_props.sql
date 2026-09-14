@@ -96,7 +96,12 @@ INSERT INTO  prop_jg VALUES
 ('Vertical_Tail'),
 ('Waw'),
 ('Yeh'), ('Yeh_Barree'), ('Yeh_With_Tail'), ('Yudh'), ('Yudh_He'),
-('Zain'), ('Zhain');
+('Zain'), ('Zhain'),
+-- v17.0
+('Thin_Noon'), ('BAA'), ('FA'), ('HAA'), ('HA_GOAL'), ('HA'), ('CAF'),
+('KNOTTED_HA'), ('RA'), ('SWASH_CAF'), ('HAMZAH_ON_HA_GOAL'), ('TAA_MARBUTAH'),
+('YA_BARREE'), ('YA'), ('ALEF_MAQSURAH')
+;
 
 CREATE TABLE prop_lb ( lb VARCHAR(3) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO  prop_lb VALUES
@@ -118,7 +123,10 @@ INSERT INTO  prop_lb VALUES
 ('VF'), ('VI'),
 ('WJ'),
 ('XX'),
-('ZW'), ('ZWJ');
+('ZW'), ('ZWJ'),
+-- v17.0
+('HH')
+;
 
 CREATE TABLE prop_ea ( ea VARCHAR(2) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO  prop_ea VALUES ('A'), ('F'), ('H'), ('N'), ('Na'), ('W');
@@ -139,7 +147,10 @@ INSERT INTO  prop_InSC VALUES
 ('Number_Joiner'), ('Other'), ('Pure_Killer'), ('Register_Shifter'),
 ('Reordering_Killer'),
 ('Syllable_Modifier'), ('Tone_Letter'), ('Tone_Mark'), ('Virama'), ('Visarga'),
-('Vowel'), ('Vowel_Dependent'), ('Vowel_Independent');
+('Vowel'), ('Vowel_Dependent'), ('Vowel_Independent'),
+-- v17.0
+('Consonant_Repha')
+;
 
 CREATE TABLE prop_InMC ( InMC VARCHAR(24) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO  prop_InMC VALUES ('Right'), ('Left'), ('Visual_Order_Left'),
@@ -152,7 +163,10 @@ INSERT INTO  prop_InPC VALUES ('Bottom'), ('Bottom_And_Left'),
 ('Bottom_And_Right'), ('Left'), ('Left_And_Right'), ('NA'), ('Overstruck'),
 ('Right'), ('Top'), ('Top_And_Bottom'), ('Top_And_Bottom_And_Left'),
 ('Top_And_Bottom_And_Right'), ('Top_And_Left'), ('Top_And_Left_And_Right'),
-('Top_And_Right'), ('Visual_Order_Left');
+('Top_And_Right'), ('Visual_Order_Left'),
+-- v17.0
+('Invisible')
+;
 
 CREATE TABLE prop_InCB ( InCB VARCHAR(24) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO  prop_InCB VALUES ('None'), ('Linker'),
