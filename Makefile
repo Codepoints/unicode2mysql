@@ -32,6 +32,7 @@ WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.org
 DUMMY_DB := codepts
 
 UNIFONT_VERSION := 18.0.01
+SCHEHERAZADE_VERSION := 4.500
 
 
 all: sql
@@ -197,52 +198,81 @@ cache/fonts/HANNOMB.ttf:
 
 cache/fonts/HanaMinA.otf:
 	@echo download font Hanazono
-	@cd cache/fonts && \
-		$(CURL) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinA.otf' > HanaMinA.otf && \
-		$(CURL) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinB.otf' > HanaMinB.otf && \
-		$(CURL) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinC.otf' > HanaMinC.otf
+	@( [ -f prefetched-data/fonts/HanaMinA.otf ] && \
+			cat prefetched-data/fonts/HanaMinA.otf || \
+			$(CURL) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinA.otf' \
+		) > cache/fonts/HanaMinA.otf
 .SECONDARY: cache/fonts/HanaMinA.otf
 
-cache/fonts/HanaMinB.otf: cache/fonts/HanaMinA.otf
+cache/fonts/HanaMinB.otf:
+	@( [ -f prefetched-data/fonts/HanaMinB.otf ] && \
+			cat prefetched-data/fonts/HanaMinB.otf || \
+			$(CURL) 'https://github.com/cjkvi/HanaMinBFDKO/releases/download/8.030/HanaMinB.otf' \
+		) > cache/fonts/HanaMinB.otf
 .SECONDARY: cache/fonts/HanaMinB.otf
 
-cache/fonts/HanaMinC.otf: cache/fonts/HanaMinA.otf
+cache/fonts/HanaMinC.otf:
+	@( [ -f prefetched-data/fonts/HanaMinC.otf ] && \
+			cat prefetched-data/fonts/HanaMinC.otf || \
+			$(CURL) 'https://github.com/cjkvi/HanaMinCFDKO/releases/download/8.030/HanaMinC.otf' \
+		) > cache/fonts/HanaMinC.otf
 .SECONDARY: cache/fonts/HanaMinC.otf
 
 cache/fonts/damase_v.2.ttf:
 	@echo download font damase
-	@$(CURL) 'https://dl.dafont.com/dl/?f=mph_2b_damase' | \
+	@( [ -f prefetched-data/mph_2b_damase.zip ] && \
+			cat prefetched-data/mph_2b_damase.zip || \
+			$(CURL) 'https://dl.dafont.com/dl/?f=mph_2b_damase' \
+		) | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 .SECONDARY: cache/fonts/damase_v.2.ttf
 
 cache/fonts/KikakuiSansPro.ot.ttf:
 	@echo download font KikakuiSansPro
-	@$(CURL) https://github.com/athinkra/mende-kikakui/raw/master/fonts/src/ot/KikakuiSansPro.ot.ttf > $@
+	@( [ -f prefetched-data/fonts/KikakuiSansPro.ot.ttf ] && \
+			cat prefetched-data/fonts/KikakuiSansPro.ot.ttf || \
+			$(CURL) https://github.com/athinkra/mende-kikakui/raw/master/fonts/src/ot/KikakuiSansPro.ot.ttf \
+		) > $@
 .SECONDARY: cache/fonts/KikakuiSansPro.ot.ttf
 
 cache/fonts/SuttonSignWriting8.ttf:
 	@echo download font SuttonSignWriting
-	@$(CURL) https://github.com/Slevinski/signwriting_2010_fonts/raw/master/fonts/SuttonSignWriting8.ttf > $@
+	@( [ -f prefetched-data/fonts/SuttonSignWriting8.ttf ] && \
+			cat prefetched-data/fonts/SuttonSignWriting8.ttf || \
+			$(CURL) https://github.com/Slevinski/signwriting_2010_fonts/raw/master/fonts/SuttonSignWriting8.ttf \
+		) > $@
 .SECONDARY: cache/fonts/SuttonSignWriting8.ttf
 
 cache/fonts/TangutYinchuan.ttf:
 	@echo download font TangutYinchuan
-	@$(CURL) https://babelstone.co.uk/Fonts/Download/TangutYinchuan.ttf > $@
+	@( [ -f prefetched-data/fonts/TangutYinchuan.ttf ] && \
+			cat prefetched-data/fonts/TangutYinchuan.ttf || \
+			$(CURL) https://babelstone.co.uk/Fonts/Download/TangutYinchuan.ttf \
+		) > $@
 .SECONDARY: cache/fonts/TangutYinchuan.ttf
 
 cache/fonts/BabelStoneMarchen.ttf:
 	@echo download font BabelStoneMarchen
-	@$(CURL) https://www.babelstone.co.uk/Fonts/Download/BabelStoneMarchen.ttf > $@
+	@( [ -f prefetched-data/fonts/BabelStoneMarchen.ttf ] && \
+			cat prefetched-data/fonts/BabelStoneMarchen.ttf || \
+			$(CURL) https://www.babelstone.co.uk/Fonts/Download/BabelStoneMarchen.ttf \
+		) > $@
 .SECONDARY: cache/fonts/BabelStoneMarchen.ttf
 
 cache/fonts/BabelStoneKhitanSmallLinear.ttf:
 	@echo download font BabelStoneKhitanSmallLinear
-	@$(CURL) https://babelstone.co.uk/Fonts/Download/BabelStoneKhitanSmallLinear.ttf > $@
+	@( [ -f prefetched-data/fonts/BabelStoneKhitanSmallLinear.ttf ] && \
+			cat prefetched-data/fonts/BabelStoneKhitanSmallLinear.ttf || \
+			$(CURL) https://babelstone.co.uk/Fonts/Download/BabelStoneKhitanSmallLinear.ttf \
+		) > $@
 .SECONDARY: cache/fonts/BabelStoneKhitanSmallLinear.ttf
 
 cache/fonts/BabelStonePseudographica.ttf:
 	@echo download font BabelStonePseudographica
-	@$(CURL) https://babelstone.co.uk/Fonts/Download/BabelStonePseudographica.ttf > $@
+	@( [ -f prefetched-data/fonts/BabelStonePseudographica.ttf ] && \
+			cat prefetched-data/fonts/BabelStonePseudographica.ttf || \
+			$(CURL) https://babelstone.co.uk/Fonts/Download/BabelStonePseudographica.ttf \
+		) > $@
 .SECONDARY: cache/fonts/BabelStonePseudographica.ttf
 
 cache/fonts/unifont.otf:
@@ -256,10 +286,10 @@ cache/fonts/unifont_upper.otf:
 .SECONDARY: cache/fonts/unifont_upper.otf
 
 cache/fonts/ScheherazadeNew-Regular.ttf:
-	@$(CURL) 'https://software.sil.org/downloads/r/scheherazade/ScheherazadeNew-3.000.zip' | \
+	@$(CURL) 'https://software.sil.org/downloads/r/scheherazade/ScheherazadeNew-$(SCHEHERAZADE_VERSION).zip' | \
 	    $(BSDTAR) -xf- --cd cache/fonts '*-Regular.ttf'
-	@mv 'cache/fonts/ScheherazadeNew-3.000/ScheherazadeNew-Regular.ttf' cache/fonts/
-	@rmdir 'cache/fonts/ScheherazadeNew-3.000'
+	@mv 'cache/fonts/ScheherazadeNew-$(SCHEHERAZADE_VERSION)/ScheherazadeNew-Regular.ttf' cache/fonts/
+	@rmdir 'cache/fonts/ScheherazadeNew-$(SCHEHERAZADE_VERSION)'
 .SECONDARY: cache/fonts/ScheherazadeNew-Regular.ttf
 
 cache/agl/glyphlist.txt:
