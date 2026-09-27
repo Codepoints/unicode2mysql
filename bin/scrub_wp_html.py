@@ -8,7 +8,7 @@ some profiling info in comments back.
 
 import sys
 from lxml.html import fragment_fromstring, tostring
-from lxml.html.clean import Cleaner
+from lxml_html_clean import Cleaner
 
 src = sys.stdin.read()
 doc = fragment_fromstring('<div>%s</div>' % src)

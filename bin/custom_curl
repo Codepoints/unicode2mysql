@@ -1,0 +1,14 @@
+#!/bin/bash
+#
+# set curl with useful settings and a polite user agent
+#
+
+USER_AGENT="Unicode2MySQLBot/18.0.0 (https://github.com/Codepoints/unicode2mysql)"
+
+curl \
+    --silent \
+    --show-error \
+    --location \
+    --max-redirs 3 \
+    --user-agent "$USER_AGENT" \
+    "$@"

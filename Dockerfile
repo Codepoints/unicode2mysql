@@ -1,6 +1,6 @@
-FROM ubuntu:24.04
+FROM ubuntu:26.04
 
-LABEL net.codepoints.unicode2mysql.version="16.0"
+LABEL net.codepoints.unicode2mysql.version="18.0"
 
 ENV LANG=C.UTF-8
 ENV TARGET=all
@@ -19,16 +19,18 @@ RUN <<EOF
         libmariadb-dev-compat \
         libsaxonb-java \
         make \
-        openjdk-21-jre \
+        openjdk-25-jre \
         pkg-config \
         python3 \
         python3-pip \
         tini \
         virtualenv
-    curl -fsSL https://deb.nodesource.com/setup_20.x | bash -
-    apt-get install -y nodejs
     /usr/bin/virtualenv --python=/usr/bin/python3 /virtualenv
 EOF
+
+COPY --from=node:26-slim /usr/local/bin/node /usr/local/bin/node
+COPY --from=node:26-slim /usr/local/bin/npm /usr/local/bin/npm
+COPY --from=node:26-slim /usr/local/lib/node_modules /usr/local/lib/node_modules
 
 # prepare virtualenv
 COPY requirements.txt /requirements.txt

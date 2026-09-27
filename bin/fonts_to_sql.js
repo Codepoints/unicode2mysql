@@ -1,16 +1,16 @@
-const fs = require('fs');
-const readline = require('readline');
+import * as fs from 'node:fs';
+import * as readline from 'node:readline';
 
-const glob = require('fast-glob');
-const opentype = require('opentype.js');
-const { optimize } = require('svgo');
+import * as fg from 'fast-glob';
+import opentype from 'opentype.js';
+import { optimize } from 'svgo';
 
 
 /**
  *
  */
 async function main() {
-  process.chdir(__dirname + '/..');
+  process.chdir(import.meta.dirname + '/..');
 
   const sql = [];
 
@@ -72,7 +72,8 @@ async function getFont(filename) {
   }
 
   try {
-    return await opentype.load(filename);
+    const buffer = fs.promises.readFile(filename);
+    return await opentype.parse(await buffer);
   } catch (err) {
     console.error(err);
     return null;
@@ -90,7 +91,7 @@ function getImage(glyph, font) {
    * modifier. Move it into the middle of the canvas to make it
    * wholy visible. */
   const tr = glyph.advanceWidth? 0 : font.unitsPerEm / 2;
-  return `( ${glyph.unicode}, '${font.names.fontFamily.en}', ${width}, ${height}, '<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path ', `<path transform="translate(${tr}, ${font.unitsPerEm*0.9}) scale(1,-1)" `)}</svg>' )`;
+  return `( ${glyph.unicode}, '${font.names.windows.fontFamily.en}', ${width}, ${height}, '<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path ', `<path transform="translate(${tr}, ${font.unitsPerEm*0.9}) scale(1,-1)" `)}</svg>' )`;
 }
 
 /**

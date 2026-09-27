@@ -161,6 +161,7 @@ cache/fonts/KikakuiSansPro.ot.ttf
 cache/fonts/TangutYinchuan.ttf
 cache/fonts/BabelStoneMarchen.ttf
 cache/fonts/BabelStoneKhitanSmallLinear.ttf
+cache/fonts/BabelStonePseudographica.ttf
 cache/fonts/ScheherazadeNew-Regular.ttf
 cache/fonts/unifont.otf
 cache/fonts/unifont_upper.otf

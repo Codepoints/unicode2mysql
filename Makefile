@@ -7,10 +7,11 @@
 
 SHELL := /bin/bash
 
+ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+
 # executables and their options
 
-CURL := curl
-CURL_OPTS := --silent --show-error --location --max-redirs 3 --user-agent "Unicode2MySQL,github.com/Codepoints/unicode2mysql"
+CURL := $(ROOT_DIR)/bin/custom_curl
 
 JQ := jq
 
@@ -30,7 +31,7 @@ WIKIPEDIA_DUMP_MIRROR := https://dumps.wikimedia.org
 
 DUMMY_DB := codepts
 
-UNIFONT_VERSION := 17.0.01
+UNIFONT_VERSION := 18.0.01
 
 
 all: sql
@@ -68,29 +69,29 @@ sql-fonts: sql/60_fonts.sql
 
 cache/confusables.txt:
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/security/latest/confusables.txt > $@
+	@$(CURL) http://www.unicode.org/Public/security/latest/confusables.txt > $@
 .SECONDARY: cache/confusables.txt
 
 cache/rfc1345.txt:
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) http://www.rfc-editor.org/rfc/rfc1345.txt > $@
+	@$(CURL) http://www.rfc-editor.org/rfc/rfc1345.txt > $@
 .SECONDARY: cache/rfc1345.txt
 
 cache/htmlentities.json:
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) https://html.spec.whatwg.org/entities.json > $@
+	@$(CURL) https://html.spec.whatwg.org/entities.json > $@
 .SECONDARY: cache/htmlentities.json
 
 cache/ucd.all.flat.xml:
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip | \
+	@$(CURL) http://www.unicode.org/Public/UCD/latest/ucdxml/ucd.all.flat.zip | \
 	    $(BSDTAR) -xf- --cd cache
 .SECONDARY: cache/ucd.all.flat.xml
 
 cache/unicode/ReadMe.txt:
 	@echo fetch Unicode data
 	@mkdir -p cache/unicode
-	@$(CURL) $(CURL_OPTS) http://www.unicode.org/Public/UCD/latest/ucd/UCD.zip | \
+	@$(CURL) http://www.unicode.org/Public/UCD/latest/ucd/UCD.zip | \
 	    $(BSDTAR) -xf- --cd cache/unicode
 .SECONDARY: cache/unicode/ReadMe.txt
 
@@ -106,7 +107,7 @@ cache/plwiki-latest-all-titles-in-ns0.gz: intermediate-wiki-all-titles
 intermediate-wiki-all-titles:
 	@echo create $@
 	@for l in $(LANGUAGES); do \
-	    $(CURL) $(CURL_OPTS) "$(WIKIPEDIA_DUMP_MIRROR)/$${l}wiki/latest/$${l}wiki-latest-all-titles-in-ns0.gz" > "cache/$${l}wiki-latest-all-titles-in-ns0.gz"; \
+	    $(CURL) "$(WIKIPEDIA_DUMP_MIRROR)/$${l}wiki/latest/$${l}wiki-latest-all-titles-in-ns0.gz" > "cache/$${l}wiki-latest-all-titles-in-ns0.gz"; \
 	    if grep -q "503 Service Temporarily Unavailable" "cache/$${l}wiki-latest-all-titles-in-ns0.gz"; then \
 	        echo "Wikipedia sent an error when fetching cache/$${l}wiki-latest-all-titles-in-ns0.gz" >&2; \
 	        exit 1; \
@@ -132,14 +133,16 @@ cache/abstracts/pl/sentinel: \
 cache/abstracts/%/sentinel: cache/%wiki-latest-all-titles-in-ns0.gz
 	@echo create $@
 	@mkdir -p cache/abstracts/$*
-	@zcat cache/$*wiki-latest-all-titles-in-ns0.gz | \
-		LANG=C.UTF-8 grep '^.$$' | \
-		CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' PYTHON='$(PYTHON)' SRCLANG="$*" \
-			xargs -d '\n' -i -n 1 -P 3 bin/char_to_abstract.sh '{}'
-	@cat ./data/wikipedia_map.json | \
-		$(JQ) -r 'to_entries[] | select(.key == "$*") | .value | to_entries[] | "$* \(.value) cache/abstracts/$*/\(.key)"' | \
-		CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' PYTHON='$(PYTHON)' \
-			xargs -n 3 bin/fetch_abstract.sh
+	# TODO re-enable when we found a better way to fetch excerpts. Currently,
+	# we run in API timeouts.
+	#@zcat cache/$*wiki-latest-all-titles-in-ns0.gz | \
+	#	LANG=C.UTF-8 grep '^.$$' | \
+	#	CURL='$(CURL)' CURL_OPTS='' JQ='$(JQ)' PYTHON='$(PYTHON)' SRCLANG="$*" \
+	#		xargs -d '\n' -i -n 1 -P 3 bin/char_to_abstract.sh '{}'
+	#@cat ./data/wikipedia_map.json | \
+	#	$(JQ) -r 'to_entries[] | select(.key == "$*") | .value | to_entries[] | "$* \(.value) cache/abstracts/$*/\(.key)"' | \
+	#	CURL='$(CURL)' CURL_OPTS='' JQ='$(JQ)' PYTHON='$(PYTHON)' \
+	#		xargs -n 3 bin/fetch_abstract.sh
 	@touch "$@"
 .SECONDARY: cache/abstracts/de/sentinel
 .SECONDARY: cache/abstracts/en/sentinel
@@ -149,26 +152,26 @@ cache/abstracts/%/sentinel: cache/%wiki-latest-all-titles-in-ns0.gz
 cache/noto/NotoSans-Regular.ttf:
 	@echo fetch Noto fonts
 	@mkdir -p cache/noto
-	@cd cache/noto && $(CURL) $(CURL_OPTS) 'https://github.com/googlefonts/Arimo/raw/refs/heads/main/fonts/ttf/Arimo-Regular.ttf' > Arimo-Regular.ttf
-	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/HK/NotoSansHK-Regular.otf > cache/noto/NotoSansCJKhk-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/JP/NotoSansJP-Regular.otf > cache/noto/NotoSansCJKjp-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/KR/NotoSansKR-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf > cache/noto/NotoSansCJKsc-Regular.otf
-	@$(CURL) $(CURL_OPTS) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/TC/NotoSansTC-Regular.otf > cache/noto/NotoSansCJKtc-Regular.otf
+	@cd cache/noto && $(CURL) 'https://github.com/googlefonts/Arimo/raw/refs/heads/main/fonts/ttf/Arimo-Regular.ttf' > Arimo-Regular.ttf
+	@$(CURL) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/HK/NotoSansHK-Regular.otf > cache/noto/NotoSansCJKhk-Regular.otf
+	@$(CURL) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/JP/NotoSansJP-Regular.otf > cache/noto/NotoSansCJKjp-Regular.otf
+	@$(CURL) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/KR/NotoSansKR-Regular.otf > cache/noto/NotoSansCJKkr-Regular.otf
+	@$(CURL) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/SC/NotoSansSC-Regular.otf > cache/noto/NotoSansCJKsc-Regular.otf
+	@$(CURL) https://github.com/notofonts/noto-cjk/raw/main/Sans/SubsetOTF/TC/NotoSansTC-Regular.otf > cache/noto/NotoSansCJKtc-Regular.otf
 	@cd cache/noto && \
-		$(CURL) $(CURL_OPTS) 'https://notofonts.github.io/' | \
+		$(CURL) 'https://notofonts.github.io/' | \
 		grep -Eo 'https://cdn\.jsdelivr\.net/gh/notofonts/notofonts\.github\.io/fonts/.*/unhinted/ttf/.*-Regular\.ttf' | \
-		xargs -n 1 $(CURL) $(CURL_OPTS) -O
+		xargs -n 1 $(CURL) -O
 .SECONDARY: cache/noto/NotoSans-Regular.ttf
 
 cache/latex.xml: cache/charlist.dtd
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) 'https://raw.githubusercontent.com/w3c/xml-entities/refs/heads/gh-pages/unicode.xml' > $@
+	@$(CURL) 'https://raw.githubusercontent.com/w3c/xml-entities/refs/heads/gh-pages/unicode.xml' > $@
 .SECONDARY: cache/latex.xml
 
 cache/charlist.dtd:
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) http://www.w3.org/Math/characters/charlist.dtd > $@
+	@$(CURL) http://www.w3.org/Math/characters/charlist.dtd > $@
 .SECONDARY: cache/charlist.dtd
 
 cache/cldr_annotations_de.xml \
@@ -177,75 +180,83 @@ cache/cldr_annotations_es.xml \
 cache/cldr_annotations_pl.xml:
 cache/cldr_annotations_%.xml:
 	@echo create $@
-	@$(CURL) $(CURL_OPTS) \
+	@$(CURL) \
 		"https://raw.githubusercontent.com/unicode-org/cldr/master/common/annotations/$*.xml" | \
 		sed '/<!DOCTYPE/d' > "$@"
 .SECONDARY: cache/cldr_annotations_*.xml
 
 cache/fonts/HANNOMB.ttf:
 	@echo download font Han Nom B
-	@$(CURL) $(CURL_OPTS) https://downloads.sourceforge.net/project/vietunicode/hannom/hannom%20v2005/hannomH.zip | \
+	@( [ -f prefetched-data/hannomH.zip ] && \
+			cat prefetched-data/hannomH.zip || \
+			$(CURL) https://downloads.sourceforge.net/project/vietunicode/hannom/hannom%20v2005/hannomH.zip \
+		) | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 	@mv "cache/fonts/HAN NOM B.ttf" "$@"
 .SECONDARY: cache/fonts/HANNOMB.ttf
 
-cache/fonts/HanaMinA.ttf:
+cache/fonts/HanaMinA.otf:
 	@echo download font Hanazono
 	@cd cache/fonts && \
-		$(CURL) $(CURL_OPTS) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinA.otf' > HanaMinA.otf && \
-		$(CURL) $(CURL_OPTS) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinB.otf' > HanaMinB.otf && \
-		$(CURL) $(CURL_OPTS) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinC.otf' > HanaMinC.otf
-.SECONDARY: cache/fonts/HanaMinA.ttf
+		$(CURL) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinA.otf' > HanaMinA.otf && \
+		$(CURL) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinB.otf' > HanaMinB.otf && \
+		$(CURL) 'https://github.com/cjkvi/HanaMinAFDKO/releases/download/8.030/HanaMinC.otf' > HanaMinC.otf
+.SECONDARY: cache/fonts/HanaMinA.otf
 
-cache/fonts/HanaMinB.ttf: cache/fonts/HanaMinA.ttf
-.SECONDARY: cache/fonts/HanaMinB.ttf
+cache/fonts/HanaMinB.otf: cache/fonts/HanaMinA.otf
+.SECONDARY: cache/fonts/HanaMinB.otf
 
-cache/fonts/HanaMinC.ttf: cache/fonts/HanaMinA.ttf
-.SECONDARY: cache/fonts/HanaMinC.ttf
+cache/fonts/HanaMinC.otf: cache/fonts/HanaMinA.otf
+.SECONDARY: cache/fonts/HanaMinC.otf
 
 cache/fonts/damase_v.2.ttf:
 	@echo download font damase
-	@$(CURL) $(CURL_OPTS) 'https://dl.dafont.com/dl/?f=mph_2b_damase' | \
+	@$(CURL) 'https://dl.dafont.com/dl/?f=mph_2b_damase' | \
 	    $(BSDTAR) -xf- --cd cache/fonts
 .SECONDARY: cache/fonts/damase_v.2.ttf
 
 cache/fonts/KikakuiSansPro.ot.ttf:
 	@echo download font KikakuiSansPro
-	@$(CURL) $(CURL_OPTS) https://github.com/athinkra/mende-kikakui/raw/master/fonts/src/ot/KikakuiSansPro.ot.ttf > $@
+	@$(CURL) https://github.com/athinkra/mende-kikakui/raw/master/fonts/src/ot/KikakuiSansPro.ot.ttf > $@
 .SECONDARY: cache/fonts/KikakuiSansPro.ot.ttf
 
 cache/fonts/SuttonSignWriting8.ttf:
 	@echo download font SuttonSignWriting
-	@$(CURL) $(CURL_OPTS) https://github.com/Slevinski/signwriting_2010_fonts/raw/master/fonts/SuttonSignWriting8.ttf > $@
+	@$(CURL) https://github.com/Slevinski/signwriting_2010_fonts/raw/master/fonts/SuttonSignWriting8.ttf > $@
 .SECONDARY: cache/fonts/SuttonSignWriting8.ttf
 
 cache/fonts/TangutYinchuan.ttf:
 	@echo download font TangutYinchuan
-	@$(CURL) $(CURL_OPTS) https://babelstone.co.uk/Fonts/Download/TangutYinchuan.ttf > $@
+	@$(CURL) https://babelstone.co.uk/Fonts/Download/TangutYinchuan.ttf > $@
 .SECONDARY: cache/fonts/TangutYinchuan.ttf
 
 cache/fonts/BabelStoneMarchen.ttf:
 	@echo download font BabelStoneMarchen
-	@$(CURL) $(CURL_OPTS) https://www.babelstone.co.uk/Fonts/Download/BabelStoneMarchen.ttf > $@
+	@$(CURL) https://www.babelstone.co.uk/Fonts/Download/BabelStoneMarchen.ttf > $@
 .SECONDARY: cache/fonts/BabelStoneMarchen.ttf
 
 cache/fonts/BabelStoneKhitanSmallLinear.ttf:
 	@echo download font BabelStoneKhitanSmallLinear
-	@$(CURL) $(CURL_OPTS) https://babelstone.co.uk/Fonts/Download/BabelStoneKhitanSmallLinear.ttf > $@
+	@$(CURL) https://babelstone.co.uk/Fonts/Download/BabelStoneKhitanSmallLinear.ttf > $@
 .SECONDARY: cache/fonts/BabelStoneKhitanSmallLinear.ttf
+
+cache/fonts/BabelStonePseudographica.ttf:
+	@echo download font BabelStonePseudographica
+	@$(CURL) https://babelstone.co.uk/Fonts/Download/BabelStonePseudographica.ttf > $@
+.SECONDARY: cache/fonts/BabelStonePseudographica.ttf
 
 cache/fonts/unifont.otf:
 	@echo download font Unifont
-	@$(CURL) $(CURL_OPTS) https://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont-$(UNIFONT_VERSION).otf > $@
+	@$(CURL) https://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont-$(UNIFONT_VERSION).otf > $@
 .SECONDARY: cache/fonts/unifont.otf
 
 cache/fonts/unifont_upper.otf:
 	@echo download font Unifont Upper
-	@$(CURL) $(CURL_OPTS) https://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).otf > $@
+	@$(CURL) https://unifoundry.com/pub/unifont/unifont-$(UNIFONT_VERSION)/font-builds/unifont_upper-$(UNIFONT_VERSION).otf > $@
 .SECONDARY: cache/fonts/unifont_upper.otf
 
 cache/fonts/ScheherazadeNew-Regular.ttf:
-	@$(CURL) $(CURL_OPTS) 'https://software.sil.org/downloads/r/scheherazade/ScheherazadeNew-3.000.zip' | \
+	@$(CURL) 'https://software.sil.org/downloads/r/scheherazade/ScheherazadeNew-3.000.zip' | \
 	    $(BSDTAR) -xf- --cd cache/fonts '*-Regular.ttf'
 	@mv 'cache/fonts/ScheherazadeNew-3.000/ScheherazadeNew-Regular.ttf' cache/fonts/
 	@rmdir 'cache/fonts/ScheherazadeNew-3.000'
@@ -254,18 +265,18 @@ cache/fonts/ScheherazadeNew-Regular.ttf:
 cache/agl/glyphlist.txt:
 	@echo fetch AGL data
 	@mkdir -p cache/agl
-	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-1.txt' > cache/agl/adobe-latin-1.txt
-	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-2.txt' > cache/agl/adobe-latin-2.txt
-	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-3.txt' > cache/agl/adobe-latin-3.txt
-	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-4-precomposed.txt' > cache/agl/adobe-latin-4.txt
-	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-5-precomposed.txt' > cache/agl/adobe-latin-5.txt
-	@$(CURL) $(CURL_OPTS) 'https://github.com/adobe-type-tools/agl-aglfn/raw/master/glyphlist.txt' > cache/agl/glyphlist.txt
+	@$(CURL) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-1.txt' > cache/agl/adobe-latin-1.txt
+	@$(CURL) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-2.txt' > cache/agl/adobe-latin-2.txt
+	@$(CURL) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-3.txt' > cache/agl/adobe-latin-3.txt
+	@$(CURL) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-4-precomposed.txt' > cache/agl/adobe-latin-4.txt
+	@$(CURL) 'https://github.com/adobe-type-tools/adobe-latin-charsets/raw/master/adobe-latin-5-precomposed.txt' > cache/agl/adobe-latin-5.txt
+	@$(CURL) 'https://github.com/adobe-type-tools/agl-aglfn/raw/master/glyphlist.txt' > cache/agl/glyphlist.txt
 .SECONDARY: cache/agl/glyphlist.txt
 
 cache/csur/UnicodeData.txt:
 	@echo fetch ucsur data
 	@mkdir -p cache/csur
-	@$(CURL) $(CURL_OPTS) 'http://www.kreativekorp.com/ucsur/UNIDATA/UnicodeData.txt' > $@
+	@$(CURL) 'http://www.kreativekorp.com/ucsur/UNIDATA/UnicodeData.txt' > $@
 .SECONDARY: cache/csur/UnicodeData.txt
 
 
@@ -388,20 +399,21 @@ sql/50_wp_codepoints_%.sql: cache/abstracts/%/sentinel
 
 sql/51_wp_scripts.sql:
 	@echo create $@
-	@CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' bin/wp_scripts_to_sql.sh "$@"
+	@CURL='$(CURL)' CURL_OPTS='' JQ='$(JQ)' bin/wp_scripts_to_sql.sh "$@"
 
 sql/52_wp_blocks.sql:
 	@echo create $@
-	@CURL='$(CURL)' CURL_OPTS='$(CURL_OPTS)' JQ='$(JQ)' bin/wp_blocks_to_sql.sh "$@"
+	@CURL='$(CURL)' CURL_OPTS='' JQ='$(JQ)' bin/wp_blocks_to_sql.sh "$@"
 
 sql/60_fonts.sql: \
 		cache/noto/NotoSans-Regular.ttf \
 		cache/fonts/BabelStoneKhitanSmallLinear.ttf \
 		cache/fonts/BabelStoneMarchen.ttf \
+		cache/fonts/BabelStonePseudographica.ttf \
 		cache/fonts/damase_v.2.ttf \
-		cache/fonts/HanaMinA.ttf \
-		cache/fonts/HanaMinB.ttf \
-		cache/fonts/HanaMinC.ttf \
+		cache/fonts/HanaMinA.otf \
+		cache/fonts/HanaMinB.otf \
+		cache/fonts/HanaMinC.otf \
 		cache/fonts/HANNOMB.ttf \
 		cache/fonts/KikakuiSansPro.ot.ttf \
 		cache/fonts/ScheherazadeNew-Regular.ttf \
@@ -463,10 +475,11 @@ fill-cache: \
 	cache/confusables.txt \
 	cache/fonts/BabelStoneKhitanSmallLinear.ttf \
 	cache/fonts/BabelStoneMarchen.ttf \
+	cache/fonts/BabelStonePseudographica.ttf \
 	cache/fonts/damase_v.2.ttf \
-	cache/fonts/HanaMinA.ttf \
-	cache/fonts/HanaMinB.ttf \
-	cache/fonts/HanaMinC.ttf \
+	cache/fonts/HanaMinA.otf \
+	cache/fonts/HanaMinB.otf \
+	cache/fonts/HanaMinC.otf \
 	cache/fonts/HANNOMB.ttf \
 	cache/fonts/KikakuiSansPro.ot.ttf \
 	cache/fonts/ScheherazadeNew-Regular.ttf \
