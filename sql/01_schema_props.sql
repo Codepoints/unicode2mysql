@@ -8,7 +8,7 @@ CREATE TABLE prop_age ( age VARCHAR(4) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLA
 INSERT INTO  prop_age VALUES ('1.1'), ('2.0'), ('2.1'), ('3.0'), ('3.1'),
 ('3.2'), ('4.0'), ('4.1'), ('5.0'), ('5.1'), ('5.2'), ('6.0'), ('6.1'),
 ('6.2'), ('6.3'), ('7.0'), ('8.0'), ('9.0'), ('10.0'), ('11.0'), ('12.0'),
-('12.1'), ('13.0'), ('14.0'), ('15.0'), ('15.1'), ('16.0');
+('12.1'), ('13.0'), ('14.0'), ('15.0'), ('15.1'), ('16.0'), ('17.0'), ('18.0');
 
 CREATE TABLE prop_gc ( gc VARCHAR(2) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 INSERT INTO  prop_gc VALUES
@@ -72,7 +72,7 @@ INSERT INTO  prop_jg VALUES
 ('Gaf'), ('Gamal'),
 ('Hah'), ('Hamza_On_Heh_Goal'), ('Hanifi_Rohingya_Kinna_Ya'), ('Hanifi_Rohingya_Pa'),
 ('He'), ('Heh'), ('Heh_Goal'), ('Heth'),
-('Kaf'), ('Kaph'), ('Kashmiri_Yeh'), ('Khaph'), ('Knotted_Heh'),
+('Kaf'), ('Kaph'), ('Khaph'), ('Knotted_Heh'),
 ('Lam'), ('Lamadh'),
 ('Malayalam_Nga'), ('Malayalam_Ja'), ('Malayalam_Nya'), ('Malayalam_Tta'),
 ('Malayalam_Nna'), ('Malayalam_Nnna'), ('Malayalam_Bha'), ('Malayalam_Ra'),
@@ -97,10 +97,15 @@ INSERT INTO  prop_jg VALUES
 ('Waw'),
 ('Yeh'), ('Yeh_Barree'), ('Yeh_With_Tail'), ('Yudh'), ('Yudh_He'),
 ('Zain'), ('Zhain'),
+-- v16.0
+('Kashmiri_Yeh'),
 -- v17.0
 ('Thin_Noon'), ('BAA'), ('FA'), ('HAA'), ('HA_GOAL'), ('HA'), ('CAF'),
 ('KNOTTED_HA'), ('RA'), ('SWASH_CAF'), ('HAMZAH_ON_HA_GOAL'), ('TAA_MARBUTAH'),
-('YA_BARREE'), ('YA'), ('ALEF_MAQSURAH')
+('YA_BARREE'), ('YA'), ('ALEF_MAQSURAH'),
+-- v18.0
+('Crown_Ain'), ('Crown_Beh'), ('Crown_Feh'), ('Crown_Hah'), ('Crown_Heh'),
+('Crown_Kaf'), ('Crown_Meem'), ('Crown_Sad'), ('Crown_Seen'), ('Crown_Tah')
 ;
 
 CREATE TABLE prop_lb ( lb VARCHAR(3) PRIMARY KEY ) CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;

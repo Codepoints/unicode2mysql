@@ -159,8 +159,10 @@ def handle_cp(hex_cp, attrs):
         elif f == 'blk':
             fields.append(f)
             values.append("'%s'" % block_map.get(v, v).replace("'", "''"))
-        elif f[0] == 'k' and f[0:2] != 'kEH':
-            unihan[f] = v
+        elif f.startswith('k'):
+            # unikemet ("kEH") is handled in ./unikemet_to_sql.py
+            if not f.startswith('kEH'):
+                unihan[f] = v
         else:
             fields.append(f)
             values.append("'%s'" % v.replace("'", "''"))
