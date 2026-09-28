@@ -308,4 +308,61 @@ block_map = {
   "Yi_Syllables": "Yi Syllables",
   "Yijing": "Yijing Hexagram Symbols",
   "Zanabazar_Square": "Zanabazar Square",
+
+  # v14.0
+  "Arabic_Ext_B": "Arabic Extended-B",
+  "Cypro_Minoan": "Cypro-Minoan",
+  "Ethiopic_Ext_B": "Ethiopic Extended-B",
+  "Kana_Ext_B": "Kana Extended-B",
+  "Latin_Ext_F": "Latin Extended-F",
+  "Latin_Ext_G": "Latin Extended-G",
+  "Old_Uyghur": "Old Uyghur",
+  "Tangsa": "Tangsa",
+  "Toto": "Toto",
+  "UCAS_Ext_A": "Unified Canadian Aboriginal Syllabics Extended-A",
+  "Vithkuqi": "Vithkuqi",
+  "Znamenny_Music": "Znamenny Musical Notation",
+
+  # v15.0
+  "Arabic_Ext_C": "Arabic Extended-C",
+  "CJK_Ext_H": "CJK Unified Ideographs Extension H",
+  "Cyrillic_Ext_D": "Cyrillic Extended-D",
+  "Devanagari_Ext_A": "Devanagari Extended-A",
+  "Kaktovik_Numerals": "Kaktovik Numerals",
+  "Kawi": "Kawi",
+  "Nag_Mundari": "Nag Mundari",
+
+  # v15.1
+  "CJK_Ext_I": "CJK Unified Ideographs Extension I",
+
+  # v16.0
+  "Egyptian_Hieroglyphs_Ext_A": "Egyptian Hieroglyphs Extended-A",
+  "Garay": "Garay",
+  "Gurung_Khema": "Gurung Khema",
+  "Kirat_Rai": "Kirat Rai",
+  "Myanmar_Ext_C": "Myanmar Extended-C",
+  "Ol_Onal": "Ol Onal",
+  "Sunuwar": "Sunuwar",
+  "Symbols_for_Legacy_Computing_Sup": "Symbols for Legacy Computing Supplement",
+  "Todhri": "Todhri",
+  "Tulu_Tigalari": "Tulu-Tigalari",
+
+  # v17.0
+  "Beria_Erfe": "Beria Erfe",
+  "CJK_Ext_J": "CJK Unified Ideographs Extension J",
+  "Misc_Symbols_Sup": "Miscellaneous Symbols Supplement",
+  "Sharada_Sup": "Sharada Supplement",
+  "Sidetic": "Sidetic",
+  "Tai_Yo": "Tai Yo",
+  "Tangut_Components_Sup": "Tangut Components Supplement",
+  "Tolong_Siki": "Tolong Siki",
+
+  # v18.0
+  "Archaic_Cuneiform_Numerals": "Archaic Cuneiform Numerals",
+  "Bengali_Sup": "Bengali Supplement",
+  "Jurchen": "Jurchen",
+  "Jurchen_Radicals": "Jurchen Radicals",
+  "Misc_Arrows_Ext": "Miscellaneous Symbols and Arrows Extended",
+  "Music_Sup": "Musical Symbols Supplement",
+  "Seal": "Seal",
 }
