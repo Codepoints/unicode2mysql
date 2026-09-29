@@ -157,6 +157,7 @@ INSERT INTO scripts (iso, name) VALUES ('Samr', 'Samaritan');
 INSERT INTO scripts (iso, name) VALUES ('Sara', 'Sarati');
 INSERT INTO scripts (iso, name) VALUES ('Sarb', 'Old South Arabian');
 INSERT INTO scripts (iso, name) VALUES ('Saur', 'Saurashtra');
+INSERT INTO scripts (iso, name) VALUES ('Seal', '(Small) Seal');
 INSERT INTO scripts (iso, name) VALUES ('Sgnw', 'Sutton SignWriting');
 INSERT INTO scripts (iso, name) VALUES ('Shaw', 'Shavian');
 INSERT INTO scripts (iso, name) VALUES ('Shrd', 'Sharada');
