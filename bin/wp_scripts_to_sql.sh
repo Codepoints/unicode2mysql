@@ -7,14 +7,20 @@
 #
 #        SELECT DISTINCT ?iso ?lang ?name ?article WHERE {
 #          ?script wdt:P506 ?iso .
+#          VALUES ?wikis {
+#                        <https://de.wikipedia.org/>
+#                        <https://en.wikipedia.org/>
+#                        <https://es.wikipedia.org/>
+#                        <https://pl.wikipedia.org/>
+#          }
 #          ?article schema:about ?script ;
 #                      schema:inLanguage ?lang ;
 #                      schema:name ?name ;
-#                      schema:isPartOf [ wikibase:wikiGroup "wikipedia" ] .
+#                      schema:isPartOf ?wikis .
 #          FILTER(?lang in ('en', 'de', 'pl', 'es')) .
 #        }
 #
-#    Sandbox: https://w.wiki/xTJ
+#    Sandbox: https://w.wiki/VqHZ
 #
 # 2. run the result through `jq` to make a TSV data on the fly.
 #
@@ -30,7 +36,7 @@ set -euo pipefail
 
 TARGET="$1"
 
-$CURL $CURL_OPTS 'https://query.wikidata.org/sparql?query=SELECT%20DISTINCT%20%3Fiso%20%3Flang%20%3Fname%20%3Farticle%20WHERE%20%7B%0A%20%20%3Fscript%20wdt%3AP506%20%3Fiso%20.%0A%20%20%3Farticle%20schema%3Aabout%20%3Fscript%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20schema%3AinLanguage%20%3Flang%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20schema%3Aname%20%3Fname%20%3B%0A%20%20%20%20%20%20%20%20%20%20%20%20%20%20schema%3AisPartOf%20%5B%20wikibase%3AwikiGroup%20%22wikipedia%22%20%5D%20.%0A%20%20FILTER(%3Flang%20in%20('"'en'%2C%20'de'%2C%20'pl'%2C%20'es'"'))%20.%0A%7D&format=json' | \
+$CURL $CURL_OPTS 'https://query.wikidata.org/sparql?query=SELECT%20DISTINCT%20%3Fiso%20%3Flang%20%3Fname%20%3Farticle%20WHERE%7B%3Fscript%20wdt%3AP506%20%3Fiso.VALUES%20%3Fwikis%7B%3Chttps%3A//de.wikipedia.org/%3E%20%3Chttps%3A//en.wikipedia.org/%3E%20%3Chttps%3A//es.wikipedia.org/%3E%20%3Chttps%3A//pl.wikipedia.org/%3E%7D%3Farticle%20schema%3Aabout%20%3Fscript%3Bschema%3AinLanguage%20%3Flang%3Bschema%3Aname%20%3Fname%3Bschema%3AisPartOf%20%3Fwikis.FILTER%28%3Flang%20in%20%28%27en%27%2C%20%27de%27%2C%20%27pl%27%2C%20%27es%27%29%29.%7D&format=json' | \
     $JQ -r '.results.bindings[] | [.iso.value, .article.value, .lang.value, .name.value] | join("\t")' | \
     while IFS= read -r line; do
         sleep 1
