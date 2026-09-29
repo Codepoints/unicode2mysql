@@ -90,7 +90,7 @@ function getImage(glyph, font) {
   /* when the glyph has no advanceWidth, then it's some kind of
    * modifier. Move it into the middle of the canvas to make it
    * wholy visible. */
-  const tr = glyph.advanceWidth? 0 : ` transform="(${font.unitsPerEm / 2}, 0)"`;
+  const tr = glyph.advanceWidth? '' : ` transform="(${font.unitsPerEm / 2}, 0)"`;
   return `( ${glyph.unicode}, '${font.names.windows.fontFamily.en}', ${width}, ${height}, '<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path', `<path${tr}`)}</svg>' )`;
 }
 
@@ -119,7 +119,7 @@ async function getCJK(all_glyphs) {
       const hex = Number(glyph.unicode).toString(16).toUpperCase().padStart(4, '0');
       const width = glyph.advanceWidth || font.unitsPerEm;
       const height = font.unitsPerEm; //Math.abs(font.descender) + font.ascender;
-      const tr = glyph.advanceWidth? 0 : ` transform="(${font.unitsPerEm / 2}, 0)"`;
+      const tr = glyph.advanceWidth? '' : ` transform="(${font.unitsPerEm / 2}, 0)"`;
       const image = `<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path', `<path${tr}`)}</svg>`;
       let seen = false;
       image_map.get(glyph.unicode).forEach(item => {
