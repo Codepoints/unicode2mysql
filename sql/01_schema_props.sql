@@ -102,7 +102,7 @@ INSERT INTO  prop_jg VALUES
 -- v17.0
 ('Thin_Noon'), ('BAA'), ('FA'), ('HAA'), ('HA_GOAL'), ('HA'), ('CAF'),
 ('KNOTTED_HA'), ('RA'), ('SWASH_CAF'), ('HAMZAH_ON_HA_GOAL'), ('TAA_MARBUTAH'),
-('YA_BARREE'), ('YA'), ('ALEF_MAQSURAH'),
+('YA_BARREE'), ('YA'), -- lower-case version already there: ('ALEF_MAQSURAH'),
 -- v18.0
 ('Crown_Ain'), ('Crown_Beh'), ('Crown_Feh'), ('Crown_Hah'), ('Crown_Heh'),
 ('Crown_Kaf'), ('Crown_Meem'), ('Crown_Sad'), ('Crown_Seen'), ('Crown_Tah')
@@ -145,7 +145,7 @@ INSERT INTO  prop_InSC VALUES
 ('Consonant'), ('Consonant_Dead'), ('Consonant_Final'),
 ('Consonant_Head_Letter'), ('Consonant_Initial_Postfixed'),
 ('Consonant_Killer'), ('Consonant_Medial'), ('Consonant_Placeholder'),
-('Consonant_Preceding_Repha'), ('Consonant_Prefixed'), ('Consonant_Repha'),
+('Consonant_Preceding_Repha'), ('Consonant_Prefixed'),
 ('Consonant_Subjoined'), ('Consonant_Succeeding_Repha'),
 ('Consonant_With_Stacker'), ('Gemination_Mark'), ('Invisible_Stacker'),
 ('Joiner'), ('Modifying_Letter'), ('Non_Joiner'), ('Nukta'), ('Number'),
