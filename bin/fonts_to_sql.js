@@ -39,7 +39,8 @@ async function main() {
         continue;
       }
       all_glyphs.push(glyph.unicode);
-      sql.push(getImage(glyph, font));
+      const image_data = getImage(glyph, font);
+      sql.push(`( ${image_data[0]}, '${image_data[1]}', ${image_data[2]}, ${image_data[3]}, '${image_data[4]}' )`);
     }
   }
 
@@ -86,12 +87,22 @@ async function getFont(filename) {
 function getImage(glyph, font) {
   const hex = Number(glyph.unicode).toString(16).toUpperCase().padStart(4, '0');
   const width = glyph.advanceWidth || font.unitsPerEm;
-  const height = font.unitsPerEm; //Math.abs(font.descender) + font.ascender;
+  const height = font.unitsPerEm;
+
   /* when the glyph has no advanceWidth, then it's some kind of
    * modifier. Move it into the middle of the canvas to make it
    * wholy visible. */
-  const tr = glyph.advanceWidth? '' : ` transform="(${font.unitsPerEm / 2}, 0)"`;
-  return `( ${glyph.unicode}, '${font.names.windows.fontFamily.en}', ${width}, ${height}, '<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path', `<path${tr}`)}</svg>' )`;
+  const tr_x = glyph.advanceWidth? '0' : font.unitsPerEm / 2;
+
+  const tr_y = height * .9;
+
+  return [
+    glyph.unicode,
+    font.names.windows.fontFamily.en,
+    width,
+    height,
+    `<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG({flipY: false}).replace('<path', `<path transform="translate(${tr_x} ${tr_y}) scale(1 -1)"`)}</svg>`,
+  ];
 }
 
 /**
@@ -116,11 +127,7 @@ async function getCJK(all_glyphs) {
       if (! image_map.has(glyph.unicode)) {
         image_map.set(glyph.unicode, []);
       }
-      const hex = Number(glyph.unicode).toString(16).toUpperCase().padStart(4, '0');
-      const width = glyph.advanceWidth || font.unitsPerEm;
-      const height = font.unitsPerEm; //Math.abs(font.descender) + font.ascender;
-      const tr = glyph.advanceWidth? '' : ` transform="(${font.unitsPerEm / 2}, 0)"`;
-      const image = `<svg id="U${hex}" viewBox="0 0 ${width} ${height}">${glyph.path.toSVG().replace('<path', `<path${tr}`)}</svg>`;
+      const [glunicode, font_name, width, height, image] = getImage(glyph, font);
       let seen = false;
       image_map.get(glyph.unicode).forEach(item => {
         if (item[2] === image) {
